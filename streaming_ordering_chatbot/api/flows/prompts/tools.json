@@ -1,0 +1,71 @@
+{
+  "tool_choice": {"type": "function", "function": {"name": "update_order"}},
+  "tools": [
+    {
+      "type": "function",
+      "function": {
+        "name": "update_order",
+        "description": "Update an order according to the customers preferences and available menu items.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "itemId": {
+                    "type": "string",
+                    "description": "Unique integer identifier for item."
+                  },
+                  "name": {
+                    "type": "string",
+                    "description": "Name of item to order."
+                  },
+                  "size": {
+                    "type": "string",
+                    "description": "Size of item to order. If different than default size."
+                  },
+                  "toppings": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "name": {
+                          "type": "string",
+                          "description": "Name of topping to add to item."
+                        },
+                        "amount": {
+                          "enum": ["none", "half", "normal", "double"],
+                          "description": "Amount of topping to add to item."
+                        }
+                      },
+                      "required": ["name"]
+                    }
+                  },
+                  "bun": {
+                    "type": "string",
+                    "description": "Type of bun to use for item, if applicable"
+                  },
+                  "cook": {
+                    "type": "string",
+                    "description": "Cooking preference for item, if applicable"
+                  },
+                  "quantity": {
+                    "type": "integer",
+                    "description": "Number of items to order, if applicable"
+                  }
+                },
+                "required": ["name", "size", "itemId", "quantity"],
+                "description": "Description of item to order"
+              }
+            }
+          },
+          "required": [
+            "items"
+          ]
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,39 @@
+{%
+Order Intent Detection Prompt for Semantic Kernel
+Detects if user has placed something that would require an order to be created or modified.
+Inputs: user_message (str), current_order (object)
+%}
+
+You are an order intent detection assistant. Your task is to analyze each customer message, considering the context of the conversation and the current order, to determine if the user is attempting to place or modify an order. Respond with <yes> if the intent is to place or modify an order, and <no> if it's not.
+
+Examples:
+
+User: Could I add a cheeseburger?
+Current order: {"items": [{"name": "fries", "quantity": 1}]}
+Assistant: The user currently has fries in their order. They asked for cheeseburger. They want to modify their order. <yes>
+
+User: Do you have chicken sandwiches?
+Current order: {"items": [{"name": "cheeseburger", "quantity": 1}, {"name": "cola", "quantity": 1}]}
+Assistant: The user currently has cheeseburger and cola in their order. They asked for chicken sandwiches. They are asking about the availability of a product. <no>
+
+User: {{$user_message}}
+Current order: {{$current_order}}
+
+{% set isEmpty = OrderUtils.is_order_empty $current_order %}
+{% if isEmpty %}
+Assistant: The order is empty. This appears to be an initial order inquiry. <yes>
+{% else %}
+Assistant: The order has items. Analyzing the message:
+{{$user_message}}
+{% if "change" in $user_message or "modify" in $user_message or "update" in $user_message %}
+<yes>
+{% else %}
+Let me analyze the intent...
+{% set words = $user_message | split " " %}
+{% if "add" in words or "remove" in words or "get" in words %}
+<yes>
+{% else %}
+<no>
+{% endif %}
+{% endif %}
+{% endif %}

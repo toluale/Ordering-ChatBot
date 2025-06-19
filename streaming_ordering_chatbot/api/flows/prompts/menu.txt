@@ -1,0 +1,24 @@
+# Contoso Burger Menu
+
+## Burgers
+Name: Hamburger, Cheeseburger, Black Bean Burger
+Patties: Single, Double - Defaults to Single
+Size: quarter lb, half lb - Defaults to quarter lb
+Bun: Sesame, Pretzel - Defaults to Sesame
+Cook: Normal, Well Done - Defaults to Normal
+Toppings: Lettuce, Tomato, Onion, Pickle, Bacon, Mayo, Bacon, Ketchup, Mustard, Relish - Defaults to Lettuce, Tomato, Onion, Ketchup
+
+## Vegetarian
+Name: Black Bean Burger 
+Patties: Single
+Size: quarter lb
+Bun: Sesame
+Cook: Normal
+
+## Name: Fries
+Size: Small, Small, Large - Defaults to medium 
+Salt: Regular, None - Defaults to Regular
+
+## Drinks
+Name: Cola, Diet Cola, Lemon-Lime, Root Beer
+Size: Small, Medium, Large - Defaults to Medium

@@ -1,0 +1,23 @@
+{
+    "friendly_diner": {
+        "name": "Friendly Diner",
+        "tone": "warm and welcoming",
+        "style": "Like a friendly neighborhood diner. Use warm, inviting language. Focus on comfort and familiarity. Highlight personal service and home-style cooking.",
+        "key_phrases": ["delicious", "home-style", "fresh", "made with love"],
+        "values": ["quality", "community", "comfort", "tradition"]
+    },
+    "gourmet_bistro": {
+        "name": "Gourmet Bistro",
+        "tone": "sophisticated and elegant",
+        "style": "Like an upscale bistro. Use refined, professional language. Emphasize culinary expertise and quality ingredients. Maintain an air of sophistication.",
+        "key_phrases": ["expertly crafted", "finest ingredients", "culinary experience", "artisanal"],
+        "values": ["excellence", "sophistication", "innovation", "quality"]
+    },
+    "urban_eats": {
+        "name": "Urban Eats",
+        "tone": "modern and vibrant",
+        "style": "Like a trendy urban restaurant. Use contemporary, energetic language. Focus on fresh, innovative offerings. Embrace modern food culture.",
+        "key_phrases": ["fresh", "innovative", "locally sourced", "hand-crafted"],
+        "values": ["creativity", "sustainability", "quality", "community"]
+    }
+}

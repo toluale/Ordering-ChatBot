@@ -1,0 +1,68 @@
+# Contoso Burger Menu
+
+## Items
+ProductCode: Description
+HB14SPN: Hamburger, quarter lb, single, pretzel bun, normal cook
+HB14DPN: Hamburger, quarter lb, double, pretzel bun, normal cook
+HB13SPN: hamburger, half lb, single, pretzel bun, normal cook
+HB13DPN: hamburger, half lb, double, pretzel bun, normal cook
+CZHB14SPN: cheeseburger, quarter lb, single, pretzel bun, normal cook
+CZHB14DPN: cheeseburger, quarter lb, double, pretzel bun, normal cook
+CZHB13SPN: cheeseburger, half lb, single, pretzel bun, normal cook
+CZHB13DPN: cheeseburger, half lb, double, pretzel bun, normal cook
+HB14SSN: hamburger, quarter lb, single, sesame seed bun, normal cook
+HB14DSN: hamburger, quarter lb, double, sesame seed bun, normal cook
+HB13SSN: hamburger, half lb, single, sesame seed bun, normal cook
+HB13DSN: hamburger, half lb, double, sesame seed bun, normal cook
+CZHB14SSN: cheeseburger, quarter lb, single, sesame seed bun, normal cook
+CZHB14DSN: cheeseburger, quarter lb, double, sesame seed bun, normal cook
+CZHB13SSN: cheeseburger, half lb, single, sesame seed bun, normal cook
+CZHB13DSN: cheeseburger, half lb, double, sesame seed bun, normal cook
+HB14SPW: hamburger, quarter lb, single, pretzel bun, well-done cook
+HB14DPW: hamburger, quarter lb, double, pretzel bun, well-done cook
+HB13SPW: hamburger, half lb, single, pretzel bun, well-done cook
+HB13DPW: hamburger, half lb, double, pretzel bun, well-done cook
+CZHB14SPW: cheeseburger, quarter lb, single, pretzel bun, well-done cook
+CZHB14DPW: cheeseburger, quarter lb, double, pretzel bun, well-done cook
+CZHB13SPW: cheeseburger, half lb, single, pretzel bun, well-done cook
+CZHB13DPW: cheeseburger, half lb, double, pretzel bun, well-done cook
+HB14SSW: hamburger, quarter lb, single, sesame seed bun, well-done cook
+HB14DSW: hamburger, quarter lb, double, sesame seed bun, well-done cook
+HB13SSW: hamburger, half lb, single, sesame seed bun, well-done cook
+HB13DSW: hamburger, half lb, double, sesame seed bun, well-done cook
+CZHB14SSW: cheeseburger, quarter lb, single, sesame seed bun, well-done cook
+CZHB14DSW: cheeseburger, quarter lb, double, sesame seed bun, well-done cook
+CZHB13SSW: cheeseburger, half lb, single, sesame seed bun, well-done cook
+CZHB13DSW: cheeseburger, half lb, double, sesame seed bun, well-done cook
+BBSS: black bean burger, single, sesame bun
+BBDS: black bean burger, double, sesame bun
+DSC: drink, small, cola
+DSD: drink, small, diet cola
+DSLL: drink, small, lemon lime
+DSR: drink, small, root beer
+DMC: drink, medium, cola
+DMD: drink, medium, diet cola
+DMLL: drink, medium, lemon lime
+DMR: drink, medium, root beer
+DLC: drink, large, cola
+DLD: drink, large, diet cola
+DLLL: drink, large, lemon lime
+DLR: drink, large, root beer
+FSS: fries, small, salted
+FMS: fries, medium, salted
+FLS: fries, large, salted
+FSNS: fries, small, no salt
+FMNS: fries, medium, no salt
+FLNS: fries, large, no salt
+
+## Burger Toppings
+ToppingCode: Description
+T: tomato
+L: lettuce
+O: onion
+P: pickle
+C: ketchup
+M: mustard
+Y: mayo
+R: relish
+B: bacon
