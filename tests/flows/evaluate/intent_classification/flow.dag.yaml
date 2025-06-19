@@ -1,0 +1,21 @@
+$schema: https://azuremlschemas.azureedge.net/promptflow/flow.schema.json
+name: intent_classification_evaluation
+type: evaluation
+inputs:
+  test_case:
+    type: object
+    default: {}
+outputs:
+  evaluation_output:
+    type: object
+    reference: ${evaluate_intent_classification.output}
+nodes:
+- name: evaluate_intent_classification
+  type: python
+  source:
+    type: code
+    path: evaluate.py
+  inputs:
+    test_case: ${inputs.test_case}
+environment:
+    python_requirements_txt: requirements.txt

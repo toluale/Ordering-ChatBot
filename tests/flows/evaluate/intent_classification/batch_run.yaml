@@ -1,0 +1,12 @@
+name: intent_classification_bulk_run
+inputs:
+  test_cases: tests/data/intent_test_cases.json
+environment:
+  python_requirements_txt: requirements.txt
+flows:
+  classification_eval:
+    flow: .
+    path: tests/flows/evaluate/intent_classification
+    connections:
+      azure_openai: azure-openai
+    strategy: bulk_run
