@@ -3,68 +3,57 @@
         {
             "message": "I want to change my order.",
             "current_order": {"items": [{"name": "fries", "quantity": 1}]},
-            "expected_intent": "order",
-            "scenario": "explicit_modification"
+            "expected_intent": "order"            
         },
         {
             "message": "Can I add a burger to that?",
             "current_order": {"items": [{"name": "fries", "quantity": 1}]},
-            "expected_intent": "order",
-            "scenario": "add_item"
+            "expected_intent": "order"
         },
         {
             "message": "What's in your chicken sandwich?",
             "current_order": {"items": [{"name": "fries", "quantity": 1}]},
-            "expected_intent": "conversation",
-            "scenario": "menu_inquiry"
+            "expected_intent": "conversation"           
         },
         {
             "message": "Remove the fries please",
             "current_order": {"items": [{"name": "fries", "quantity": 1}]},
-            "expected_intent": "order",
-            "scenario": "remove_item"
+            "expected_intent": "order"            
         },
         {
             "message": "How spicy is the chicken?",
             "current_order": {"items": []},
-            "expected_intent": "conversation",
-            "scenario": "product_inquiry"
+            "expected_intent": "conversation"           
         },
         {
             "message": "I'd like to start my order",
             "current_order": {"items": []},
-            "expected_intent": "order",
-            "scenario": "new_order"
+            "expected_intent": "order"
         },
         {
             "message": "Thanks for your help!",
             "current_order": {"items": []},
-            "expected_intent": "conversation",
-            "scenario": "general_conversation"
+            "expected_intent": "conversation"            
         },
         {
             "message": "Make that two fries instead of one",
             "current_order": {"items": [{"name": "fries", "quantity": 1}]},
-            "expected_intent": "order",
-            "scenario": "quantity_modification"
+            "expected_intent": "order"            
         },
         {
             "message": "Can you add fries to my order?",
             "current_order": {"items": []},
-            "expected_intent": "order",
-            "scenario": "quantity_modification"
+            "expected_intent": "order"            
         },
         {
             "message": "I want to cancel my order",
             "current_order": {"items": [{"name": "fries", "quantity": 1}]},
-            "expected_intent": "order",
-            "scenario": "cancel_order"
+            "expected_intent": "order"            
         },
         {
             "message": "Can I get a receipt for my order?",
             "current_order": {"items": [{"name": "fries", "quantity": 1}]},
-            "expected_intent": "conversation",
-            "scenario": "receipt_request"
+            "expected_intent": "conversation"            
         }
     ]
 }
