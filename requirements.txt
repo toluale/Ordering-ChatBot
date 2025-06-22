@@ -1,0 +1,10 @@
+openai>=1.12.0
+semantic-kernel>=0.4.3
+pandas>=2.2.0
+scikit-learn>=1.4.0
+numpy>=1.26.0
+python-dotenv>=1.0.0
+asyncio>=3.4.3
+pathlib>=1.0.1
+typing>=3.7.4.3
+pytest>=8.0.0  # For running tests

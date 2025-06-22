@@ -1,7 +1,7 @@
 from pathlib import Path
 import json
 import asyncio
-from typing import Dict, List
+from typing import Dict, List, Optional
 import pandas as pd
 from sklearn.metrics import accuracy_score, precision_recall_fscore_support
 
@@ -45,7 +45,7 @@ class SKIntentEvaluator:
         # Initialize classifier
         self.classifier = OrderIntentFlowSK(endpoint, api_key, deployment_name)
     
-    async def __call__(self, test_cases: List[Dict] = None) -> Dict:
+    async def __call__(self, test_cases: Optional[List[Dict]] = None) -> Dict:
         """
         Make the evaluator directly callable, similar to OrderIntentFlowSK.
         Args:
@@ -71,6 +71,9 @@ class SKIntentEvaluator:
             test_data_path = Path(__file__).parent / "data" / "intent_test_cases.json"
             with open(test_data_path, "r") as f:
                 test_cases = json.load(f)["test_cases"]
+        
+        # Ensure test_cases is not None
+        test_cases = test_cases or []
         
         results = []
         error_logs = {}  # Store error logs by index
@@ -128,9 +131,22 @@ class SKIntentEvaluator:
         
         # Calculate per-intent metrics
         unique_intents = sorted(set(df['expected_intent']))
-        precisions, recalls, f1s, supports = precision_recall_fscore_support(
-            y_true, y_pred, labels=unique_intents
-        )
+        precision_dict = {}
+        recall_dict = {}
+        f1_dict = {}
+        support_dict = {}
+        
+        for intent in unique_intents:
+            # Calculate metrics for each intent separately
+            y_true_intent = [1 if y == intent else 0 for y in y_true]
+            y_pred_intent = [1 if y == intent else 0 for y in y_pred]
+            precision, recall, f1, support = precision_recall_fscore_support(
+                y_true_intent, y_pred_intent, average='binary'
+            )
+            precision_dict[intent] = precision
+            recall_dict[intent] = recall
+            f1_dict[intent] = f1
+            support_dict[intent] = sum(y_true_intent)
         
         # Create metrics output
         metrics = {
@@ -143,12 +159,12 @@ class SKIntentEvaluator:
         }
         
         # Add per-intent metrics
-        for i, intent in enumerate(unique_intents):
+        for intent in unique_intents:
             metrics['per_intent'][intent] = {
-                'precision': precisions[i],
-                'recall': recalls[i],
-                'f1_score': f1s[i],
-                'support': supports[i]
+                'precision': precision_dict[intent],
+                'recall': recall_dict[intent],
+                'f1_score': f1_dict[intent],
+                'support': support_dict[intent]
             }
         
         # Add error cases
@@ -230,8 +246,8 @@ class SKIntentEvaluator:
 
 async def main():
     # Replace with your Azure OpenAI details
-    ENDPOINT = ""
-    API_KEY = ""
+    ENDPOINT = "https://t-toluale-9780-resource.openai.azure.com/"
+    API_KEY = "5X5TUj3Ti4XAnDNYo0asokIXxBjzRcBAAS7Et3nhrfwWXvXrjtWaJQQJ99BFACHYHv6XJ3w3AAAAACOGX608"
     DEPLOYMENT_NAME = "gpt-4o"
     
     # Create evaluator

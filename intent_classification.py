@@ -1,3 +1,4 @@
+import os
 import asyncio
 import json
 from pathlib import Path
@@ -7,8 +8,8 @@ import pandas as pd
 from tests.sk_intent_evaluator import SKIntentEvaluator
 
 # Azure OpenAI configuration
-ENDPOINT = ""
-API_KEY = ""
+ENDPOINT = "https://t-toluale-9780-resource.openai.azure.com/"
+API_KEY = "5X5TUj3Ti4XAnDNYo0asokIXxBjzRcBAAS7Et3nhrfwWXvXrjtWaJQQJ99BFACHYHv6XJ3w3AAAAACOGX608"
 DEPLOYMENT_NAME = "gpt-4o"
 
 async def test_order_intent():
