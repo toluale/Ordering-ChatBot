@@ -5,8 +5,8 @@ from pathlib import Path
 from openai import AzureOpenAI
 
 # Azure OpenAI configuration
-ENDPOINT = os.getenv("AZURE_OPENAI_ENDPOINT", "https://t-toluale-9780-resource.openai.azure.com/")
-API_KEY = os.getenv("AZURE_OPENAI_KEY", "5X5TUj3Ti4XAnDNYo0asokIXxBjzRcBAAS7Et3nhrfwWXvXrjtWaJQQJ99BFACHYHv6XJ3w3AAAAACOGX608")
+ENDPOINT = os.getenv("AZURE_OPENAI_ENDPOINT", "")
+API_KEY = os.getenv("AZURE_OPENAI_KEY", "")
 DEPLOYMENT_NAME = os.getenv("AZURE_OPENAI_DEPLOYMENT_NAME", "gpt-4o")
 
 def read_prompt_template(template_name: str) -> str:
