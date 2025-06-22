@@ -9,8 +9,8 @@ from streaming_ordering_chatbot.api.flows.conversation_flows_SK import (
 )
 from streaming_ordering_chatbot.api.models import Message
 
-ENDPOINT = "https://t-toluale-1040-resource.openai.azure.com/"
-API_KEY = "8cfBQF1HE4qzxIn5VapNbWeqhqpYIR6OnHq0zXvxp3gVOz3YC2uOJQQJ99BFACHYHv6XJ3w3AAAAACOGGDMG"
+ENDPOINT = ""
+API_KEY = ""
 DEPLOYMENT_NAME = "gpt-4o" 
 ''''
 # Azure OpenAI configuration - Get from environment variables
