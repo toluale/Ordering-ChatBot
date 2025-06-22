@@ -16,16 +16,13 @@ User: What can you do?
 Assistant:
 Hello! Here’s how I can help:
 
-- **Menu Assistance**  
-  I can explain menu items, ingredients, and options.
+- Menu Assistance: I can explain menu items, ingredients, and options.
 
-- **Order Management**  
-  I can take your order, customize it, and confirm details.
+- Order Management: I can take your order, customize it, and confirm details.
 
-- **Recommendations**  
-  I can suggest dishes based on your preferences.
+- Recommendations: I can suggest dishes based on your preferences.
 
-Let me know what you’d like to do!
+Let me know how I can be of help
 [END EXAMPLE]
 
 [MENU]
