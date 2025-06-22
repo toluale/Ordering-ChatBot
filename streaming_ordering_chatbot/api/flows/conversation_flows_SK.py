@@ -1,35 +1,46 @@
+import os
 import asyncio
-from copy import copy
 import logging
 from pathlib import Path
-from typing import AsyncGenerator, Optional, Dict, Any, List
-
+from dotenv import load_dotenv
+from typing import Optional, AsyncGenerator, Dict
 from openai import AzureOpenAI
-from openai.types.chat import ChatCompletionSystemMessageParam, ChatCompletionUserMessageParam, ChatCompletionAssistantMessageParam
+from openai.types.chat import (
+    ChatCompletionSystemMessageParam,
+    ChatCompletionUserMessageParam,
+    ChatCompletionAssistantMessageParam
+)
 from semantic_kernel import Kernel
-from semantic_kernel.connectors.ai.open_ai import AzureChatCompletion, OpenAIPromptExecutionSettings
-from semantic_kernel.contents.chat_history import ChatHistory
-from semantic_kernel.contents.streaming_chat_message_content import StreamingChatMessageContent
-from semantic_kernel.prompt_template import PromptTemplateConfig
+from semantic_kernel.connectors.ai.open_ai import AzureChatCompletion
 from semantic_kernel.functions.kernel_function_decorator import kernel_function
+from semantic_kernel.prompt_template import PromptTemplateConfig
 from semantic_kernel.functions.kernel_arguments import KernelArguments
 
-from streaming_ordering_chatbot.api.content_safety import wrap_content_safety
-from streaming_ordering_chatbot.api.flows.schemas import LLMOrder
 from streaming_ordering_chatbot.api.models import Message
-from streaming_ordering_chatbot.api.flows.brand_personality import BrandPersonalityPlugin
+from streaming_ordering_chatbot.api.content_safety import wrap_content_safety
+
+# Load environment variables
+load_dotenv()
+# Azure OpenAI configuration
+ENDPOINT = os.getenv("AZURE_OPENAI_ENDPOINT")
+API_KEY = os.getenv("AZURE_OPENAI_API_KEY")
+DEPLOYMENT_NAME = os.getenv("AZURE_OPENAI_DEPLOYMENT_NAME")
+
+def get_required_env_var(name: str) -> str:
+    """Get a required environment variable or raise an informative error."""
+    value = os.getenv(name)
+    if not value:
+        raise ValueError(
+            f"{name} environment variable is not set. "
+            "Please set it in your .env file."
+        )
+    return value
 
 # Set up logging
-handler = logging.FileHandler("streaming_ordering_chatbot.conversation_flow_sk.log")
-formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
-handler.setFormatter(formatter)
-
 logger = logging.getLogger(__name__)
-logger.addHandler(handler)
-logger.setLevel(logging.INFO)
 
 # Type for chat messages
-ChatMessage = Dict[str, str]
+# ChatMessage = Dict[str, str]
 
 
 class ConversationPlugin:

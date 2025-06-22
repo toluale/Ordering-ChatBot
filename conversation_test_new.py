@@ -2,12 +2,28 @@ import asyncio
 import json
 import os
 from pathlib import Path
+from dotenv import load_dotenv
 from openai import AzureOpenAI
 
+# Load environment variables from .env file
+load_dotenv()
+
 # Azure OpenAI configuration
-ENDPOINT = os.getenv("AZURE_OPENAI_ENDPOINT", "https://t-toluale-9780-resource.openai.azure.com/")
-API_KEY = os.getenv("AZURE_OPENAI_KEY", "5X5TUj3Ti4XAnDNYo0asokIXxBjzRcBAAS7Et3nhrfwWXvXrjtWaJQQJ99BFACHYHv6XJ3w3AAAAACOGX608")
-DEPLOYMENT_NAME = os.getenv("AZURE_OPENAI_DEPLOYMENT_NAME", "gpt-4o")
+ENDPOINT = os.getenv("AZURE_OPENAI_ENDPOINT")
+API_KEY = os.getenv("AZURE_OPENAI_API_KEY")
+DEPLOYMENT_NAME = os.getenv("AZURE_OPENAI_DEPLOYMENT_NAME")
+
+# Validate environment variables
+if not all([ENDPOINT, API_KEY, DEPLOYMENT_NAME]):
+    raise ValueError("Missing required environment variables. Please check your .env file.")
+
+# Type assertions for static type checking
+assert ENDPOINT is not None
+assert API_KEY is not None
+assert DEPLOYMENT_NAME is not None
+ENDPOINT = str(ENDPOINT)
+API_KEY = str(API_KEY)
+DEPLOYMENT_NAME = str(DEPLOYMENT_NAME)
 
 def read_prompt_template(template_name: str) -> str:
     """Read a prompt template from the prompts directory.
@@ -48,6 +64,7 @@ async def natural_conversation() -> None:
     is_first_message = True
     
     # Create Azure OpenAI client for direct streaming
+    assert ENDPOINT is not None  # Ensure ENDPOINT is not None
     client = AzureOpenAI(
         api_key=API_KEY,
         api_version="2023-12-01-preview",
@@ -134,10 +151,11 @@ async def natural_conversation() -> None:
             
             # Get streaming response directly from OpenAI
             completion = client.chat.completions.create(
-                model=DEPLOYMENT_NAME,
+                model=str(DEPLOYMENT_NAME),
                 messages=api_messages,
                 temperature=0.7,
-                stream=True
+                stream=True,
+                max_tokens=1000
             )
             
             # Stream tokens without post-processing

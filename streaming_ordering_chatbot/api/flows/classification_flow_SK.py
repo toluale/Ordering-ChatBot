@@ -23,11 +23,11 @@ class OrderIntentFlowSK:
     UTILS_PLUGIN_NAME = "OrderUtils"
     UTILS_FUNCTION_NAME = "is_order_empty"
 
-    def __init__(self, endpoint: str, api_key: str, deployment_name: str):
+    def __init__(self, ENDPOINT: str, API_KEY: str, DEPLOYMENT_NAME: str):
         """Classifies user intent for order modification using Semantic Kernel and Azure AI Foundry."""
-        self.endpoint = endpoint
-        self.api_key = api_key
-        self.deployment_name = deployment_name
+        self.endpoint = ENDPOINT
+        self.api_key = API_KEY
+        self.deployment_name = DEPLOYMENT_NAME
         self.prompt_path = Path(__file__).parent.joinpath("prompts/order_intent_SK.prompty")
         self.kernel = Kernel()
         

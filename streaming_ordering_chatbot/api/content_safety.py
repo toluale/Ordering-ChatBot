@@ -21,9 +21,9 @@ def get_required_env_var(name: str) -> str:
     return value
 
 # Content safety configuration
-AZURE_CONTENT_SAFETY_KEY ="5X5TUj3Ti4XAnDNYo0asokIXxBjzRcBAAS7Et3nhrfwWXvXrjtWaJQQJ99BFACHYHv6XJ3w3AAAAACOGX608" #get_required_env_var("AZURE_CONTENT_SAFETY_KEY")
-AZURE_CONTENT_SAFETY_ENDPOINT ="https://t-toluale-9780-resource.openai.azure.com/" #get_required_env_var("AZURE_CONTENT_SAFETY_ENDPOINT")
-BLOCKLIST_NAME = "CustomBlocklist171" #get_required_env_var("BLOCKLIST_NAME")
+AZURE_CONTENT_SAFETY_KEY = get_required_env_var("AZURE_CONTENT_SAFETY_KEY")
+AZURE_CONTENT_SAFETY_ENDPOINT = get_required_env_var("AZURE_CONTENT_SAFETY_ENDPOINT")
+BLOCKLIST_NAME = get_required_env_var("BLOCKLIST_NAME")
 
 # Content safety severity limits
 CATEGORY_SEVERITY_LIMITS = {

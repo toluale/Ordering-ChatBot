@@ -1,10 +1,11 @@
 from pathlib import Path
 import json
 import asyncio
+import os
 from typing import Dict, List, Optional
 import pandas as pd
 from sklearn.metrics import accuracy_score, precision_recall_fscore_support
-
+from dotenv import load_dotenv
 from semantic_kernel import Kernel
 from semantic_kernel.connectors.ai.open_ai import AzureChatCompletion
 from semantic_kernel.functions.kernel_function_decorator import kernel_function
@@ -12,6 +13,8 @@ from semantic_kernel.functions.kernel_arguments import KernelArguments
 
 from streaming_ordering_chatbot.api.flows.classification_flow_SK import OrderIntentFlowSK
 from streaming_ordering_chatbot.api.models import Message
+
+load_dotenv()
 
 class IntentEvaluationPlugin:
     """Semantic Kernel plugin for evaluating intent classification."""
@@ -203,55 +206,18 @@ class SKIntentEvaluator:
             "predicted": predicted_intent,
             "correct": bool(accuracy)
         }
-        '''
-    async def evaluate_single_case(self, test_case: Dict) -> Dict:
-        """Evaluate a single test case using Semantic Kernel functions."""
-        chat_history = [Message(role="user", content=test_case["message"])]
-        predicted_intent = await self.classifier(chat_history, test_case["current_order"])
-        
-        # Use SK function to evaluate accuracy
-        accuracy = await self.kernel.invoke(
-            plugin_name="evaluation",
-            function_name="evaluate_accuracy",
-            arguments=KernelArguments(
-                expected=test_case["expected_intent"],
-                predicted=predicted_intent
-            )
-        )
-        
-        # If prediction was wrong, log the error
-        error_log = None
-        if accuracy == 0:
-            error_log = await self.kernel.invoke(
-                plugin_name="evaluation",
-                function_name="log_error",
-                arguments=KernelArguments(
-                    message=test_case["message"],
-                    expected=test_case["expected_intent"],
-                    predicted=predicted_intent,
-                    scenario=test_case["scenario"]
-                )
-            )
-        
-        # Return complete result dictionary
-        return {
-            "message": test_case["message"],
-            #"scenario": test_case["scenario"],
-            "expected_intent": test_case["expected_intent"],
-            "predicted_intent": predicted_intent,
-            "accuracy": accuracy,
-            "error_log": error_log
-        }
-        '''    
-
+    
 async def main():
-    # Replace with your Azure OpenAI details
-    ENDPOINT = "https://t-toluale-9780-resource.openai.azure.com/"
-    API_KEY = "5X5TUj3Ti4XAnDNYo0asokIXxBjzRcBAAS7Et3nhrfwWXvXrjtWaJQQJ99BFACHYHv6XJ3w3AAAAACOGX608"
-    DEPLOYMENT_NAME = "gpt-4o"
+    # Azure OpenAI configuration
+    ENDPOINT = os.getenv("AZURE_OPENAI_ENDPOINT")
+    API_KEY = os.getenv("AZURE_OPENAI_API_KEY")
+    DEPLOYMENT_NAME = os.getenv("AZURE_OPENAI_DEPLOYMENT_NAME")
+    
+    if not all([ENDPOINT, API_KEY, DEPLOYMENT_NAME]):
+        raise ValueError("Missing required environment variables")
     
     # Create evaluator
-    evaluator = SKIntentEvaluator(ENDPOINT, API_KEY, DEPLOYMENT_NAME)
+    evaluator = SKIntentEvaluator(str(ENDPOINT), str(API_KEY), str(DEPLOYMENT_NAME))
     
     # Example 1: Evaluate using default test cases
     print("Running evaluation with default test cases...")
