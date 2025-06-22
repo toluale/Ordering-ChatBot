@@ -7,8 +7,8 @@ import pandas as pd
 from tests.sk_intent_evaluator import SKIntentEvaluator
 
 # Azure OpenAI configuration
-ENDPOINT = "https://t-toluale-1040-resource.openai.azure.com/"
-API_KEY = "8cfBQF1HE4qzxIn5VapNbWeqhqpYIR6OnHq0zXvxp3gVOz3YC2uOJQQJ99BFACHYHv6XJ3w3AAAAACOGGDMG"
+ENDPOINT = ""
+API_KEY = ""
 DEPLOYMENT_NAME = "gpt-4o"
 
 async def test_order_intent():
