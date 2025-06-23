@@ -3,7 +3,7 @@ import asyncio
 import logging
 from pathlib import Path
 from dotenv import load_dotenv
-from typing import Optional, AsyncGenerator, Dict
+from typing import Optional, AsyncGenerator, Dict, List, Union
 from openai import AzureOpenAI
 from openai.types.chat import (
     ChatCompletionSystemMessageParam,
@@ -39,9 +39,8 @@ def get_required_env_var(name: str) -> str:
 # Set up logging
 logger = logging.getLogger(__name__)
 
-# Type for chat messages
-# ChatMessage = Dict[str, str]
-
+# Set up logging
+logger = logging.getLogger(__name__)
 
 class ConversationPlugin:
     """Base plugin for conversation handling with native SK functions."""
@@ -53,61 +52,8 @@ class ConversationPlugin:
     async def prepare_chat_context(self, chat_history: list[Message]) -> str:
         """Formats chat history for prompt template."""
         # Format chat history as string
-        chat_str = "\n".join([f"{msg.role}: { msg.content }" for msg in chat_history])
-        return f"Chat History:\n{chat_str}"    
-    
-    @kernel_function(description="Formats response for streaming", name="format_response")
-    async def format_response(self, response: str) -> str:
-        """Formats the response with proper spacing between words, sentences, and after punctuation.
-        
-        Args:
-            response (str): The raw response string to format
-            
-        Returns:
-            str: The formatted response with proper spacing
-        """
-        if not response:
-            return ""
-            
-        # First handle basic word splitting
-        words = []
-        current_word = ""
-        
-        for i, char in enumerate(response):
-            if char.isupper() and i > 0:
-                # If we see an uppercase letter and it's not the start,
-                # it likely indicates a new word
-                if current_word:
-                    words.append(current_word)
-                current_word = char
-            else:
-                current_word += char
-                
-            # Handle bullet points
-            if char == '*':
-                if current_word:
-                    words.append(current_word[:-1])  # Remove the * from previous word
-                words.append('*')
-                current_word = ""
-                
-        if current_word:
-            words.append(current_word)
-            
-        # Join words with spaces
-        formatted = ' '.join(word for word in words if word)
-        
-        # Handle punctuation spacing
-        for punct in '.!?,':
-            formatted = formatted.replace(f' {punct}', punct)  # Remove space before punctuation
-            formatted = formatted.replace(f'{punct}', f'{punct} ')  # Add space after punctuation
-            
-        # Clean up multiple spaces and handle special characters
-        formatted = ' '.join(formatted.split())
-        
-        # Special handling for bullet points
-        formatted = formatted.replace('* ', '\n* ')
-        
-        return formatted.strip()
+        chat_str = "\n".join([f"{msg.role}: {msg.content}" for msg in chat_history])
+        return f"Chat History:\n{chat_str}"
 
 
 class OrderPlugin(ConversationPlugin):
@@ -132,60 +78,65 @@ class OrderPlugin(ConversationPlugin):
 
 
 class ConversationFlowSK:
+    """Base class for conversation flows using Semantic Kernel."""
     PROMPT_PATH = None
     PLUGIN_NAME = "conversation"
-    MAX_TOKENS = 1000  # Add token limit
+    MAX_TOKENS = 1000
 
-    def __init__(self, endpoint: str, api_key: str, deployment_name: str):
-        """Base class for conversation flows using Semantic Kernel.
-
-        Args:
-            endpoint (str): Azure OpenAI endpoint
-            api_key (str): Azure OpenAI API key
-            deployment_name (str): Model deployment name
-        """
+    def __init__(self, endpoint: str, api_key: str, deployment_name: str, brand_name: Optional[str] = None):
         self.endpoint = endpoint
         self.api_key = api_key
         self.deployment_name = deployment_name
         
-        # Initialize Semantic Kernel for prompt handling
+        # Initialize Semantic Kernel
         self.kernel = Kernel()
         self.chat_service = AzureChatCompletion(
-            deployment_name=self.deployment_name,
-            endpoint=self.endpoint,
-            api_key=self.api_key,
+            deployment_name=deployment_name,
+            endpoint=endpoint,
+            api_key=api_key,
             service_id="azurechat"
         )
-        # Add the chat service to the kernel
         self.kernel.add_service(self.chat_service)
-          # Initialize Azure OpenAI client for streaming
+        
+        # Initialize Azure OpenAI client
         self.client = AzureOpenAI(
-            api_key=self.api_key,
+            api_key=api_key,
             api_version="2024-02-15-preview",
-            azure_endpoint=self.endpoint
+            azure_endpoint=endpoint
         )
         
-        # Set up basic conversation plugin
+        # Set up plugins
         self.conversation_plugin = ConversationPlugin(self.kernel)
         self.kernel.add_plugin(self.conversation_plugin, "conversation")
         
-        # Load and register prompt template
+        # Add brand personality plugin
+        from .brand_personality import BrandPersonalityPlugin
+        self.brand_plugin = BrandPersonalityPlugin(self.kernel, brand_name)
+        self.kernel.add_plugin(self.brand_plugin, "brand")
+          # Load prompt template
         if self.PROMPT_PATH:
             self._setup_prompt_function()
-            
-    def _setup_prompt_function(self):
-        """Load and register the prompt template as a semantic function"""
+
+    def _setup_prompt_function(self) -> None:
+        """Set up the prompt function with brand personality integration."""
         try:
-            if self.PROMPT_PATH is None:
+            if not self.PROMPT_PATH:
                 raise ValueError("PROMPT_PATH must be set in the derived class")
                 
             with open(self.PROMPT_PATH, "r", encoding="utf-8") as f:
-                prompt_template = f.read()
+                base_template = f.read()
+            
+            # Get brand instructions and combine them with the base template
+            if hasattr(self, 'brand_plugin'):
+                brand_instructions = self.brand_plugin.get_brand_instructions()
+                prompt_template = f"{brand_instructions}\n\n{base_template}"
+            else:
+                prompt_template = base_template
             
             prompt_config = PromptTemplateConfig(
                 template=prompt_template,
                 name="chat",
-                description="Chat with the assistant"
+                description="Chat with the assistant using brand personality"
             )
             
             self.kernel.add_function(
@@ -193,51 +144,120 @@ class ConversationFlowSK:
                 function_name="chat",
                 prompt_template_config=prompt_config
             )
+            
+            logger.info("Successfully set up prompt function with brand personality")
         except Exception as e:
             logger.error(f"Error setting up prompt function: {e}")
             raise
 
+    async def enhance_prompt_with_brand(self, system_prompt: str) -> str:
+        try:
+            if not hasattr(self, 'brand_plugin'):
+                return system_prompt
+                
+            args = KernelArguments()
+            args["system_prompt"] = system_prompt
+            result = await self.kernel.invoke(
+                plugin_name="brand",
+                function_name="enhance_system_prompt",                arguments=args
+            )
+            return str(result) if result is not None else system_prompt
+        except Exception:
+            logger.warning("Failed to enhance prompt with brand personality", exc_info=True)
+            return system_prompt
+
+    async def _process_stream(
+        self,
+        completion,
+        delay: float = 0.05
+    ) -> AsyncGenerator[str, None]:
+        try:
+            current_word = []
+            last_was_punctuation = False
+            last_was_space = False
+
+            for chunk in completion:
+                if delay > 0:
+                    await asyncio.sleep(delay)
+                
+                if (not chunk or not chunk.choices 
+                    or not chunk.choices[0].delta 
+                    or not hasattr(chunk.choices[0].delta, 'content')
+                    or chunk.choices[0].delta.content is None):
+                    continue
+                
+                token = chunk.choices[0].delta.content
+                
+                # Smart token handling
+                if token.strip() == "":  # All types of whitespace
+                    if current_word:
+                        yield "".join(current_word)
+                        current_word = []
+                    if not last_was_space and token != "\n":  # Only yield space if not after punctuation
+                        yield " "
+                        last_was_space = True
+                    elif token == "\n":  # Always yield newlines
+                        yield "\n"
+                        last_was_space = True
+                    last_was_punctuation = False
+                elif token in ".!?,;:":  # Punctuation
+                    if current_word:
+                        yield "".join(current_word)
+                        current_word = []
+                    yield token
+                    last_was_punctuation = True
+                    last_was_space = False
+                else:  # Regular text
+                    if last_was_punctuation:
+                        yield " "  # Add space after punctuation
+                    current_word.append(token)
+                    last_was_punctuation = False
+                    last_was_space = False
+            
+            # Yield any remaining content
+            if current_word:
+                yield "".join(current_word)
+                
+        except Exception as e:
+            logger.error(f"Error in stream processing: {e}")
+            yield f"\nError: {str(e)}"
+
     @wrap_content_safety
     async def __call__(
         self,
-        chat_history: list[Message],
+        chat_history: List[Message],
+        current_order: Optional[Dict] = None,
         delay: float = 0.05,
-        model_deployment: Optional[str] = None,
+        model_deployment: Optional[str] = None
     ) -> AsyncGenerator[str, None]:
-        """Execute LLM inference and stream response using direct Azure OpenAI client.
-        
-        Args:
-            chat_history: List of chat messages
-            delay: Delay between yielding tokens
-            model_deployment: Optional model deployment override
-            
-        Yields:
-            Tokens from the streaming response
-        """
+        current_order = current_order if current_order is not None else {"items": []}
         try:
-            # Format chat history for the model
-            args = KernelArguments(chat_history=chat_history)
-            
-            # Get system prompt from template
+            # Format chat history and order for the model
+            context_args = KernelArguments()
+            context_args["chat_history"] = chat_history
+            context_args["current_order"] = current_order
+
+            # Get system prompt from template and enhance with brand personality
             system_prompt = await self.kernel.invoke(
                 plugin_name=self.PLUGIN_NAME,
                 function_name="chat",
-                arguments=args
+                arguments=context_args
             )
+            enhanced_prompt = await self.enhance_prompt_with_brand(str(system_prompt))
+
+            # Create messages with proper types            # Create messages list for completion
+            messages: List[Union[ChatCompletionSystemMessageParam, ChatCompletionUserMessageParam, ChatCompletionAssistantMessageParam]] = [
+                ChatCompletionSystemMessageParam(role="system", content=str(enhanced_prompt))
+            ]
             
-            # Create messages with proper types
-            messages = (
-                [ChatCompletionSystemMessageParam(role="system", content=str(system_prompt))] +
-                [
-                    ChatCompletionUserMessageParam(role="user", content=msg.content)
-                    if msg.role == "user"
-                    else ChatCompletionAssistantMessageParam(role="assistant", content=msg.content)
-                    for msg in chat_history
-                    if msg.role in ["user", "assistant"]
-                ]
-            )
-            
-            # Get streaming response using direct Azure OpenAI client
+            # Add conversation history
+            for msg in chat_history:
+                if msg.role == "user":
+                    messages.append(ChatCompletionUserMessageParam(role="user", content=msg.content))
+                elif msg.role == "assistant":
+                    messages.append(ChatCompletionAssistantMessageParam(role="assistant", content=msg.content))
+
+            # Create completion stream
             completion = self.client.chat.completions.create(
                 model=model_deployment or self.deployment_name,
                 messages=messages,
@@ -246,130 +266,43 @@ class ConversationFlowSK:
                 max_tokens=self.MAX_TOKENS,
                 stream=True
             )
-            
-            # Stream the response chunks
-            previous_text = ""
-            for chunk in completion:
-                if chunk.choices and chunk.choices[0].delta.content is not None:
-                    text = chunk.choices[0].delta.content
-                    # Insert a space if needed
-                    if previous_text and not previous_text.endswith(" ") and not text.startswith(" "):
-                        logger.info("Inserted space between tokens")
-                        yield " "
-                        await asyncio.sleep(delay)
-                    logger.info("Produced token: %s", text)
-                    yield text
-                    previous_text = text
-                    await asyncio.sleep(delay)
-                        
+
+            # Stream tokens with proper formatting
+            async for token in self._process_stream(completion, delay):
+                yield token
+
         except Exception as e:
-            logger.error(f"Error in chat completion: {e}")
-            raise
+            error_msg = f"Error in conversation: {str(e)}"
+            logger.error(error_msg)
+            yield f"\nI apologize, but I encountered an error. Please try again."
 
 
+# Specific conversation flows
 class PreambleFlowSK(ConversationFlowSK):
-    """Flow class for handling the preamble conversation using Semantic Kernel."""
+    """Initial greeting and menu introduction flow."""
     PROMPT_PATH = Path(__file__).parent.joinpath("prompts/preamble_SK.prompty")
     PLUGIN_NAME = "preamble"
 
-
-class SummaryFlowSK(ConversationFlowSK):
-    """Flow class for generating conversation summaries using Semantic Kernel."""
-    PROMPT_PATH = Path(__file__).parent.joinpath("prompts/summary_SK.prompty")
-    PLUGIN_NAME = "summary"
+    def __init__(self, endpoint: str, api_key: str, deployment_name: str, brand_name: Optional[str] = None):
+        super().__init__(endpoint, api_key, deployment_name, brand_name)
 
 
 class OrderAssistantFlowSK(ConversationFlowSK):
-    """Flow class for order-related conversations using Semantic Kernel."""
-    PROMPT_PATH = Path(__file__).parent.joinpath("prompts/assistant_SK.prompty")
-    PLUGIN_NAME = "assistant"
+    """Main order taking and menu assistance flow."""
+    PROMPT_PATH = Path(__file__).parent.joinpath("prompts/order_intent_SK.prompty")
+    PLUGIN_NAME = "order"
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self._load_prompts()        # Set up order plugin
+    def __init__(self, endpoint: str, api_key: str, deployment_name: str, brand_name: Optional[str] = None):
+        super().__init__(endpoint, api_key, deployment_name, brand_name)
+        # Add OrderPlugin for menu and order context
         self.order_plugin = OrderPlugin(self.kernel)
         self.kernel.add_plugin(self.order_plugin, "order")
 
-    def _load_prompts(self):
-        """Load static menu content"""
-        try:
-            with Path(__file__).parent.joinpath("prompts/menu.txt").open() as f:
-                self.menu = f.read()
-        except Exception as e:
-            logger.error(f"Error loading menu: {e}")
-            self.menu = "Error loading menu content"
-            
-    @wrap_content_safety
-    async def __call__(
-        self,
-        chat_history: list[Message],
-        current_order: Optional[dict] = None,
-        delay: float = 0.05,
-        model_deployment: Optional[str] = None,
-    ) -> AsyncGenerator[str, None]:
-        """Execute LLM inference and stream response using direct Azure OpenAI client.
-        
-        Args:
-            chat_history: List of chat messages
-            current_order: Current order state
-            delay: Delay between yielding tokens
-            model_deployment: Optional model deployment override
-            
-        Yields:
-            Tokens from the streaming response
-        """
-        try:
-            # Set up kernel arguments with both chat history and order
-            args = KernelArguments(
-                chat_history=chat_history,
-                current_order=current_order or {"items": []},
-                menu=self.menu
-            )
-            
-            # Get system prompt from template
-            system_prompt = await self.kernel.invoke(
-                plugin_name=self.PLUGIN_NAME,
-                function_name="chat",
-                arguments=args
-            )
-            
-            # Create messages with proper types
-            messages = (
-                [ChatCompletionSystemMessageParam(role="system", content=str(system_prompt))] +
-                [
-                    ChatCompletionUserMessageParam(role="user", content=msg.content)
-                    if msg.role == "user"
-                    else ChatCompletionAssistantMessageParam(role="assistant", content=msg.content)
-                    for msg in chat_history
-                    if msg.role in ["user", "assistant"]
-                ]
-            )
-            
-            # Get streaming response using direct Azure OpenAI client
-            completion = self.client.chat.completions.create(
-                model=model_deployment or self.deployment_name,
-                messages=messages,
-                temperature=0.7,
-                top_p=0.95,
-                max_tokens=self.MAX_TOKENS,
-                stream=True
-            )
-            
-            # Stream the response chunks
-            previous_text = ""
-            for chunk in completion:
-                if chunk.choices and chunk.choices[0].delta.content is not None:
-                    text = chunk.choices[0].delta.content
-                    # Insert a space if needed
-                    if previous_text and not previous_text.endswith(" ") and not text.startswith(" "):
-                        logger.info("Inserted space between tokens")
-                        yield " "
-                        await asyncio.sleep(delay)
-                    logger.info("Produced token: %s", text)
-                    yield text
-                    previous_text = text
-                    await asyncio.sleep(delay)
-                        
-        except Exception as e:
-            logger.error(f"Error in chat completion: {e}")
-            raise
+
+class SummaryFlowSK(ConversationFlowSK):
+    """Order summary and confirmation flow."""
+    PROMPT_PATH = Path(__file__).parent.joinpath("prompts/summary_SK.prompty")
+    PLUGIN_NAME = "summary"
+
+    def __init__(self, endpoint: str, api_key: str, deployment_name: str, brand_name: Optional[str] = None):
+        super().__init__(endpoint, api_key, deployment_name, brand_name)

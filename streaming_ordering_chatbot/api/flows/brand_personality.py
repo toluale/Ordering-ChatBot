@@ -9,9 +9,16 @@ from semantic_kernel.functions.kernel_function_decorator import kernel_function
 class BrandPersonalityPlugin:
     """Plugin for managing brand personality in conversations."""
 
-    def __init__(self, kernel: Kernel):
+    def __init__(self, kernel: Kernel, brand_name: Optional[str] = None):
+        """Initialize the brand personality plugin.
+        
+        Args:
+            kernel: The Semantic Kernel instance
+            brand_name: Optional name of the brand to use (e.g., 'dominos_pizza', 'pf_changs', 'chipotle')
+        """
         self.kernel = kernel
         self._load_brand_configs()
+        self.current_brand = brand_name if brand_name in self.brand_configs else None
 
     def _load_brand_configs(self):
         """Load brand configurations from JSON file."""
@@ -23,43 +30,105 @@ class BrandPersonalityPlugin:
             print(f"Error loading brand configs: {e}")
             self.brand_configs = {}
 
-    @kernel_function(
-        description="Get brand personality instructions",
-        name="get_brand_instructions"
-    )
-    def get_brand_instructions(self, brand_name: str) -> str:
+    def set_brand(self, brand_name: str) -> bool:
+        """Set the current brand personality.
+        
+        Args:
+            brand_name: Name of the brand to use
+            
+        Returns:
+            bool: True if brand was successfully set, False if brand not found
+        """
+        if brand_name in self.brand_configs:
+            self.current_brand = brand_name
+            return True
+        return False   
+     
+    @kernel_function(description="Get brand personality instructions", name="get_brand_instructions")
+    def get_brand_instructions(self, brand_name: Optional[str] = None) -> str:
         """Get the personality instructions for a specific brand."""
+        brand_name = brand_name or self.current_brand
+        if not brand_name:
+            return "No brand personality selected."
+            
         brand = self.brand_configs.get(brand_name, {})
         if not brand:
-            return ""
+            return f"Brand '{brand_name}' not found."
         
-        return f"""Brand Voice: {brand['name']}
-Tone: {brand['tone']}
-Style: {brand['style']}
-Key phrases to incorporate: {', '.join(brand['key_phrases'])}
-Brand values: {', '.join(brand['values'])}"""
+        return f"""You are representing {brand['name']}.
+
+TONE AND STYLE:
+- Tone: {brand['tone']}
+- Style: {brand['style']}
+
+BRAND VOICE GUIDELINES:
+1. Key phrases to naturally incorporate:
+   {', '.join(brand['key_phrases'])}
+
+2. Core brand values to embody:
+   {', '.join(brand['values'])}
+
+Remember to maintain this brand voice consistently throughout the conversation while remaining helpful and natural."""
+
+    @kernel_function(
+        description="Apply brand personality to system prompt",
+        name="enhance_system_prompt"
+    )
+    def enhance_system_prompt(self, system_prompt: str) -> str:
+        """Enhance a system prompt with brand personality instructions."""
+        if not self.current_brand:
+            return system_prompt
+            
+        brand_instructions = self.get_brand_instructions()
+        return f"{brand_instructions}\n\nBASE INSTRUCTIONS:\n{system_prompt}"
 
     @kernel_function(
         description="Format message with brand personality",
         name="format_brand_message"
     )
-    def format_brand_message(self, message: str, brand_name: str) -> str:
+    def format_brand_message(self, message: str, brand_name: Optional[str] = None) -> str:
         """Format a message according to brand personality."""
+        brand_name = brand_name or self.current_brand
+        if not brand_name:
+            return message
+            
         brand = self.brand_configs.get(brand_name, {})
         if not brand:
             return message
-            
+
         # Add brand-specific context
         context = self.get_brand_instructions(brand_name)
-        return f"{context}\n\nResponse: {message}"
+        return f"{context}\n\nResponse in this style: {message}"
 
     @kernel_function(
         description="List available brand personalities",
         name="list_brands"
     )
     def list_brands(self) -> str:
-        """List all available brand personalities."""
-        return "\n".join([
-            f"- {brand}: {config['tone']}"
-            for brand, config in self.brand_configs.items()
-        ])
+        """List all available brand personalities with their key characteristics."""
+        if not self.brand_configs:
+            return "No brand configurations available."
+            
+        brands_info = []
+        for brand_name, config in self.brand_configs.items():
+            brands_info.append(
+                f"- {config['name']}:\n"
+                f"  Tone: {config['tone']}\n"
+                f"  Values: {', '.join(config['values'])}"
+            )
+        return "\n\n".join(brands_info)
+
+    @kernel_function(
+        description="Get the current brand personality",
+        name="get_current_brand"
+    )
+    def get_current_brand(self) -> str:
+        """Get information about the currently selected brand."""
+        if not self.current_brand:
+            return "No brand personality currently selected."
+            
+        brand = self.brand_configs.get(self.current_brand, {})
+        if not brand:
+            return f"Error: Selected brand '{self.current_brand}' not found in configurations."
+            
+        return f"Current brand: {brand['name']}\nTone: {brand['tone']}\nStyle: {brand['style']}"

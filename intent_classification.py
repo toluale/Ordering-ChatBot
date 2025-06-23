@@ -96,7 +96,7 @@ async def evaluate_intent_classifier() -> dict:
         if metrics['metrics']['errors']:
             for error in metrics['metrics']['errors']:
                 print(f"\nMessage: {error['message']}")
-                print(f"Expected: {error['expected']}, Got: {error['predicted']}")
+                print(f"Expected: {error['expected']}, Predicted: {error['predicted']}")
         else:
             print("No misclassified cases found.")
         

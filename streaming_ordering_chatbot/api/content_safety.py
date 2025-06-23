@@ -1,6 +1,8 @@
 import asyncio
 import os
 from typing import AsyncGenerator, Optional, Any, List, cast
+from pathlib import Path
+from dotenv import load_dotenv
 
 import httpx
 from azure.ai.contentsafety import ContentSafetyClient
@@ -10,13 +12,18 @@ from presidio_analyzer import AnalyzerEngine
 from presidio_anonymizer import AnonymizerEngine
 from presidio_anonymizer.entities import OperatorConfig, RecognizerResult
 
+# Load environment variables from project root .env file
+ROOT_DIR = Path(__file__).parents[3]  # Go up 3 levels to project root
+ENV_PATH = ROOT_DIR / '.env'
+load_dotenv(ENV_PATH)
+
 def get_required_env_var(name: str) -> str:
     """Get a required environment variable or raise an informative error."""
     value = os.getenv(name)
     if not value:
         raise ValueError(
             f"{name} environment variable is not set. "
-            "Please set it to the appropriate value."
+            f"Please set it in {ENV_PATH} to the appropriate value."
         )
     return value
 
