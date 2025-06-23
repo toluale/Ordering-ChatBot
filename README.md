@@ -6,4 +6,4 @@ To test the conversation flow with brand personality feature: run conversation_b
 
 Brand configuration file is in Ordering-ChatBot\streaming_ordering_chatbot\resources\brand_configs.json
 
-NB: The env variables are hard_coded for now
+NB: 
