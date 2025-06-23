@@ -101,7 +101,7 @@ class ConversationFlowSK:
         # Initialize Azure OpenAI client
         self.client = AzureOpenAI(
             api_key=api_key,
-            api_version="2024-11-20",
+            api_version="2024-12-01-preview",
             azure_endpoint=endpoint
         )
         
@@ -285,6 +285,8 @@ class PreambleFlowSK(ConversationFlowSK):
 
     def __init__(self, endpoint: str, api_key: str, deployment_name: str, brand_name: Optional[str] = None):
         super().__init__(endpoint, api_key, deployment_name, brand_name)
+        self._setup_prompt_function()
+        logger.info("Initialized PreambleFlowSK for greetings only")
 
 
 class OrderAssistantFlowSK(ConversationFlowSK):
@@ -297,6 +299,10 @@ class OrderAssistantFlowSK(ConversationFlowSK):
         # Add OrderPlugin for menu and order context
         self.order_plugin = OrderPlugin(self.kernel)
         self.kernel.add_plugin(self.order_plugin, "order")
+        # Verify menu is loaded
+        if not hasattr(self.order_plugin, 'menu') or not self.order_plugin.menu:
+            raise ValueError("Menu not properly loaded in OrderPlugin")
+        logger.info("Initialized OrderAssistantFlowSK with menu context")
 
 
 class SummaryFlowSK(ConversationFlowSK):

@@ -143,6 +143,12 @@ async def natural_conversation() -> None:
                         response += token
                         print(token, end='', flush=True)
                     is_first_message = False
+                    # If first message is about menu/order, immediately follow up with order flow
+                    if any(keyword in user_input.lower() for keyword in ['menu', 'order', 'food', 'drink', 'what', 'have', 'give']):
+                        flow = order_flow
+                        async for token in flow(chat_history, current_order):
+                            response += token
+                            print(token, end='', flush=True)
                 else:
                     # Regular ordering interaction
                     flow = order_flow

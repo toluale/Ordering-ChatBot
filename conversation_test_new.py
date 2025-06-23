@@ -67,7 +67,7 @@ async def natural_conversation() -> None:
     assert ENDPOINT is not None  # Ensure ENDPOINT is not None
     client = AzureOpenAI(
         api_key=API_KEY,
-        api_version="2024-11-20",
+        api_version="2024-12-01-preview",
         azure_endpoint=ENDPOINT
     )
     
