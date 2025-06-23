@@ -101,7 +101,7 @@ class ConversationFlowSK:
         # Initialize Azure OpenAI client
         self.client = AzureOpenAI(
             api_key=api_key,
-            api_version="2024-02-15-preview",
+            api_version="2024-11-20",
             azure_endpoint=endpoint
         )
         
@@ -188,7 +188,7 @@ class ConversationFlowSK:
                 
                 token = chunk.choices[0].delta.content
                 
-                # Smart token handling
+                # token handling
                 if token.strip() == "":  # All types of whitespace
                     if current_word:
                         yield "".join(current_word)
@@ -245,7 +245,7 @@ class ConversationFlowSK:
             )
             enhanced_prompt = await self.enhance_prompt_with_brand(str(system_prompt))
 
-            # Create messages with proper types            # Create messages list for completion
+            # Create messages with proper types and create messages list for completion
             messages: List[Union[ChatCompletionSystemMessageParam, ChatCompletionUserMessageParam, ChatCompletionAssistantMessageParam]] = [
                 ChatCompletionSystemMessageParam(role="system", content=str(enhanced_prompt))
             ]

@@ -160,7 +160,7 @@ async def natural_conversation() -> None:
             
             # End conversation if order is complete
             if user_input.lower() == 'done' and len(current_order.get("items", [])) > 0:
-                print("\nOrder completed! Thank you for dining with us.")
+                print("\nOrder completed! Thank you for patronizing us.")
                 break
                 
         except Exception as e:
