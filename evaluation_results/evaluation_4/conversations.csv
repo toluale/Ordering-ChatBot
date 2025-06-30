@@ -1,0 +1,177 @@
+brand_name,user_prompt,assistant_response
+Contoso Restaurant,Hello,"Hello there!Welcome to Contoso Restaurant!We're so glad you stopped by.Whether you're craving something delicious or just looking for a warmand inviting spot to enjoy a meal,you've come to the right place.How can we make your day brighter today?"
+Contoso Restaurant,"Hello, I want to order dinner for my family","That sounds wonderful!At Contoso Restaurant,we’re all about serving up fresh,delicious meals made with love.Let’s create a dinner your family will truly enjoy!What would you like to start with—perhaps someburgers,fries,or drinks?Let me know how I can help craft the perfect mealfor everyone!"
+Contoso Restaurant,I want hamburger and cheeseburger with large fries,"Great choice!Our hamburgers and cheeseburgers are made freshwith quality,organic ingredients,and our fries are always crispy and delicious.Let’s get your order started!
+
+For the **hamburger**:- Would you like a single or double patty?- Do you prefer quarter-pound or half-pound size?- The default bun is sesame—does that workfor you?- And for toppings,we include lettuce,tomato,onion,and ketchup by default.Would you like to add or change anything?
+
+For the**cheeseburger**:- Same questions as above:patty size,weight,bun type,and any customizations for toppings?
+
+And lastly,I’ll add **large fries** to your order!Would you like regular salt or no salt on them?Let me know what works best for your family!"
+Contoso Restaurant,Can you put together a meal for 4 people?,"Absolutely!Let’s create a delicious,home-style meal for your family of four.Here’s what I’d recommend to make sure everyone leaveshappy and satisfied:
+
+### Suggested Meal for 4 People:- **2 Hamburgers**:Made with single quarter-pound patties on sesame buns,cooked to perfection.Topped with lettuce,tomato,onion,and ketchup (customizable).  
+- **2 Cheeseburgers**:Same as above,but with melted cheese added for extra flavor.- **2 Large Fries**:Crispy and golden,with regular salt (or no salt if preferred).- **4 Drinks**:A variety of options—Cola,Diet Cola,Lemon-Lime,or Root Beer.
+
+Does this sound good for your family?Let me know if you'd like any adjustments—such asdifferent toppings or drink choices—or if you’d like toadd anything else!"
+Contoso Restaurant,Include medium size drinks for everyone,"Got it!Here’s the updated meal for your family of four,complete with medium drinks:
+
+### Family Meal for 4:- **2 Hamburgers**:Single quarter-pound patties on sesame buns,cooked to perfection.Topped with lettuce,tomato,onion,and ketchup (customizable).  
+- **2 Cheeseburgers**:Same as above but with melted cheese added for extra flavor.
+- **2 Large Fries**:Crispy and golden,with regular salt (or no salt if preferred).
+-**4 Medium Drinks**:Choose from Cola,Diet Cola,Lemon-Lime,or Root Beer.
+
+Let me know your drink preferences orif you'd like any changes to the burgers or fries.This meal is sure to bring comfort and smiles to everyoneat the table!"
+Contoso Restaurant,Increase the order by 2 people and give me a summary of the total order,"Absolutely!Let’s adjust the order to serve six people and providea summary of the full meal.Here’s what I recommend:
+
+---
+
+### Family Meal for6 People:- **3 Hamburgers**:- Single quarter-pound patties on sesame buns,cooked to perfection.- Topped with lettuce,tomato,onion,and ketchup (customizable).  
+
+- **3 Cheeseburgers**:- Same as above but with melted cheese addedfor extra flavor.- **3 Large Fries**:- Crispy and golden,with regular salt (or no salt if preferred).- **6 Medium Drinks**:- Choose from Cola,Diet Cola,Lemon-Lime,or Root Beer.
+
+---
+
+This meal is fresh,delicious,and made with love—perfect for sharing around the table!Let me know your drink choices or if you'd like tocustomize any burgers or fries further.😊"
+Contoso Restaurant,Can you summarize my order?,"Of course!Here's a summary of your delicious,home-style meal for six people:
+
+---
+
+### Your Order:- **3 Hamburgers**:Single quarter-pound patties on sesame buns,cooked to perfection.Topped with lettuce,tomato,onion,and ketchup.- **3 Cheeseburgers**:Same classic setup,with melted cheese added for extra flavor.- **3 Large Fries**:Crispy and golden,seasoned with regular salt (or no salt if preferred).- **6 Medium Drinks**:Choose from Cola,Diet Cola,Lemon-Lime,or Root Beer.
+
+---
+
+This hearty meal is freshly preparedand made with love—perfect for bringing everyone together overdelicious food.Let me know if you'd like to make any changes oradditions!😊"
+Domino's Pizza,Hello,Hi there!😊 How can I assist you today?
+Domino's Pizza,"Hello, I want to order dinner for my family","Great!What would you like to order?We’ve got burgers,fries,and drinks.Let me know the details for each item,and I’ll take care of it!😊"
+Domino's Pizza,I want hamburger and cheeseburger with large fries,"Got it!Let me confirm your order:
+
+- 1 Hamburger (default options:single patty,quarter lb,sesame bun,normal cook,lettuce,tomato,onion,ketchup)
+- 1 Cheeseburger (default options:single patty,quarter lb,sesame bun,normal cook,lettuce,tomato,onion,ketchup)
+- 1 Large Fries (regular salt)Would you like to customize anything or add drinks?😊"
+Domino's Pizza,Can you put together a meal for 4 people?,"Sure!Let me put together a meal for 4 people.Here’s a suggestion:
+
+### Meal for 4 People:- **2 Hamburgers** (default options:single patty,quarter lb,sesame bun,normal cook,lettuce,tomato,onion,ketchup)
+- **2 Cheeseburgers** (default options:single patty,quarter lb,sesame bun,normal cook,lettuce,tomato,onion,ketchup)
+- **2 Large Fries** (regular salt)
+- **4 Drinks** (your choice of Cola,Diet Cola,Lemon-Lime,or Root Beer—default size is medium)
+
+Would youlike to customize anything or let me know your drink preferences?😊"
+Domino's Pizza,Include medium size drinks for everyone,"Got it!Here’s your updated meal for 4 people:
+
+###Meal for 4 People:- **2 Hamburgers** (default options:single patty,quarter lb,sesame bun,normal cook,lettuce,tomato,onion,ketchup)
+- **2 Cheeseburgers** (default options:single patty,quarter lb,sesame bun,normal cook,lettuce,tomato,onion,ketchup)
+- **2 Large Fries** (regular salt)
+- **4 Medium Drinks** (your choice ofCola,Diet Cola,Lemon-Lime,or Root Beer)
+
+Let me know your drink preferences orif you’d like to make any changes!😊"
+Domino's Pizza,Increase the order by 2 people and give me a summary of the total order,"Here’s the updated order for 6 people:
+
+###Meal for 6 People:- **3 Hamburgers** (default options:single patty,quarter lb,sesame bun,normal cook,lettuce,tomato,onion,ketchup)
+- **3 Cheeseburgers** (default options:single patty,quarter lb,sesame bun,normal cook,lettuce,tomato,onion,ketchup)
+- **3 Large Fries** (regular salt)
+- **6 Medium Drinks** (your choice ofCola,Diet Cola,Lemon-Lime,or Root Beer)
+
+Let me know your drink preferences orif you’d like to make any further changes!😊"
+Domino's Pizza,Can you summarize my order?,"Here’s a summary of your order for 6 people:
+
+- **3 Hamburgers**  
+  *(defaultoptions:single patty,quarter lb,sesame bun,normal cook,lettuce,tomato,onion,ketchup)*  
+- **3 Cheeseburgers***(default options:single patty,quarter lb,sesame bun,normal cook,lettuce,tomato,onion,ketchup)*  
+- **3 Large Fries***(regular salt)*  
+- **6 Medium Drinks***(your choice of Cola,Diet Cola,Lemon-Lime,or Root Beer)*  
+
+This sounds like a perfect mealIf everything looks good,click the ""Add to Cart"" button to complete yourorder.Let me know if you’d like to update your drinkchoices or make any other changes.😊"
+P.F. Chang’s,Hello,Hello!😊 How can I assist you today?
+P.F. Chang’s,"Hello, I want to order dinner for my family","Great!Let's get started.What would you like to order for your family?We have burgers,fries,and drinks on the menu.Let me know your preferences!😊"
+P.F. Chang’s,I want hamburger and cheeseburger with large fries,"Got it!Let me confirm your order:
+
+- **Hamburger**(Single patty,quarter lb,sesame bun,cooked normal,with lettuce,tomato,onion,and ketchup)
+- **Cheeseburger** (Single patty,quarter lb,sesame bun,cooked normal,with lettuce,tomato,onion,and ketchup)
+- **Large Fries** (Regular salt)
+
+Would you like to customize anything?Or should I add this to your order?😊"
+P.F. Chang’s,Can you put together a meal for 4 people?,"Absolutely!Let me put together a balanced meal for 4 people.Here's what I suggest:
+
+### Meal for 4:- **2 Hamburgers** (Single patty,quarter lb,sesame bun,cooked normal,with lettuce,tomato,onion,and ketchup)
+- **2 Cheeseburgers**(Single patty,quarter lb,sesame bun,cooked normal,with lettuce,tomato,onion,and ketchup)
+- **2 Large Fries** (Regularsalt)
+- **4 Medium Drinks** (Choose fromCola,Diet Cola,Lemon-Lime,or Root Beer)
+
+Would you like to customize anything orlet me know your drink choices?😊"
+P.F. Chang’s,Include medium size drinks for everyone,"Great!Here's your updated meal for 4:
+
+### Meal for4:- **2 Hamburgers** (Single patty,quarter lb,sesame bun,cooked normal,with lettuce,tomato,onion,and ketchup)
+- **2 Cheeseburgers**(Single patty,quarter lb,sesame bun,cooked normal,with lettuce,tomato,onion,and ketchup)
+- **2 Large Fries** (Regularsalt)
+- **4 Medium Drinks** (Choose fromCola,Diet Cola,Lemon-Lime,or Root Beer)
+
+Let me know your drink preferences soI can finalize the order!😊"
+P.F. Chang’s,Increase the order by 2 people and give me a summary of the total order,"Sure!I'll adjust the order to accommodate 6 people.Here's the updated summary:
+
+### Meal for 6:- **3 Hamburgers** (Single patty,quarter lb,sesame bun,cooked normal,with lettuce,tomato,onion,and ketchup)
+- **3 Cheeseburgers**(Single patty,quarter lb,sesame bun,cooked normal,with lettuce,tomato,onion,and ketchup)
+- **3 Large Fries** (Regularsalt)
+- **6 Medium Drinks** (Choose fromCola,Diet Cola,Lemon-Lime,or Root Beer)
+
+Let me know your drink preferences orif you'd like to customize anything further!😊"
+P.F. Chang’s,Can you summarize my order?,"Certainly!Here's a summary of your order for **6 people**:
+
+- **Hamburgers**  
+  -3 Single patty,quarter lb,sesame bun,cooked normal,with lettuce,tomato,onion,and ketchup  
+
+- **Cheeseburgers**- 3 Single patty,quarter lb,sesame bun,cooked normal,with lettuce,tomato,onion,and ketchup  
+
+- **Large Fries**  
+  -3 orders,regular salt  
+
+- **Medium Drinks**  
+  -6 (Choose from Cola,Diet Cola,Lemon-Lime,or Root Beer)  
+
+Let me know your drink choicesto finalize the order!😊"
+Chipotle,Hello,Hi there!😊 How can I assist you today?
+Chipotle,"Hello, I want to order dinner for my family","Great!Let's get started with your order.What would you like to have for dinner?We have burgers,fries,and drinks on the menu.Let me know the specifics for each item,and I'll add them to your order!😊"
+Chipotle,I want hamburger and cheeseburger with large fries,"Got it!Here's what I have so far:
+
+- **Hamburger**:Default options (Single patty,quarter lb size,sesame bun,normal cook,lettuce,tomato,onion,ketchup)
+- **Cheeseburger**:Default options (Single patty,quarter lb size,sesame bun,normal cook,lettuce,tomato,onion,ketchup)
+- **Fries**:Large with regular salt
+
+Would you like to customize anythingor add drinks to your order?😊"
+Chipotle,Can you put together a meal for 4 people?,"Sure!Let’s create a meal for 4 people.Here’s a balanced suggestion:
+
+### Meal for 4People:1.**Burgers**:- 2 Hamburgers (Default options:single patty,quarter lb size,sesame bun,normal cook,lettuce,tomato,onion,ketchup)  
+   - 2 Cheeseburgers(Default options:single patty,quarter lb size,sesame bun,normal cook,lettuce,tomato,onion,ketchup)
+
+2.**Fries**:- 2 Large Fries (Regular salt)3.**Drinks**:- 4 Medium drinks (Choose from Cola,Diet Cola,Lemon-Lime,or Root Beer)
+
+Would you like to customize anything orlet me know the drink preferences?😊"
+Chipotle,Include medium size drinks for everyone,"Here’s the updated **Meal for 4 People**with medium drinks included:
+
+### Meal for 4 People:1.**Burgers**:- 2 Hamburgers (Default options:single patty,quarter lb size,sesame bun,normal cook,lettuce,tomato,onion,ketchup)  
+   - 2 Cheeseburgers(Default options:single patty,quarter lb size,sesame bun,normal cook,lettuce,tomato,onion,ketchup)
+
+2.**Fries**:- 2 Large Fries (Regular salt)3.**Drinks**:- 4 Medium Drinks (Choose from Cola,Diet Cola,Lemon-Lime,or Root Beer)
+
+Let me know your drink preferences orif you’d like to make any other changes!😊"
+Chipotle,Increase the order by 2 people and give me a summary of the total order,"Sure!Let’s adjust the order to serve 6 people.Here’s the updated **Meal for 6 People**:
+
+### Total Order Summary:1.**Burgers**  
+   - 3 Hamburgers (Default options:single patty,quarter lb size,sesame bun,normal cook,lettuce,tomato,onion,ketchup)  
+   - 3 Cheeseburgers(Default options:single patty,quarter lb size,sesame bun,normal cook,lettuce,tomato,onion,ketchup)
+
+2.**Fries**  
+   - 3 Large Fries(Regular salt)
+
+3.**Drinks**  
+   - 6 Medium Drinks(Choose from Cola,Diet Cola,Lemon-Lime,or Root Beer)
+
+Let me know your drink preferences orif you'd like to make any other changes!😊"
+Chipotle,Can you summarize my order?,"Here’s a summary of your order for **6 people**:
+
+- **Burgers**:- 3 Hamburgers (Single patty,quarter lb size,sesame bun,normal cook,lettuce,tomato,onion,ketchup)  
+  - 3 Cheeseburgers(Single patty,quarter lb size,sesame bun,normal cook,lettuce,tomato,onion,ketchup)  
+
+- **Fries**:- 3 Large Fries (Regular salt)- **Drinks**:- 6 Medium Drinks (Choose from Cola,Diet Cola,Lemon-Lime,or Root Beer)  
+
+Let me know your drink preferencesor if there’s anything else you’d like to tweak!😊"

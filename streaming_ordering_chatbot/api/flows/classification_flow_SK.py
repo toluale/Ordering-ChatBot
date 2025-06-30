@@ -8,14 +8,14 @@ from semantic_kernel.prompt_template import PromptTemplateConfig
 from semantic_kernel.functions.kernel_function_decorator import kernel_function
 from semantic_kernel.functions.kernel_arguments import KernelArguments
 
-# Python plugin for business logic
+# Plugin
 class OrderUtils:
     @kernel_function(name="is_order_empty", description="Checks if the current order is empty.")
     def is_order_empty(self, current_order: dict) -> bool:
         return not current_order.get("items")
 
 class OrderIntentFlowSK:
-    # Constants for the prompt function (LLM)
+    # Constants for the prompt function 
     PROMPT_FUNCTION_NAME = "order_intent"
     PROMPT_PLUGIN_NAME = "order_plugin"
     
@@ -39,7 +39,7 @@ class OrderIntentFlowSK:
         )
         self.kernel.add_service(self.azure_chat)
         
-        # Register Python utility plugin first
+        # Register utility plugin first
         self.kernel.add_plugin(OrderUtils(), self.UTILS_PLUGIN_NAME)
         
         # Load and register prompt template as a function

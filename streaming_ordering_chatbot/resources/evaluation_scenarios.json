@@ -1,0 +1,53 @@
+{
+    "scenarios": [
+        {
+            "id": "family_order",
+            "text": "Hello, I want to order dinner for my family",
+            "type": "order_initiation",
+            "expected_outcomes": [
+                "Ask for number of people",
+                "Ask for dietary preferences",
+                "Suggest family-style options"
+            ]
+        },
+        {
+            "id": "order",
+            "text": "I want hamburger and cheeseburger with large fries",
+            "type": "order_specification",
+            "expected_outcomes": [
+                "Acknowledge order",
+                "Suggest toppings"
+            ]
+        },
+        {
+            "id": "group_size",
+            "text": "Can you put together a meal for 4 people?",
+            "type": "order_specification",
+            "expected_outcomes": [
+                "Acknowledge group size",
+                "Suggest appropriate portion sizes",
+                "Ask for preferences or restrictions"
+            ]
+        },
+        {
+            "id": "drink_order",
+            "text": "Include medium size drinks for everyone",
+            "type": "order_addition",
+            "expected_outcomes": [
+                "Confirm drink quantity",
+                "List drink options",
+                "Ask for specific drink preferences"
+            ]
+        },
+        {
+            "id": "order_modification",
+            "text": "Increase the order by 2 people and give me a summary of the total order",
+            "type": "order_modification",
+            "expected_outcomes": [
+                "Acknowledge order increase",
+                "Update quantities",
+                "Suggest additional items"
+            ]
+        }
+    ]
+}

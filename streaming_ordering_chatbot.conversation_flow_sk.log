@@ -4058,3 +4058,6 @@
 2025-06-19 11:51:35,160 - streaming_ordering_chatbot.api.flows.conversation_flows_SK - INFO - Produced token:  experience
 2025-06-19 11:51:35,214 - streaming_ordering_chatbot.api.flows.conversation_flows_SK - INFO - Produced token:  wonderful
 2025-06-19 11:51:35,267 - streaming_ordering_chatbot.api.flows.conversation_flows_SK - INFO - Produced token: !
+2025-06-24 12:08:10,534 - streaming_ordering_chatbot.api.flows.conversation_flows_SK - INFO - Produced token: 
+2025-06-24 12:08:10,536 - streaming_ordering_chatbot.api.flows.conversation_flows_SK - ERROR - Error in chat completion: '<=' not supported between instances of 'dict' and 'int'
+2025-06-24 12:14:19,189 - streaming_ordering_chatbot.api.flows.conversation_flows_SK - ERROR - Error in chat completion: Plugin 'preamble' not found

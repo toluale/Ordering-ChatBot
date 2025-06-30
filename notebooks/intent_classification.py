@@ -7,11 +7,10 @@ import pandas as pd
 from tests.sk_intent_evaluator import SKIntentEvaluator
 
 # Replace with your actual Azure OpenAI details
-ENDPOINT = "https://t-toluale-1040-resource.openai.azure.com/"
-API_KEY = "8cfBQF1HE4qzxIn5VapNbWeqhqpYIR6OnHq0zXvxp3gVOz3YC2uOJQQJ99BFACHYHv6XJ3w3AAAAACOGGDMG"
+ENDPOINT = ""
+API_KEY = ""
 DEPLOYMENT_NAME = "gpt-4o"
 
-# Sample chat history and order
 chat_history = [Message(role="user", content="What toppings do you have?.")]
 current_order = {"items": [{"name": "fries", "quantity": 1}]}
 
@@ -23,12 +22,12 @@ async def test_order_intent():
 async def evaluate_intent_classifier():
     evaluator = SKIntentEvaluator(ENDPOINT, API_KEY, DEPLOYMENT_NAME)
     
-    # Load test cases to show alongside results
+
     test_data_path = Path(__file__).parent.parent / "tests" / "data" / "intent_test_cases.json"
     with open(test_data_path, "r") as f:
         test_cases = json.load(f)["test_cases"]
     
-    # Run evaluation with default test cases
+
     metrics = await evaluator()
     
     print("\nEvaluation Metrics:")

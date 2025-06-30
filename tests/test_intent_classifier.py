@@ -40,23 +40,17 @@ class IntentClassifierEvaluator:
             result = await self.evaluate_single_case(case)
             results.append(result)
         
-        # Convert results to pandas DataFrame
         df = pd.DataFrame(results)
         
-        # Calculate metrics
         y_true = df["expected"].tolist()
         y_pred = df["predicted"].tolist()
         
-        # Generate classification report
         report = classification_report(y_true, y_pred, output_dict=True)
         
-        # Generate confusion matrix
         cm = confusion_matrix(y_true, y_pred)
         
-        # Calculate accuracy by scenario
         scenario_accuracy = df.groupby("scenario")["correct"].mean()
         
-        # Find problematic cases
         errors = df[~df["correct"]]
         
         return {
@@ -81,7 +75,6 @@ class IntentClassifierEvaluator:
         plt.close()
 
 async def main():
-    # Replace with your Azure OpenAI details
     ENDPOINT = ""
     API_KEY = ""
     DEPLOYMENT_NAME = "gpt-4o"
@@ -89,7 +82,6 @@ async def main():
     evaluator = IntentClassifierEvaluator(ENDPOINT, API_KEY, DEPLOYMENT_NAME)
     results = await evaluator.evaluate_all()
     
-    # Print results
     print("\n=== Overall Results ===")
     print(f"Accuracy: {results['overall_accuracy']:.2%}")
     

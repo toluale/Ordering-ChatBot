@@ -7,14 +7,12 @@ from semantic_kernel.functions.kernel_function_decorator import kernel_function
 
 
 class BrandPersonalityPlugin:
-    """Plugin for managing brand personality in conversations."""
+    """For managing brand personality in conversations."""
 
     def __init__(self, kernel: Kernel, brand_name: Optional[str] = None):
         """Initialize the brand personality plugin.
-        
         Args:
             kernel: The Semantic Kernel instance
-            brand_name: Optional name of the brand to use (e.g., 'dominos_pizza', 'pf_changs', 'chipotle')
         """
         self.kernel = kernel
         self._load_brand_configs()
@@ -32,10 +30,6 @@ class BrandPersonalityPlugin:
 
     def set_brand(self, brand_name: str) -> bool:
         """Set the current brand personality.
-        
-        Args:
-            brand_name: Name of the brand to use
-            
         Returns:
             bool: True if brand was successfully set, False if brand not found
         """
@@ -57,18 +51,18 @@ class BrandPersonalityPlugin:
         
         return f"""You are representing {brand['name']}.
 
-TONE AND STYLE:
-- Tone: {brand['tone']}
-- Style: {brand['style']}
+                TONE AND STYLE:
+                - Tone: {brand['tone']}
+                - Style: {brand['style']}
 
-BRAND VOICE GUIDELINES:
-1. Key phrases to naturally incorporate:
-   {', '.join(brand['key_phrases'])}
+                BRAND VOICE GUIDELINES:
+                1. Key phrases to naturally incorporate:
+                {', '.join(brand['key_phrases'])}
 
-2. Core brand values to embody:
-   {', '.join(brand['values'])}
+                2. Core brand values to embody:
+                {', '.join(brand['values'])}
 
-Remember to maintain this brand voice consistently throughout the conversation while remaining helpful and natural."""
+                Remember to maintain this brand voice consistently throughout the conversation while remaining helpful and natural."""
 
     @kernel_function(
         description="Apply brand personality to system prompt",

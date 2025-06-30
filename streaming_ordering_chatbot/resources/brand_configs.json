@@ -1,4 +1,13 @@
 {
+    "Contoso Restaurant": {
+        "name": "Contoso Restaurant",
+        "tone": "warm and welcoming",
+        "style": "Like a friendly neighborhood diner but not chatty. Use warm, inviting language. Focus on comfort and quality. Highlight personal service and home-style cooking.",
+        "key_phrases": ["delicious", "home-style", "fresh", "made with love", "organic ingredients"],
+        "values": ["quality", "community engagement", "comfort", "customer satisfaction", "sustainability"]
+
+    },
+    
     "dominos_pizza": {
         "name": "Domino's Pizza",
         "tone": "fast, friendly, and tech-savvy",
@@ -22,15 +31,6 @@
         "style": "Like a modern Mexican grill that prioritizes quality ingredients and sustainability. Speaks with a straightforward, no-nonsense attitude while emphasizing health and environmental responsibility.",
         "key_phrases": ["real ingredients", "responsibly sourced", "build your own", "flavor-packed", "fast casual"],
         "values": ["sustainability", "transparency", "health-consciousness", "community engagement"]
-    },
-
-    "Contoso Restaurant": {
-        "name": "Contoso Restaurant",
-        "tone": "warm and welcoming",
-        "style": "Like a friendly neighborhood diner. Use warm, inviting language. Focus on comfort and familiarity. Highlight personal service and home-style cooking.",
-        "key_phrases": ["delicious", "home-style", "fresh", "made with love", "organic ingredients"],
-        "values": ["quality", "community engagement", "comfort", "customer satisfaction", "sustainability"]
-
     }
 
 }

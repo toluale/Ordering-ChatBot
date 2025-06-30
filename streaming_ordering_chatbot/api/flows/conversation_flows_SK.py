@@ -1,15 +1,12 @@
 import os
 import asyncio
 import logging
+import json
 from pathlib import Path
 from dotenv import load_dotenv
 from typing import Optional, AsyncGenerator, Dict, List, Union
 from openai import AzureOpenAI
-from openai.types.chat import (
-    ChatCompletionSystemMessageParam,
-    ChatCompletionUserMessageParam,
-    ChatCompletionAssistantMessageParam
-)
+from openai.types.chat import (ChatCompletionSystemMessageParam, ChatCompletionUserMessageParam, ChatCompletionAssistantMessageParam)
 from semantic_kernel import Kernel
 from semantic_kernel.connectors.ai.open_ai import AzureChatCompletion
 from semantic_kernel.functions.kernel_function_decorator import kernel_function
@@ -27,17 +24,12 @@ API_KEY = os.getenv("AZURE_OPENAI_API_KEY")
 DEPLOYMENT_NAME = os.getenv("AZURE_OPENAI_DEPLOYMENT_NAME")
 
 def get_required_env_var(name: str) -> str:
-    """Get a required environment variable or raise an informative error."""
     value = os.getenv(name)
     if not value:
         raise ValueError(
-            f"{name} environment variable is not set. "
-            "Please set it in your .env file."
+            f"{name} environment variable is not set. Please set it in your .env file."
         )
     return value
-
-# Set up logging
-logger = logging.getLogger(__name__)
 
 # Set up logging
 logger = logging.getLogger(__name__)
@@ -64,16 +56,59 @@ class OrderPlugin(ConversationPlugin):
         self.menu_path = Path(__file__).parent.joinpath("prompts/menu.txt")
         with open(self.menu_path, "r") as f:
             self.menu = f.read()
-    
+
+    def _clean_assistant_response(self, content: str) -> str:
+        """Remove context markers from responses while preserving order information."""
+        if not content:
+            return ""
+            
+        # List of markers to remove
+        markers = [
+            "Previous conversation:",
+            "Current Order:",
+            "Available menu:",
+            "Current order status:",
+            "Menu:",
+            "Chat History:",
+            "Instructions:",
+            "Reference Information"
+        ]
+        
+        # Get the content before any system markers
+        cleaned = content
+        for marker in markers:
+            if marker in cleaned:
+                parts = cleaned.split(marker)
+                # Keep only the first part (before the marker)
+                cleaned = parts[0].strip()
+        
+        return cleaned
+        
     @kernel_function(description="Prepares order context for prompt template", name="chat")
     async def prepare_order_context(self, chat_history: list[Message], current_order: dict) -> str:
         """Formats order context for prompt template."""
-        # Convert objects to their string representations for the prompt
-        chat_str = "\n".join([f"{msg.role}: { msg.content }" for msg in chat_history])
-        order_str = "\n".join([f"{k}: {v}" for k, v in current_order.items()])
+        # Clean and format chat history
+        clean_history = []
+        for msg in chat_history:
+            content = msg.content
+            if msg.role == "assistant":
+                content = self._clean_assistant_response(content)
+            clean_history.append(f"{msg.role}: {content}")
         
-        # Format the context in a consistent way
-        context = f"Chat History:\n{chat_str}\n\nCurrent Order:\n{order_str}\n\nMenu:\n{self.menu}"
+        # Get recent conversation history
+        chat_str = "\n".join(clean_history[-6:])  # Keep last 6 messages for immediate context
+        
+        items = current_order.get("items", [])
+        order_str = "Current items in order: " + ", ".join(str(item) for item in items) if items else "No items in order yet"
+        
+        # Format context with clear section markers
+        context = (
+            f"Previous Conversation:\n{chat_str}\n\n"
+            f"Current Order Status:\n{order_str}\n\n"
+            f"Available Menu:\n{self.menu}\n\n"
+            "Instructions: Use the above information to assist the customer with their order. "
+            "Keep track of items ordered and respond naturally to their requests."
+        )
         return context
 
 
@@ -81,7 +116,7 @@ class ConversationFlowSK:
     """Base class for conversation flows using Semantic Kernel."""
     PROMPT_PATH = None
     PLUGIN_NAME = "conversation"
-    MAX_TOKENS = 1000
+    MAX_TOKENS = 500  
 
     def __init__(self, endpoint: str, api_key: str, deployment_name: str, brand_name: Optional[str] = None):
         self.endpoint = endpoint
@@ -144,7 +179,6 @@ class ConversationFlowSK:
                 function_name="chat",
                 prompt_template_config=prompt_config
             )
-            
             logger.info("Successfully set up prompt function with brand personality")
         except Exception as e:
             logger.error(f"Error setting up prompt function: {e}")
@@ -159,7 +193,8 @@ class ConversationFlowSK:
             args["system_prompt"] = system_prompt
             result = await self.kernel.invoke(
                 plugin_name="brand",
-                function_name="enhance_system_prompt",                arguments=args
+                function_name="enhance_system_prompt",                
+                arguments=args
             )
             return str(result) if result is not None else system_prompt
         except Exception:
@@ -172,9 +207,7 @@ class ConversationFlowSK:
         delay: float = 0.05
     ) -> AsyncGenerator[str, None]:
         try:
-            current_word = []
-            last_was_punctuation = False
-            last_was_space = False
+            buffer = []
 
             for chunk in completion:
                 if delay > 0:
@@ -187,36 +220,20 @@ class ConversationFlowSK:
                     continue
                 
                 token = chunk.choices[0].delta.content
+                buffer.append(token)
                 
-                # token handling
-                if token.strip() == "":  # All types of whitespace
-                    if current_word:
-                        yield "".join(current_word)
-                        current_word = []
-                    if not last_was_space and token != "\n":  # Only yield space if not after punctuation
-                        yield " "
-                        last_was_space = True
-                    elif token == "\n":  # Always yield newlines
-                        yield "\n"
-                        last_was_space = True
-                    last_was_punctuation = False
-                elif token in ".!?,;:":  # Punctuation
-                    if current_word:
-                        yield "".join(current_word)
-                        current_word = []
-                    yield token
-                    last_was_punctuation = True
-                    last_was_space = False
-                else:  # Regular text
-                    if last_was_punctuation:
-                        yield " "  # Add space after punctuation
-                    current_word.append(token)
-                    last_was_punctuation = False
-                    last_was_space = False
+                # Yield on natural breaks or when buffer gets too large
+                if (token in ".!?,;:\n" or len(buffer) > 10):
+                    text = "".join(buffer)
+                    if text.strip(): 
+                        yield text
+                    buffer = []
             
-            # Yield any remaining content
-            if current_word:
-                yield "".join(current_word)
+            # Yield any remaining content in buffer
+            if buffer:
+                final_text = "".join(buffer)
+                if final_text.strip():
+                    yield final_text
                 
         except Exception as e:
             logger.error(f"Error in stream processing: {e}")
@@ -230,56 +247,90 @@ class ConversationFlowSK:
         delay: float = 0.05,
         model_deployment: Optional[str] = None
     ) -> AsyncGenerator[str, None]:
+        """Handle a conversation turn."""
         current_order = current_order if current_order is not None else {"items": []}
         try:
-            # Format chat history and order for the model
+            # Prepare context arguments
             context_args = KernelArguments()
-            context_args["chat_history"] = chat_history
-            context_args["current_order"] = current_order
-
+            
+            # Handle OrderAssistantFlowSK 
+            if isinstance(self, OrderAssistantFlowSK):
+                context_args["current_order"] = current_order
+                context_args["chat_history"] = chat_history
+                plugin_name = "order_assistant"
+                function_name = "chat"
+            else:
+                context_args["chat_history"] = chat_history
+                plugin_name = self.PLUGIN_NAME
+                function_name = "chat"
+            
             # Get system prompt from template and enhance with brand personality
             system_prompt = await self.kernel.invoke(
-                plugin_name=self.PLUGIN_NAME,
-                function_name="chat",
+                plugin_name=plugin_name,
+                function_name=function_name,
                 arguments=context_args
             )
             enhanced_prompt = await self.enhance_prompt_with_brand(str(system_prompt))
-
-            # Create messages with proper types and create messages list for completion
+            
+            # Create messages list with system message and recent context
             messages: List[Union[ChatCompletionSystemMessageParam, ChatCompletionUserMessageParam, ChatCompletionAssistantMessageParam]] = [
                 ChatCompletionSystemMessageParam(role="system", content=str(enhanced_prompt))
             ]
+
+            # Get the last 6 messages from chat history
+            recent_history = chat_history[-6:]
             
-            # Add conversation history
-            for msg in chat_history:
+            # Add cleaned conversation history
+            for msg in recent_history:
                 if msg.role == "user":
                     messages.append(ChatCompletionUserMessageParam(role="user", content=msg.content))
                 elif msg.role == "assistant":
-                    messages.append(ChatCompletionAssistantMessageParam(role="assistant", content=msg.content))
+                    cleaned_content = self._clean_assistant_response(msg.content) if msg.content else ""
+                    if cleaned_content:
+                        messages.append(ChatCompletionAssistantMessageParam(role="assistant", content=cleaned_content))
 
-            # Create completion stream
+            # completion parameters
             completion = self.client.chat.completions.create(
                 model=model_deployment or self.deployment_name,
                 messages=messages,
                 temperature=0.7,
                 top_p=0.95,
                 max_tokens=self.MAX_TOKENS,
+                presence_penalty=0.6,  
+                frequency_penalty=0.3,  
                 stream=True
             )
 
-            # Stream tokens with proper formatting
+            # Process and yield tokens
             async for token in self._process_stream(completion, delay):
                 yield token
 
         except Exception as e:
             error_msg = f"Error in conversation: {str(e)}"
             logger.error(error_msg)
-            yield f"\nI apologize, but I encountered an error. Please try again."
+            yield "I apologize, but I encountered an error."
+
+    def _clean_assistant_response(self, content: str) -> str:
+        """Remove context markers and sections from assistant responses."""
+        # List of markers that indicate context sections
+        context_markers = [
+            "MENU", "CURRENT ORDER", "CHAT HISTORY", "CONVERSATION HISTORY",
+            "Current Order:", "Menu:", "Chat History:", "Available menu:",
+            "Current order status:", "Previous conversation:"
+        ]
+        
+        # Get the content before any context marker
+        cleaned = content
+        for marker in context_markers:
+            if marker in cleaned:
+                cleaned = cleaned.split(marker)[0].strip()
+        
+        return cleaned
 
 
 # Specific conversation flows
 class PreambleFlowSK(ConversationFlowSK):
-    """Initial greeting and menu introduction flow."""
+    """Initial greeting."""
     PROMPT_PATH = Path(__file__).parent.joinpath("prompts/preamble_SK.prompty")
     PLUGIN_NAME = "preamble"
 
@@ -291,18 +342,35 @@ class PreambleFlowSK(ConversationFlowSK):
 
 class OrderAssistantFlowSK(ConversationFlowSK):
     """Main order taking and menu assistance flow."""
-    PROMPT_PATH = Path(__file__).parent.joinpath("prompts/order_intent_SK.prompty")
-    PLUGIN_NAME = "order"
+    PROMPT_PATH = Path(__file__).parent.joinpath("prompts/assistant_SK.prompty")
+    PLUGIN_NAME = "order_assistant"
 
     def __init__(self, endpoint: str, api_key: str, deployment_name: str, brand_name: Optional[str] = None):
         super().__init__(endpoint, api_key, deployment_name, brand_name)
         # Add OrderPlugin for menu and order context
         self.order_plugin = OrderPlugin(self.kernel)
-        self.kernel.add_plugin(self.order_plugin, "order")
+        self.kernel.add_plugin(self.order_plugin, "order_assistant")
         # Verify menu is loaded
         if not hasattr(self.order_plugin, 'menu') or not self.order_plugin.menu:
             raise ValueError("Menu not properly loaded in OrderPlugin")
         logger.info("Initialized OrderAssistantFlowSK with menu context")
+        
+    async def invoke_semantic_function(self, function_name: str, arguments: KernelArguments) -> str:
+        """Override to properly format the response."""
+        # Get the raw response from the kernel
+        response = await self.kernel.invoke(
+            plugin_name=self.PLUGIN_NAME,
+            function_name=function_name,
+            arguments=arguments
+        )
+        
+        # Clean the response to remove any embedded context
+        response_text = str(response)
+        for marker in ["Chat History:", "Current Order:", "Menu:", "Previous conversation:", "Available menu:", "Current order status:"]:
+            if marker in response_text:
+                response_text = response_text.split(marker)[0].strip()
+            
+        return response_text
 
 
 class SummaryFlowSK(ConversationFlowSK):

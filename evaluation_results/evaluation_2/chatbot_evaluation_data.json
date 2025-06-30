@@ -1,0 +1,289 @@
+{
+  "metadata": {
+    "timestamp": "2025-06-30T09:21:09.152360",
+    "num_brands": 4,
+    "num_scenarios": 5
+  },
+  "evaluation": [
+    {
+      "scenario_id": "full_conversation",
+      "brand_name": "Contoso Restaurant",
+      "scores": {
+        "BrandVoiceMetric": 0.85,
+        "RelevanceMetric": 0.8,
+        "TaskCompletionMetric": 0.9
+      },
+      "conversation": [
+        {
+          "role": "user",
+          "content": "Hello"
+        },
+        {
+          "role": "assistant",
+          "content": "Welcome to Contoso Restaurant!We're so glad you stopped by.How can we serve you today?Whether you're looking for a cozy meal or have questions aboutour menu,we're here to make sure your experience is nothing short ofdelicious."
+        },
+        {
+          "role": "user",
+          "content": "Hello, I want to order dinner for my family"
+        },
+        {
+          "role": "assistant",
+          "content": "That sounds wonderful!Let\u2019s get started with crafting a delicious,home-style dinner for your family.We have fresh burgers,crispy fries,and refreshing drinks on the menu.Let me know what you\u2019d like to order\u2014or Ican help you customize something perfect for everyone!"
+        },
+        {
+          "role": "user",
+          "content": "I want hamburger and cheeseburger with large fries"
+        },
+        {
+          "role": "assistant",
+          "content": "You've got it\u2014a classic and delicious choice for a familydinner!Let me make sure I get everything just right.For the hamburger and cheeseburger,would you like to stick with the default options\u2014quarterlb patty,sesame bun,normal cook\u2014or customize anything?And your large fries will come with regular salt unless you'dprefer no salt.Let me know if there\u2019s anything you\u2019d like adjusted!"
+        },
+        {
+          "role": "user",
+          "content": "Can you put together a meal for 4 people?"
+        },
+        {
+          "role": "assistant",
+          "content": "Absolutely!Let\u2019s put together a warm,home-style meal for your family of four.Here's what I can suggest for a well-rounded dinner:### Meal Plan:1.**Burger Options**:- 2 Hamburgers (default:quarter lb patty,sesame bun,normal cook,lettuce,tomato,onion,and ketchup)  \n   - 2 Cheeseburgers (default:same as hamburgers but with melty cheese)\n\n2.**Fries**:- 2 Large Fries (with regular saltunless you'd prefer no salt)\n\n3.**Drinks**:- 4 Drinks\u2014choose from Cola,Diet Cola,Lemon-Lime,or Root Beer (default size is medium).\n\nWould youlike to go with this plan?Or if there are preferences or adjustments you'd like\u2014suchas vegetarian options or other drink choices\u2014I\u2019d be happyto make it just right for you!"
+        },
+        {
+          "role": "user",
+          "content": "Include medium size drinks for everyone"
+        },
+        {
+          "role": "assistant",
+          "content": "Got it!Here's your updated meal for four\u2014complete with medium drinksfor everyone:\n\n### **Family Meal Plan**\n1.**Burgers**  \n   - 2 Hamburgers (default:quarter lb patty,sesame bun,normal cook,lettuce,tomato,onion,ketchup)  \n   - 2 Cheeseburgers(same as hamburgers but with melty cheese)2.**Fries**  \n   - 2 Large Fries(regular salt unless you'd prefer no salt)\n\n3.**Drinks**  \n   - 4 Medium Drinks:Choose from Cola,Diet Cola,Lemon-Lime,or Root Beer.\n\nLet me know which drink options you'dlike or if there\u2019s anything else you\u2019d like toadjust!\ud83d\ude0a"
+        },
+        {
+          "role": "user",
+          "content": "Increase the order by 2 people and give me a summary of the total order"
+        },
+        {
+          "role": "assistant",
+          "content": "Absolutely!Let\u2019s adjust the meal to comfortably serve six people.Here\u2019s your updated order:\n\n### **Meal Plan forSix People**\n1.**Burgers**  \n   - 3 Hamburgers (default:quarter lb patty,sesame bun,normal cook,lettuce,tomato,onion,ketchup)  \n   - 3 Cheeseburgers(same as hamburgers but with melty cheese)2.**Fries**  \n   - 3 Large Fries(with regular salt unless you'd prefer no salt)\n\n3.**Drinks**  \n   - 6 Medium Drinks:Choose from Cola,Diet Cola,Lemon-Lime,or Root Beer.\n\nLet me know which drink options you\u2019d like or if there are any customizations I canmake for the burgers or fries.Your meal is coming together deliciously!\ud83d\ude0a"
+        },
+        {
+          "role": "user",
+          "content": "Can you summarize my order?"
+        },
+        {
+          "role": "assistant",
+          "content": "Of course!Here\u2019s the summary of your order for six people:### **Order Summary**  \n- **Burgers**:- 3 Hamburgers (quarter lb patty,sesame bun,lettuce,tomato,onion,ketchup)  \n  - 3 Cheeseburgers(same as hamburgers,plus melty cheese)  \n\n- **Fries**:- 3 Large Fries (regular salt)- **Drinks**:- 6 Medium Drinks (choose from Cola,Diet Cola,Lemon-Lime,or Root Beer)  \n\nA delicious and satisfying home-stylemeal made with love and fresh ingredients.Let me know if you\u2019d like to finalize this ormake any tweaks!\ud83d\ude0a"
+        }
+      ],
+      "timestamp": "2025-06-30T09:16:33.950402",
+      "status": "success",
+      "errors": []
+    },
+    {
+      "scenario_id": "full_conversation",
+      "brand_name": "Domino's Pizza",
+      "scores": {
+        "BrandVoiceMetric": 0.3,
+        "RelevanceMetric": 0.6,
+        "TaskCompletionMetric": 0.85
+      },
+      "conversation": [
+        {
+          "role": "user",
+          "content": "Hello"
+        },
+        {
+          "role": "assistant",
+          "content": "Hi there!How can I assist you today?\ud83d\ude0a"
+        },
+        {
+          "role": "user",
+          "content": "Hello, I want to order dinner for my family"
+        },
+        {
+          "role": "assistant",
+          "content": "Sure thing!Let me know what you'd like to order for your family.We have burgers,fries,and drinks to choose from.You can customize the options too!\ud83d\ude0a"
+        },
+        {
+          "role": "user",
+          "content": "I want hamburger and cheeseburger with large fries"
+        },
+        {
+          "role": "assistant",
+          "content": "Great choice!Let's get started with your order.For the **Hamburger**, do you want anycustomizations,or should I keep it as is (single patty,quarter lb,sesame bun,normal cook,lettuce,tomato,onion,ketchup)?  \n\nFor the **Cheeseburger**,do you have any preferences on size,bun type,or toppings?I'll also add **large fries** to your order.Let me know if you'd like more than one serving offries or any changes.\ud83d\ude0a"
+        },
+        {
+          "role": "user",
+          "content": "Can you put together a meal for 4 people?"
+        },
+        {
+          "role": "assistant",
+          "content": "Absolutely!Let me put together a meal for four people.Here's a suggested order with some variety:\n\n### Meal for4 People:1.**Hamburger**  \n   - Single patty,quarter lb,sesame bun,normal cook  \n   - Toppings:Lettuce,Tomato,Onion,Ketchup  \n\n2.**Cheeseburger**  \n   - Single patty,quarter lb,sesame bun,normal cook  \n   - Toppings:Lettuce,Tomato,Onion,Ketchup + Cheese  \n\n3.**Black Bean Burger (Vegetarian Option)**- Single patty,quarter lb,sesame bun,normal cook  \n   - Toppings:Lettuce,Tomato,Onion  \n\n4.**Double Cheeseburger**  \n   - Double patty,half lb total,sesame bun,normal cook  \n   - Toppings:Lettuce,Tomato,Onion,Ketchup + Cheese  \n\n5.**Fries** (Large size for sharing)6.**Drinks** (Your choice of four drinks):- Cola  \n    - Diet Cola- Lemon-Lime  \n    - Root Beer  \n\nDoesthis work for your family?Feel free to swap or customize any items!\ud83d\ude0a"
+        },
+        {
+          "role": "user",
+          "content": "Include medium size drinks for everyone"
+        },
+        {
+          "role": "assistant",
+          "content": "Got it!Here's your updated meal for 4 people,including **medium drinks for everyone**:\n\n### Meal for4 People:1.**Hamburger**  \n   - Single patty,quarter lb,sesame bun,normal cook  \n   - Toppings:Lettuce,Tomato,Onion,Ketchup  \n\n2.**Cheeseburger**  \n   - Single patty,quarter lb,sesame bun,normal cook  \n   - Toppings:Lettuce,Tomato,Onion,Ketchup + Cheese  \n\n3.**Black Bean Burger (Vegetarian Option)**- Single patty,quarter lb,sesame bun,normal cook  \n   - Toppings:Lettuce,Tomato,Onion  \n\n4.**Double Cheeseburger**  \n   - Double patty (half lb total), sesame bun,normal cook  \n   - Toppings:Lettuce,Tomato,Onion,Ketchup + Cheese  \n\n5.**Fries**  \n   - Large size for sharing6.**Drinks (Medium Size)**:- Cola x1  \n   - Diet Colax1  \n   - Lemon-Lime x1- Root Beer x1  \n\nDoes this look goodto you?Let me know if you'd like to make any adjustments!\ud83d\ude0a"
+        },
+        {
+          "role": "user",
+          "content": "Increase the order by 2 people and give me a summary of the total order"
+        },
+        {
+          "role": "assistant",
+          "content": "Sure!Let's adjust the order to serve **6 people** andprovide a full summary.\n\n### Updated Meal for 6People:1.**Hamburger x2**  \n   - Single patty,quarter lb,sesame bun,normal cook  \n   - Toppings:Lettuce,Tomato,Onion,Ketchup  \n\n2.**Cheeseburger x2**  \n   -Single patty,quarter lb,sesame bun,normal cook  \n   - Toppings:Lettuce,Tomato,Onion,Ketchup + Cheese  \n\n3.**Black Bean Burger (Vegetarian Option) x1**  \n   - Single patty,quarter lb,sesame bun,normal cook  \n   - Toppings:Lettuce,Tomato,Onion  \n\n4.**Double Cheeseburger x1**  \n   -Double patty (half lb total), sesame bun,normal cook  \n   - Toppings:Lettuce,Tomato,Onion,Ketchup + Cheese  \n\n5.**Fries**  \n   - Large size for sharingamong all  \n\n6.**Drinks (Medium Size)**:- Cola x2  \n   - Diet Cola x1  \n   - Lemon-Lime x2- Root Beer x1  \n\n---\n\n### Summary of TotalOrder:- **Burgers**:6 total (2 Hamburgers,2 Cheeseburgers,1 Black Bean Burger,1 Double Cheeseburger)  \n- **Fries**:1 Large serving for sharing  \n- **Drinks**:6 Medium drinks (Cola x2,Diet Cola x1,Lemon-Lime x2,Root Beer x1)\n\nDoes this work for your groupof 6?Let me know if you'd like any adjustments or additions!\ud83d\ude0a"
+        },
+        {
+          "role": "user",
+          "content": "Can you summarize my order?"
+        },
+        {
+          "role": "assistant",
+          "content": "Certainly!Here's a **summary of your order** for 6people:\n\n---\n\n### **Total Order**:- **Burgers**:- **Hamburger x2**:Single patty,quarter lb,sesame bun,normal cook  \n    - Toppings:Lettuce,Tomato,Onion,Ketchup  \n  - **Cheeseburger x2**:Single patty,quarter lb,sesame bun,normal cook  \n    - Toppings:Lettuce,Tomato,Onion,Ketchup,Cheese  \n  - **Black Bean Burger (VegetarianOption) x1**:Single patty,quarter lb,sesame bun,normal cook  \n    - Toppings:Lettuce,Tomato,Onion  \n  - **Double Cheeseburger x1**:Double patty (half lb total), sesame bun,normal cook  \n    - Toppings:Lettuce,Tomato,Onion,Ketchup,Cheese  \n\n- **Fries**:- Large size for sharing  \n\n- **Drinks (Medium Size)**:- Cola x2  \n  - Diet Colax1  \n  - Lemon-Lime x2- Root Beer x1  \n\n---\n\nThis makes agreat meal for your group of six!Let me know if you'd like to make any changes oradd-ons.\ud83d\ude0a"
+        }
+      ],
+      "timestamp": "2025-06-30T09:18:19.771317",
+      "status": "success",
+      "errors": []
+    },
+    {
+      "scenario_id": "full_conversation",
+      "brand_name": "P.F. Chang\u2019s",
+      "scores": {
+        "BrandVoiceMetric": 0.1,
+        "RelevanceMetric": 0.7,
+        "TaskCompletionMetric": 0.7
+      },
+      "conversation": [
+        {
+          "role": "user",
+          "content": "Hello"
+        },
+        {
+          "role": "assistant",
+          "content": "Hello!\ud83d\ude0a How can I assist you today?"
+        },
+        {
+          "role": "user",
+          "content": "Hello, I want to order dinner for my family"
+        },
+        {
+          "role": "assistant",
+          "content": "Sure thing!Let's get started.What would you like to order for dinner?We\u2019ve got burgers,fries,and drinks on the menu.Feel free to customize your choices as you'd like!\ud83d\ude0a"
+        },
+        {
+          "role": "user",
+          "content": "I want hamburger and cheeseburger with large fries"
+        },
+        {
+          "role": "assistant",
+          "content": "Got it!Here's what I have so far:\n\n### Your Order:- **Hamburger**:Single patty,quarter lb,sesame bun,normal cook,with lettuce,tomato,onion,ketchup (default toppings).\n- **Cheeseburger**:Single patty,quarter lb,sesame bun,normal cook,with lettuce,tomato,onion,ketchup (default toppings), and cheese.\n- **LargeFries**:Regular salt.\n\nDoes this look good to you?Would you like to add any drinks or customize anything further?\ud83d\ude0a"
+        },
+        {
+          "role": "user",
+          "content": "Can you put together a meal for 4 people?"
+        },
+        {
+          "role": "assistant",
+          "content": "Absolutely!Let me create a meal for 4 people based onour menu.Here's an option that could work well for variety:\n\n###Meal for 4:1.**Hamburger**:Single patty,quarter lb,sesame bun,normal cook,lettuce,tomato,onion,ketchup (default toppings).  \n2.**Cheeseburger**:Single patty,quarter lb,sesame bun,normal cook,lettuce,tomato,onion,ketchup (default toppings) with cheese.3.**Black Bean Burger** (vegetarian): Single patty,quarter lb,sesame bun,lettuce,tomato,onion (no ketchup unless you'd like it added).4.**Hamburger**:Single patty,quarter lb,sesame bun,normal cook with extra bacon and mayo for added flavor.### Sides:- 2 Large Fries (to share).\n\n### Drinks:- 1 Large Cola  \n- 1 Large DietCola  \n- 1 Large Lemon-Lime Soda- 1 Large Root Beer  \n\nWould you like tocustomize anything in this meal or add extras?\ud83d\ude0a"
+        },
+        {
+          "role": "user",
+          "content": "Include medium size drinks for everyone"
+        },
+        {
+          "role": "assistant",
+          "content": "Got it!Here\u2019s your updated **Meal for 4** withmedium-sized drinks for everyone:\n\n### Meal for 4:1.**Hamburger**:Single patty,quarter lb,sesame bun,normal cook,lettuce,tomato,onion,ketchup (default toppings).  \n2.**Cheeseburger**:Single patty,quarter lb,sesame bun,normal cook,lettuce,tomato,onion,ketchup (default toppings), and cheese.3.**Black Bean Burger** (vegetarian): Single patty,quarter lb,sesame bun,lettuce,tomato,onion (no ketchup unless you'd like it added).4.**Hamburger**:Single patty,quarter lb,sesame bun,normal cook with extra bacon and mayo for added flavor.### Sides:- 2 Large Fries (to share).\n\n### Drinks:- 1 Medium Cola  \n- 1 Medium DietCola  \n- 1 Medium Lemon-Lime Soda- 1 Medium Root Beer  \n\nDoes this look goodto you?Would you like to make any further changes or additions?\ud83d\ude0a"
+        },
+        {
+          "role": "user",
+          "content": "Increase the order by 2 people and give me a summary of the total order"
+        },
+        {
+          "role": "assistant",
+          "content": "Got it!Here's an updated **Meal for 6** that includesfood and drinks for two additional people while keeping the orderbalanced:\n\n---\n\n### **Meal for 6**#### **Burgers:**  \n1.**Hamburger:** Single patty,quarter lb,sesame bun,normal cook,lettuce,tomato,onion,ketchup (default toppings).  \n2.**Cheeseburger:** Single patty,quarter lb,sesame bun,normal cook,lettuce,tomato,onion,ketchup (default toppings), with cheese.3.**Black Bean Burger** (vegetarian): Single patty,quarter lb,sesame bun,lettuce,tomato,onion (no ketchup unless you'd like it added).4.**Hamburger:** Single patty,quarter lb,sesame bun,normal cook with extra bacon and mayo for added flavor.5.**Cheeseburger:** Single patty,quarter lb,sesame bun,normal cook with lettuce,tomato,onion (default toppings), plus pickle and mustard for variety.6.**Hamburger:** Single patty,quarter lb,pretzel bun this time for a change in flavor profile\u2014normal cook with lettuce and relish only.\n\n---\n\n####**Sides:**  \n- 3 Large Fries (toshare).\n\n---\n\n#### **Drinks:**  \n-1 Medium Cola  \n- 1 Medium Diet Cola- 1 Medium Lemon-Lime Soda  \n-1 Medium Root Beer  \n- 1 Medium IcedTea (for variety)  \n- 1 Medium Water---\n\n### Summary of Your Total Order:- **Burgers:** 6 total (including vegetarian options).  \n- **Sides:** 3large fries to share across the group.- **Drinks:** 6 medium drinks tailoredto preferences.\n\nWould you like to make any further adjustmentsor add anything extra?\ud83d\ude0a"
+        },
+        {
+          "role": "user",
+          "content": "Can you summarize my order?"
+        },
+        {
+          "role": "assistant",
+          "content": "Of course!Here's a concise summary of your full order:\n\n---\n\n###**Order Summary for 6 People:**\n\n#### **Burgers:**  \n1.Hamburger:Single patty,sesame bun,lettuce,tomato,onion,ketchup (default toppings).  \n2.Cheeseburger:Single patty,sesame bun,lettuce,tomato,onion,ketchup (default toppings), with cheese.3.Black Bean Burger (vegetarian): Single patty,sesame bun,lettuce,tomato,onion (no ketchup).  \n4.Hamburger:Single patty,sesame bun,extra bacon,mayo.5.Cheeseburger:Single patty,sesame bun,lettuce,tomato,onion (default), plus pickle and mustard.6.Hamburger:Single patty,pretzel bun,lettuce and relish only.\n\n#### **Sides:**  \n-3 Large Fries (to share).\n\n#### **Drinks:**  \n- 1 Medium Cola  \n-1 Medium Diet Cola  \n- 1 Medium Lemon-Lime Soda  \n- 1 Medium Root Beer  \n-1 Medium Iced Tea  \n- 1 MediumWater  \n\n---\n\nThat\u2019s the complete summary!If everything looks correct or you\u2019d like any adjustments,let me know!\ud83d\ude0a"
+        }
+      ],
+      "timestamp": "2025-06-30T09:20:02.612883",
+      "status": "success",
+      "errors": []
+    },
+    {
+      "scenario_id": "full_conversation",
+      "brand_name": "Chipotle",
+      "scores": {
+        "BrandVoiceMetric": 0.4,
+        "RelevanceMetric": 0.8,
+        "TaskCompletionMetric": 0.9
+      },
+      "conversation": [
+        {
+          "role": "user",
+          "content": "Hello"
+        },
+        {
+          "role": "assistant",
+          "content": "Hi there!\ud83d\ude0a How can I assist you today?"
+        },
+        {
+          "role": "user",
+          "content": "Hello, I want to order dinner for my family"
+        },
+        {
+          "role": "assistant",
+          "content": "Awesome!Let\u2019s get started.What would you like to order?Burgers,fries,drinks\u2014tell me what you\u2019re craving,and we\u2019ll build your order together!\ud83d\ude0a"
+        },
+        {
+          "role": "user",
+          "content": "I want hamburger and cheeseburger with large fries"
+        },
+        {
+          "role": "assistant",
+          "content": "Great choice!Let me confirm your order:\n\n1.Hamburger (single patty,quarter lb,sesame bun,cooked normal with lettuce,tomato,onion,and ketchup by default\u2014let me know if you wantto customize this!)\n2.Cheeseburger (single patty,quarter lb,sesame bun,cooked normal with lettuce,tomato,onion,and ketchup by default\u2014customizations are welcome here too!)\n3.Large fries.\n\nWould you like to make any changes oradd drinks?\ud83d\ude0a"
+        },
+        {
+          "role": "user",
+          "content": "Can you put together a meal for 4 people?"
+        },
+        {
+          "role": "assistant",
+          "content": "Sure!Let me put together a meal for 4 people.Here's an idea:\n\n### Meal Plan for 4 People:1.**Burger Options:**\n   - 2 Hamburgers (single patty,quarter lb,sesame bun,cooked normal with lettuce,tomato,onion,and ketchup).\n   - 2 Cheeseburgers(single patty,quarter lb,sesame bun,cooked normal with lettuce,tomato,onion,and ketchup).\n\n2.**Sides:**\n   - 2 Large Fries.\n\n3.**Drinks:**\n   - 4 Medium Drinks (you can mixand match from Cola,Diet Cola,Lemon-Lime,or Root Beer).  \n\nWould you like to customize anythingor adjust the drink choices?\ud83d\ude0a"
+        },
+        {
+          "role": "user",
+          "content": "Include medium size drinks for everyone"
+        },
+        {
+          "role": "assistant",
+          "content": "Got it!Here's the updated meal for 4 people:\n\n### MealPlan for 4 People:1.**Burger Options:**\n   - 2 Hamburgers (single patty,quarter lb,sesame bun,cooked normal with lettuce,tomato,onion,and ketchup).\n   - 2 Cheeseburgers(single patty,quarter lb,sesame bun,cooked normal with lettuce,tomato,onion,and ketchup).\n\n2.**Sides:**\n   - 2 Large Fries.\n\n3.**Drinks:**\n   - 4 Medium Drinks (you can mixand match from Cola,Diet Cola,Lemon-Lime,or Root Beer\u2014let me know your preferences!).\n\nWouldyou like to choose specific drinks or make any further changes?\ud83d\ude0a"
+        },
+        {
+          "role": "user",
+          "content": "Increase the order by 2 people and give me a summary of the total order"
+        },
+        {
+          "role": "assistant",
+          "content": "Sure!Let me adjust the meal to accommodate 6 people andsummarize the total order for you:\n\n### Meal Plan for6 People:1.**Burger Options:**  \n   - 3 Hamburgers(single patty,quarter lb,sesame bun,cooked normal with lettuce,tomato,onion,and ketchup).  \n   - 3 Cheeseburgers (single patty,quarter lb,sesame bun,cooked normal with lettuce,tomato,onion,and ketchup).  \n\n2.**Sides:**  \n   - 3 Large Fries.3.**Drinks:**  \n   - 6 Medium Drinks(Cola,Diet Cola,Lemon-Lime,or Root Beer\u2014let me know if you'd like tospecify drink preferences!).  \n\n---\n\nWould you like to makeany changes or add anything else?\ud83d\ude0a"
+        },
+        {
+          "role": "user",
+          "content": "Can you summarize my order?"
+        },
+        {
+          "role": "assistant",
+          "content": "Absolutely!Here's a summary of your order:\n\n### **Total Orderfor 6 People:**\n- **Burgers:**\n  - 3 Hamburgers (single patty,quarter lb,sesame bun,cooked normal with lettuce,tomato,onion,and ketchup)\n  - 3 Cheeseburgers(single patty,quarter lb,sesame bun,cooked normal with lettuce,tomato,onion,and ketchup)\n\n- **Sides:**\n  - 3 Large Fries\n\n- **Drinks:**\n  - 6 Medium Drinks (mix and matchfrom Cola,Diet Cola,Lemon-Lime,or Root Beer)\n\nThis order is perfect for feeding agroup of six!Let me know if you'd like to tweak anything before finalizing.\ud83d\ude0a"
+        }
+      ],
+      "timestamp": "2025-06-30T09:21:09.144568",
+      "status": "success",
+      "errors": []
+    }
+  ]
+}

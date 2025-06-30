@@ -6,11 +6,7 @@ from pathlib import Path
 from typing import Optional, Dict
 from dotenv import load_dotenv
 
-from streaming_ordering_chatbot.api.flows import (
-    PreambleFlowSK,
-    OrderAssistantFlowSK,
-    SummaryFlowSK
-)
+from streaming_ordering_chatbot.api.flows import (PreambleFlowSK, OrderAssistantFlowSK, SummaryFlowSK)
 from streaming_ordering_chatbot.api.models import Message
 
 # Load environment variables from .env file
@@ -20,23 +16,14 @@ load_dotenv()
 logger = logging.getLogger(__name__)
 
 def get_validated_config() -> tuple[str, str, str, str]:
-    """Get and validate Azure OpenAI configuration from environment variables.
-    
-    Returns:
-        tuple: (endpoint, api_key, deployment_name, brand_name)
-        
-    Raises:
-        ValueError: If required environment variables are missing
-    """
     endpoint = os.getenv("AZURE_OPENAI_ENDPOINT")
     api_key = os.getenv("AZURE_OPENAI_API_KEY")
     deployment_name = os.getenv("AZURE_OPENAI_DEPLOYMENT_NAME")
-    brand_name = os.getenv("BRAND_NAME")  # Default to casual brand
+    brand_name = os.getenv("BRAND_NAME")  
     
     if not all([endpoint, api_key, deployment_name]):
         raise ValueError("Missing required environment variables. Please check your .env file.")
     
-    # Cast to str after validation
     endpoint = str(endpoint)
     api_key = str(api_key)
     deployment_name = str(deployment_name)
@@ -45,14 +32,7 @@ def get_validated_config() -> tuple[str, str, str, str]:
     return endpoint, api_key, deployment_name, brand_name
 
 def read_prompt_template(template_name: str) -> str:
-    """Read a prompt template from the prompts directory.
-    
-    Args:
-        template_name (str): Name of the template file (e.g., 'preamble_SK', 'assistant_SK', 'summary_SK')
-    
-    Returns:
-        str: The contents of the prompt template file
-    """
+    """Read a prompt template from the prompts directory and return its content."""
     template_path = Path(__file__).parent.joinpath(
         "streaming_ordering_chatbot",
         "api",
@@ -74,7 +54,7 @@ def initialize_conversation_flows(
     deployment_name: str,
     brand_name: str
 ):
-    """Initialize conversation flows with validated parameters."""
+    """Initialize conversation flows with parameters."""
     return (
         PreambleFlowSK(endpoint, api_key, deployment_name, brand_name=brand_name),
         OrderAssistantFlowSK(endpoint, api_key, deployment_name, brand_name=brand_name),
@@ -82,19 +62,13 @@ def initialize_conversation_flows(
     )
 
 async def natural_conversation() -> None:
-    """Run a natural restaurant ordering conversation using ConversationFlowSK classes.
-    Incorporates brand personality and streams responses with proper formatting.
-    
-    The conversation flows through three stages:
+    """Replicating natural restaurant ordering conversation using ConversationFlowSK classes with brand config incorporated.
     1. Greeting (PreambleFlowSK) - Initial welcome and menu introduction
     2. Ordering (OrderAssistantFlowSK) - Menu questions and order taking
     3. Summary (SummaryFlowSK) - Order summary and confirmation
     """
-    # Get validated configuration
     endpoint, api_key, deployment_name, brand_name = get_validated_config()
-    
-    # Initialize conversation flows with validated parameters
-    preamble_flow, order_flow, summary_flow = initialize_conversation_flows(
+    preamble_flow, order_ass_flow, summary_flow = initialize_conversation_flows(
         endpoint=endpoint,
         api_key=api_key,
         deployment_name=deployment_name,
@@ -110,7 +84,7 @@ async def natural_conversation() -> None:
     print(f"Using brand personality: {brand_name}")
     print("Commands: 'exit' to end, 'summary' for chat summary, 'done' when finished ordering")
     print("-" * 80)
-    
+    #this return a response for every user input
     while True:
         try:
             # Get user input
@@ -127,11 +101,11 @@ async def natural_conversation() -> None:
             chat_history.append(Message(role="user", content=user_input))
             
             print("\nAssistant:", end=' ', flush=True)
-              # Choose appropriate flow based on conversation state and get response
+              # using appropriate flow based on conversation state and get response
             response = ""
             try:
                 if user_input.lower() == 'summary' and len(chat_history) > 1:
-                    # Generate conversation summary
+                    # conversation summary
                     flow = summary_flow
                     async for token in flow(chat_history, current_order):
                         response += token
@@ -143,15 +117,15 @@ async def natural_conversation() -> None:
                         response += token
                         print(token, end='', flush=True)
                     is_first_message = False
-                    # If first message is about menu/order, immediately follow up with order flow
+                    # If first message is about menu/order, immediately follow up with order ass flow
                     if any(keyword in user_input.lower() for keyword in ['menu', 'order', 'food', 'drink', 'what', 'have', 'give']):
-                        flow = order_flow
+                        flow = order_ass_flow
                         async for token in flow(chat_history, current_order):
                             response += token
                             print(token, end='', flush=True)
                 else:
                     # Regular ordering interaction
-                    flow = order_flow
+                    flow = order_ass_flow
                     async for token in flow(chat_history, current_order):
                         response += token
                         print(token, end='', flush=True)
@@ -188,9 +162,8 @@ if __name__ == "__main__":
             print("- AZURE_OPENAI_ENDPOINT")
             print("- AZURE_OPENAI_API_KEY")
             print("- AZURE_OPENAI_DEPLOYMENT_NAME")
-            print("- BRAND_NAME (optional, defaults to 'casual')")
+            print("- BRAND_NAME (optional)")
         except Exception as e:
             print(f"\nAn unexpected error occurred: {str(e)}")
-            print("If the error persists, check your network connection and Azure OpenAI service status.")
-    
+            
     asyncio.run(main())

@@ -1,0 +1,5 @@
+brand_name,BrandVoiceMetric,RelevanceMetric,TaskCompletionMetric
+Contoso Restaurant,0.85,0.8,0.9
+Domino's Pizza,0.3,0.6,0.85
+P.F. Chang’s,0.1,0.7,0.7
+Chipotle,0.4,0.8,0.9

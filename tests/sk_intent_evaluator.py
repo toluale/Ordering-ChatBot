@@ -50,24 +50,7 @@ class SKIntentEvaluator:
     
     async def __call__(self, test_cases: Optional[List[Dict]] = None) -> Dict:
         """
-        Make the evaluator directly callable, similar to OrderIntentFlowSK.
-        Args:
-            test_cases: Optional list of test cases. If not provided, will load from default file.
-                Each test case should be a dict with:
-                - message: str
-                - expected_intent: str
-                - scenario: str
-                - current_order: dict
-        Returns:
-            Dict containing:
-            - metrics: Dict with evaluation metrics
-                - accuracy: overall accuracy
-                - f1_score: F1 score
-                - precision: precision
-                - recall: recall
-                - per_intent: detailed metrics per intent
-                - errors: list of misclassified cases
-            - results_df: pandas DataFrame with detailed results per test case
+        Evaluate intent classification using provided test cases or default cases.
         """
         if test_cases is None:
             # Load default test cases if none provided
@@ -97,29 +80,24 @@ class SKIntentEvaluator:
                     )
                 )
                 error_logs[i] = error_log
-                result["correct"] = False  # Make sure correct is False when prediction doesn't match
+                result["correct"] = False  
             else:
                 error_logs[i] = None
-                result["correct"] = True  # Make sure correct is True when prediction matches
+                result["correct"] = True  
                 
             results.append(result)
         
-        # Convert results to DataFrame
         df = pd.DataFrame(results)
         
-        # Rename columns first to match desired format
         df = df.rename(columns={
             'expected': 'expected_intent',
             'predicted': 'predicted_intent'
         })
         
-        # Add accuracy column (1.0 for correct predictions, 0.0 for incorrect)
         df['accuracy'] = (df['expected_intent'] == df['predicted_intent']).astype(float)
         
-        # Add error_log column
         df['error_log'] = pd.Series(error_logs)
         
-        # Select and order columns
         df = df[['message', 'scenario', 'expected_intent', 'predicted_intent', 'accuracy', 'error_log']]
         
         # Calculate metrics using sklearn
@@ -151,7 +129,6 @@ class SKIntentEvaluator:
             f1_dict[intent] = f1
             support_dict[intent] = sum(y_true_intent)
         
-        # Create metrics output
         metrics = {
             'accuracy': accuracy,
             'f1_score': f1_macro,
@@ -161,7 +138,6 @@ class SKIntentEvaluator:
             'errors': []
         }
         
-        # Add per-intent metrics
         for intent in unique_intents:
             metrics['per_intent'][intent] = {
                 'precision': precision_dict[intent],
@@ -208,7 +184,6 @@ class SKIntentEvaluator:
         }
     
 async def main():
-    # Azure OpenAI configuration
     ENDPOINT = os.getenv("AZURE_OPENAI_ENDPOINT")
     API_KEY = os.getenv("AZURE_OPENAI_API_KEY")
     DEPLOYMENT_NAME = os.getenv("AZURE_OPENAI_DEPLOYMENT_NAME")
@@ -219,7 +194,6 @@ async def main():
     # Create evaluator
     evaluator = SKIntentEvaluator(str(ENDPOINT), str(API_KEY), str(DEPLOYMENT_NAME))
     
-    # Example 1: Evaluate using default test cases
     print("Running evaluation with default test cases...")
     results = await evaluator()
     
