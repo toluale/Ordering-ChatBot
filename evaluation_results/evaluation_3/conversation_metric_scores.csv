@@ -1,0 +1,256 @@
+brand_name,user_prompt,assistant_response,relevance_score,coherence_score,fluency_score,turn_number
+Contoso Restaurant,Hello,Welcome to Contoso Restaurant!We're so glad you're here.How can we make your day a little more delicious andcomforting?,1.0,4.0,4.0,1
+Contoso Restaurant,"Hello, I want to order dinner for my family","That sounds wonderful!Let’s create a dinner your family will love.We have fresh,home-style burgers,crispy fries,and refreshing drinks to choose from.What would you like to start with?Burgers,sides,or drinks?",4.0,4.0,4.0,1
+Contoso Restaurant,I want hamburger and cheeseburger with large fries,"You've got great taste!Let’s start with a delicious Hamburger and Cheeseburger,paired with some crispy Large Fries.Would you like to customize your burgers?For example,you can choose the patty size,bun type,how it’s cooked,or add extra toppings like bacon or mayo.If you'd prefer them as they are—fresh and home-style—just let me know!",5.0,4.0,4.0,1
+Contoso Restaurant,Can you put together a meal for 4 people?,"Absolutely!Let’s craft a comforting,delicious meal for your family of four.Here’s what I recommend:1.**Burgers**:- 2 Hamburgers (classic and fresh,with lettuce,tomato,onion,and ketchup).  
+   - 2 Cheeseburgers (home-style goodness with melted cheese,lettuce,tomato,onion,and ketchup).  
+
+2.**Sides**:- 2 Large Fries to share—crispy and satisfying.3.**Drinks**:- Choose 4 refreshing drinks like Cola,Diet Cola,Lemon-Lime,or Root Beer in Medium size—or mix and match forvariety!Does this sound good to you?Or would you like to tweak anything?We’re here to make sure it’s just right foryour family!",5.0,4.0,4.0,1
+Contoso Restaurant,Include medium size drinks for everyone,"Perfect!Here’s your comforting,delicious meal for four people:### **Burgers**  
+- **2Hamburgers**:Fresh and home-style with lettuce,tomato,onion,and ketchup.- **2 Cheeseburgers**:Melted cheese goodness with lettuce,tomato,onion,and ketchup.### **Sides**  
+- **2 Large Fries**:Crispy and satisfying to share.### **Drinks**  
+- **4 MediumDrinks**:Choose from Cola,Diet Cola,Lemon-Lime,or Root Beer—or mix and match for variety!Would you like to confirm this order as is orcustomize anything further?Let me know your drink choices if you'd like specific ones!",5.0,4.0,3.0,2
+Contoso Restaurant,Increase the order by 2 people and give me a summary of the total order,"Absolutely!Let’s adjust the order to serve six people while keepingeverything comforting and delicious.Here's your updated meal for six:
+
+### **Burgers**  
+- **3 Hamburgers**:Fresh and home-style with lettuce,tomato,onion,and ketchup.- **3 Cheeseburgers**:Melted cheese goodness with lettuce,tomato,onion,and ketchup.### **Sides**  
+- **3 Large Fries**:Crispy and satisfying to share.### **Drinks**  
+- **6 MediumDrinks**:Choose from Cola,Diet Cola,Lemon-Lime,or Root Beer—or mix and match for variety!Would you like to confirm this order or customize anythingfurther?Let me know if you'd like specific drink choices or adjustments!",4.0,4.0,3.0,2
+Contoso Restaurant,Can you summarize my order?,"Of course!Here's the summary of your order for six people:### **Burgers**  
+- **3Hamburgers**:Made fresh,home-style with lettuce,tomato,onion,and ketchup.- **3 Cheeseburgers**:Melted cheese goodness with lettuce,tomato,onion,and ketchup.### **Sides**  
+- **3 Large Fries**:Crispy and satisfying to share.### **Drinks**  
+- **6 MediumDrinks**:Choose from Cola,Diet Cola,Lemon-Lime,or Root Beer—or mix and match for variety!This hearty meal is made with love,designed for comfort,and perfect for your group.If everything looks good,you're all set to click ""Add to Cart"" tocomplete your order!Let me know if you'd like any final tweaks or specifydrink choices!",5.0,5.0,3.0,2
+Domino's Pizza,Hello,Hi there!😊 How can I assist you today?,4.0,4.0,3.0,2
+Domino's Pizza,"Hello, I want to order dinner for my family",Of course!That sounds great.What would you like to order for your family?Feel free to let me know if you have any specificpreferences or if you'd like recommendations!😊,3.0,4.0,4.0,3
+Domino's Pizza,I want hamburger and cheeseburger with large fries,"Got it!Here's what I have for your order so far:
+
+-**1 Hamburger** (quarter lb,single patty,sesame bun,cooked normal with lettuce,tomato,onion,and ketchup)
+- **1 Cheeseburger** (quarter lb,single patty,sesame bun,cooked normal with lettuce,tomato,onion,and ketchup)
+- **Large Fries**
+
+Would you liketo customize anything?For example:change toppings or bun type?Add drinks or extra sides?😊",5.0,4.0,4.0,3
+Domino's Pizza,Can you put together a meal for 4 people?,"Absolutely!Here's a balanced meal for 4 people:
+
+### Mealfor 4:1.**Hamburger** (quarter lb,single patty,sesame bun,normal cook,lettuce,tomato,onion,ketchup)  
+2.**Cheeseburger** (quarter lb,single patty,sesame bun,normal cook,lettuce,tomato,onion,ketchup)  
+3.**Black Bean Burger** (quarter lb,single patty,sesame bun,normal cook - vegetarian option)  
+4.**Double Cheeseburger** (half lb,double patty,sesame bun,normal cook with lettuce,tomato,onion,bacon and ketchup)  
+
+### Sides:- **2 Large Fries**
+
+### Drinks:- **Cola** (Medium size x2)  
+- **Diet Cola** (Medium size x1)  
+- **Root Beer** (Medium sizex1)
+
+Does this look good to you?Let me know if you'd like to make any changes oradd anything else!😊",5.0,4.0,2.0,3
+Domino's Pizza,Include medium size drinks for everyone,"Here's the updated meal for 4 people,now including medium-sized drinks for everyone:
+
+### Meal for4:1.**Hamburger** (quarter lb,single patty,sesame bun,normal cook,lettuce,tomato,onion,ketchup)  
+2.**Cheeseburger** (quarter lb,single patty,sesame bun,normal cook,lettuce,tomato,onion,ketchup)  
+3.**Black Bean Burger** (quarter lb,single patty,sesame bun,normal cook - vegetarian option)  
+4.**Double Cheeseburger** (half lb,double patty,sesame bun,normal cook with lettuce,tomato,onion,bacon and ketchup)
+
+### Sides:- **2 Large Fries**
+
+### Drinks:- **Cola** (Medium size x1)- **Diet Cola** (Medium size x1)  
+- **Root Beer** (Medium size x1)  
+- **Lemon-Lime Soda**(Medium size x1)
+
+Does this look good toyou?Let me know if you'd like to make any changes oradd anything else!😊",4.0,4.0,3.0,3
+Domino's Pizza,Increase the order by 2 people and give me a summary of the total order,"Here’s the updated meal for **6 people**, withdrinks included for everyone:
+
+---
+
+### **Burgers(6 total):**
+1.**Hamburger**  
+   - Quarter lb,single patty,sesame bun,normal cook,lettuce,tomato,onion,ketchup.2.**Cheeseburger**  
+   - Quarter lb,single patty,sesame bun,normal cook,lettuce,tomato,onion,ketchup.3.**Black Bean Burger** (vegetarian option)- Quarter lb,single patty,sesame bun,normal cook.
+
+4.**Double Cheeseburger**  
+   - Half lb,double patty,sesame bun,normal cook with lettuce,tomato,onion,bacon and ketchup.5.**Hamburger**  
+   - Quarter lb,single patty,sesame bun,normal cook with lettuce,tomato,onion and ketchup.6.**Cheeseburger**  
+   - Quarter lb,single patty,sesame bun,normal cook with lettuce,tomato,onion and ketchup.
+
+---
+
+### **Sides:**
+- **3 Large Fries**
+
+---
+
+### **Drinks (6 total):**
+1.Cola (Medium size x2)  
+2.Diet Cola (Medium size x1)  
+3.Root Beer (Medium size x1)  
+4.Lemon-Lime Soda (Medium size x1)5.Cola (Medium size x1)
+
+---
+
+Let me knowif you'd like to customize anything further!😊",5.0,4.0,3.0,4
+Domino's Pizza,Can you summarize my order?,"Of course!Here’s a concise summary of your order for **6people**:
+
+---
+
+### **Burgers (6total):**
+- 2 Hamburgers  
+-2 Cheeseburgers  
+- 1 Black BeanBurger (vegetarian option)  
+- 1 DoubleCheeseburger  
+
+### **Sides:**
+- 3 Large Fries  
+
+### **Drinks(6 total):**
+- Medium Cola x3- Medium Diet Cola x1  
+- Medium Root Beerx1  
+- Medium Lemon-Lime Soda x1---
+
+Let me know if everything looks good or ifyou'd like to make any adjustments!😊",4.0,5.0,4.0,4
+P.F. Chang’s,Hello,Hello!😊 How can I assist you today?,4.0,4.0,3.0,4
+P.F. Chang’s,"Hello, I want to order dinner for my family","Great!Let’s get started with your order.What would you like to have for dinner?We’ve got burgers,fries,and drinks.Let me know the specifics for each family member!😊",4.0,4.0,3.0,4
+P.F. Chang’s,I want hamburger and cheeseburger with large fries,"Got it!Here's what I have so far:
+
+- **Hamburger**  
+  - Single patty,quarter lb,sesame bun,normal cook,default toppings:lettuce,tomato,onion,ketchup  
+
+- **Cheeseburger**- Single patty,quarter lb,sesame bun,normal cook,default toppings:lettuce,tomato,onion,ketchup  
+
+- **Large Fries**
+
+Would you like tocustomize the burgers (e.g., add or remove toppings) or order any drinks?😊",5.0,4.0,3.0,5
+P.F. Chang’s,Can you put together a meal for 4 people?,"Absolutely!Here's a suggested meal for 4 people based on themenu:
+
+### Meal for 4:1.**Hamburger**
+   - Single patty,quarter lb,sesame bun,normal cook- Default toppings:lettuce,tomato,onion,ketchup
+
+2.**Cheeseburger**
+   - Single patty,quarter lb,sesame bun,normal cook- Default toppings:lettuce,tomato,onion,ketchup
+
+3.**Black Bean Burger** (vegetarian option)- Single patty,quarter lb,sesame bun,normal cook- Default toppings:lettuce,tomato,onion,ketchup
+
+4.**Hamburger** (another one for variety)- Single patty,quarter lb,sesame bun,normal cook- Default toppings:lettuce,tomato,onion,ketchup
+
+5.**Large Fries** (to share)
+
+6.**Drinks**:- Cola (Medium)
+   - Diet Cola (Medium)
+   - Lemon-Lime (Medium)- Root Beer (Medium)
+
+Would you like to adjustanything or add/remove items?😊",5.0,4.0,2.0,5
+P.F. Chang’s,Include medium size drinks for everyone,"Here’s your updated meal for 4 people,including medium-sized drinks for everyone:
+
+### Meal for4:
+
+1.**Hamburger**  
+   - Single patty,quarter lb,sesame bun,normal cook  
+   - Default toppings:lettuce,tomato,onion,ketchup  
+
+2.**Cheeseburger**  
+   - Single patty,quarter lb,sesame bun,normal cook  
+   - Default toppings:lettuce,tomato,onion,ketchup  
+
+3.**Black Bean Burger** (vegetarian option)- Single patty,quarter lb,sesame bun,normal cook  
+   - Default toppings:lettuce,tomato,onion,ketchup  
+
+4.**Hamburger** (another one for variety)- Single patty,quarter lb,sesame bun,normal cook  
+   - Default toppings:lettuce,tomato,onion,ketchup  
+
+5.**Large Fries** (to share)
+
+6.**Drinks** (Medium size):  
+   -Cola  
+   - Diet Cola  
+   - Lemon-Lime  
+   - Root Beer  
+
+Does this look good?Let me know if you’d like to make any changesor add more items!😊",4.0,4.0,3.0,5
+P.F. Chang’s,Increase the order by 2 people and give me a summary of the total order,"Here’s the updated meal for **6 people**, witha summary of the total order:
+
+---
+
+### **Mealfor 6 People**  
+
+1.**Hamburger** (x2)  
+   -Single patty,quarter lb,sesame bun,normal cook  
+   - Default toppings:lettuce,tomato,onion,ketchup  
+
+2.**Cheeseburger** (x2)- Single patty,quarter lb,sesame bun,normal cook  
+   - Default toppings:lettuce,tomato,onion,ketchup  
+
+3.**Black Bean Burger** (vegetarian option) (x2)  
+   - Single patty,quarter lb,sesame bun,normal cook  
+   - Default toppings:lettuce,tomato,onion,ketchup  
+
+4.**Large Fries** (x2)  
+   -To share among 6 people  
+
+5.**Drinks** (Medium size):  
+   -Cola (x2)  
+   - Diet Cola (x1)  
+   - Lemon-Lime (x2)  
+   - Root Beer (x1)---
+
+### **Summary of Total Order**
+- **Burgers:** 6 total- Hamburger:2- Cheeseburger:2- Black Bean Burger:2- **Fries:** 2 Large- **Drinks:** 6 Medium drinks
+
+Letme know if you’d like to tweak anything!😊",4.0,4.0,3.0,5
+P.F. Chang’s,Can you summarize my order?,"Here’s a summary of your order for **6 people**:
+
+---
+
+### **Order Summary:**
+
+- **Burgers (6 total):**- 2 Hamburgers:Single patty,quarter lb,sesame bun,normal cook with lettuce,tomato,onion,ketchup- 2 Cheeseburgers:Single patty,quarter lb,sesame bun,normal cook with lettuce,tomato,onion,ketchup- 2 Black Bean Burgers (vegetarianoption): Single patty,quarter lb,sesame bun,normal cook with lettuce,tomato,onion,ketchup
+
+- **Fries:**
+  - 2 Large Fries (to share among6 people)
+
+- **Drinks (Medium size,6 total):**
+  - 2 Cola- 1 Diet Cola- 2 Lemon-Lime- 1 Root Beer
+
+---
+
+That’s thefull summary of your order!Let me know if everything looks good or if you'd liketo make changes.😊",4.0,4.0,3.0,6
+Chipotle,Hello,Hi there!😊 How can I help you today?,4.0,4.0,3.0,6
+Chipotle,"Hello, I want to order dinner for my family","Great!I'd be happy to help you with that.What would you like to order?We have burgers,fries,and drinks on the menu.Let me know what sounds good for your family!😊",4.0,4.0,3.0,6
+Chipotle,I want hamburger and cheeseburger with large fries,"Got it!Here's what I have so far:
+
+- **1 Hamburger** (default options:single patty,quarter lb,sesame bun,normal cook,lettuce,tomato,onion,ketchup)
+- **1 Cheeseburger** (defaultoptions:single patty,quarter lb,sesame bun,normal cook,lettuce,tomato,onion,ketchup)
+- **Large Fries**
+
+Would you like tocustomize anything?For example:patty size,toppings,or add drinks to your order?😊",5.0,4.0,4.0,6
+Chipotle,Can you put together a meal for 4 people?,"Sure!Let’s create a balanced meal for 4 people.Here's a suggestion based on our menu:
+
+### Meal for4:- **2 Hamburgers** (default options:single patty,quarter lb,sesame bun,normal cook,lettuce,tomato,onion,ketchup)
+- **2 Cheeseburgers** (default options:single patty,quarter lb,sesame bun,normal cook,lettuce,tomato,onion,ketchup)
+- **2 Large Fries**
+- **4Drinks** (Choose from Cola,Diet Cola,Lemon-Lime,Root Beer)
+
+Would you like to customize anything or chooseyour drinks?😊",5.0,4.0,3.0,7
+Chipotle,Include medium size drinks for everyone,"Got it!Here's your updated meal for 4:
+
+### Meal for4:- **2 Hamburgers** (default options:single patty,quarter lb,sesame bun,normal cook,lettuce,tomato,onion,ketchup)
+- **2 Cheeseburgers** (default options:single patty,quarter lb,sesame bun,normal cook,lettuce,tomato,onion,ketchup)
+- **2 Large Fries**
+- **4Medium Drinks** (Choose from Cola,Diet Cola,Lemon-Lime,Root Beer)
+
+Let me know which drink flavors you'd likefor everyone!😊",5.0,4.0,3.0,7
+Chipotle,Increase the order by 2 people and give me a summary of the total order,"Got it!Let’s adjust the order for 6 people.Here’s your updated summary:
+
+### Meal for 6:- **3 Hamburgers** (default options:single patty,quarter lb,sesame bun,normal cook,lettuce,tomato,onion,ketchup)
+- **3 Cheeseburgers** (default options:single patty,quarter lb,sesame bun,normal cook,lettuce,tomato,onion,ketchup)
+- **3 Large Fries**
+- **6Medium Drinks** (Choose from Cola,Diet Cola,Lemon-Lime,Root Beer)
+
+Let me know which drink flavors you'd likefor everyone or if you'd like to make any other changes!😊",5.0,4.0,3.0,7
+Chipotle,Can you summarize my order?,"Here’s a summary of your order for 6 people:
+
+- **3 Hamburgers**  
+  - Defaultoptions:single patty,quarter lb,sesame bun,normal cook,lettuce,tomato,onion,ketchup  
+- **3 Cheeseburgers**- Default options:single patty,quarter lb,sesame bun,normal cook,lettuce,tomato,onion,ketchup  
+- **3 Large Fries**  
+- **6 Medium Drinks**  
+  - Options:Cola,Diet Cola,Lemon-Lime,Root Beer  
+
+This looks like a great meal!Let me know if you’d like to finalize the drinkflavors or make any adjustments.😊",5.0,4.0,4.0,7
