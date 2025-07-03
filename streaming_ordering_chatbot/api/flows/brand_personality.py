@@ -10,10 +10,7 @@ class BrandPersonalityPlugin:
     """For managing brand personality in conversations."""
 
     def __init__(self, kernel: Kernel, brand_name: Optional[str] = None):
-        """Initialize the brand personality plugin.
-        Args:
-            kernel: The Semantic Kernel instance
-        """
+        """Initialize the brand personality plugin."""
         self.kernel = kernel
         self._load_brand_configs()
         self.current_brand = brand_name if brand_name in self.brand_configs else None
@@ -64,10 +61,7 @@ class BrandPersonalityPlugin:
 
                 Remember to maintain this brand voice consistently throughout the conversation while remaining helpful and natural."""
 
-    @kernel_function(
-        description="Apply brand personality to system prompt",
-        name="enhance_system_prompt"
-    )
+    @kernel_function(description="Apply brand personality to system prompt", name="enhance_system_prompt")
     def enhance_system_prompt(self, system_prompt: str) -> str:
         """Enhance a system prompt with brand personality instructions."""
         if not self.current_brand:
@@ -76,10 +70,7 @@ class BrandPersonalityPlugin:
         brand_instructions = self.get_brand_instructions()
         return f"{brand_instructions}\n\nBASE INSTRUCTIONS:\n{system_prompt}"
 
-    @kernel_function(
-        description="Format message with brand personality",
-        name="format_brand_message"
-    )
+    @kernel_function(description="Format message with brand personality", name="format_brand_message")
     def format_brand_message(self, message: str, brand_name: Optional[str] = None) -> str:
         """Format a message according to brand personality."""
         brand_name = brand_name or self.current_brand
@@ -94,10 +85,7 @@ class BrandPersonalityPlugin:
         context = self.get_brand_instructions(brand_name)
         return f"{context}\n\nResponse in this style: {message}"
 
-    @kernel_function(
-        description="List available brand personalities",
-        name="list_brands"
-    )
+    #@kernel_function(description="List available brand personalities", name="list_brands")
     def list_brands(self) -> str:
         """List all available brand personalities with their key characteristics."""
         if not self.brand_configs:
@@ -112,10 +100,7 @@ class BrandPersonalityPlugin:
             )
         return "\n\n".join(brands_info)
 
-    @kernel_function(
-        description="Get the current brand personality",
-        name="get_current_brand"
-    )
+    @kernel_function(description="Get the current brand personality", name="get_current_brand")
     def get_current_brand(self) -> str:
         """Get information about the currently selected brand."""
         if not self.current_brand:

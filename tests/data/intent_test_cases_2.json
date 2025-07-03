@@ -1,0 +1,188 @@
+{
+    "test_cases": [
+       {
+            "message": "What drink do you recommend?",
+            "current_order": {"items": [{"name": "cheeseburger", "quantity": 1}]},
+            "expected_intent": "conversation",
+            "scenario": "drink_recommendation"
+        },
+       
+        {
+            "message": "Can I get extra fries on the side for my burger?",
+            "current_order": {"items": [{"name": "cheeseburger", "quantity": 1}]},
+            "expected_intent": "order",
+            "scenario": "customization_request"
+        },
+        {
+            "message": "What's your most popular item? I might want to add that.",
+            "current_order": {"items": [{"name": "fries", "quantity": 1}]},
+            "expected_intent": "conversation",
+            "scenario": "popularity_inquiry_with_potential_order"
+        },
+        {
+            "message": "Do you have any specials today? If so, I'd like to hear about them before I decide.",
+            "current_order": {"items": []},
+            "expected_intent": "conversation",
+            "scenario": "specials_inquiry_decision_pending"
+        },
+        {
+            "message": "I want half cheeseburger and half hamburger",
+            "current_order": {"items": [{"name": "cheeseburger", "quantity": 1}]},
+            "expected_intent": "order",
+            "scenario": "complex_customization"
+        },
+        {
+            "message": "I'm trying to decide between the cheeseburger and the hamburger. What would you recommend based on what I already have?",
+            "current_order": {"items": [{"name": "fries", "quantity": 1}]},
+            "expected_intent": "conversation",
+            "scenario": "recommendation_based_on_current_order"
+        },
+        
+        {
+            "message": "Actually, you know what, let me just start over completely. Clear everything.",
+            "current_order": {"items": [{"name": "cheeseburger", "quantity": 1}, {"name": "fries", "quantity": 2}]},
+            "expected_intent": "order",
+            "scenario": "complete_order_reset"
+        },
+        {
+            "message": "Can I split my order into two separate orders? I want to pay for part of it now.",
+            "current_order": {"items": [{"name": "hamburger", "quantity": 2}, {"name": "fries", "quantity": 2}]},
+            "expected_intent": "conversation",
+            "scenario": "order_splitting_request"
+        },
+        {
+            "message": "I want to upgrade my fries to large, but only if it's less than $2 more. Can you check?",
+            "current_order": {"items": [{"name": "hamburger", "quantity": 1}, {"name": "fries", "quantity": 1, "size": "medium"}]},
+            "expected_intent": "order",
+            "scenario": "conditional_modification"
+        },
+        {
+            "message": "Is there any way to make the hamburger healthier? Like, can you use a lettuce wrap instead of a bun?",
+            "current_order": {"items": [{"name": "hamburger", "quantity": 1}]},
+            "expected_intent": "order",
+            "scenario": "health_conscious_modification"
+        },
+        {
+            "message": "I'm ordering for my family. Can I add items for different people and keep track of who gets what?",
+            "current_order": {"items": []},
+            "expected_intent": "conversation",
+            "scenario": "multi_person_ordering_inquiry"
+        },
+        {
+            "message": "Actually, add a large fries to that order.",
+            "current_order": {"items": [{"name": "cheeseburger", "quantity": 1}]},
+            "expected_intent": "order",
+            "scenario": "hesitation_then_confirmation"
+        },
+        {
+            "message": "Do you offer any discounts for students or seniors?",
+            "current_order": {"items": []},
+            "expected_intent": "conversation",
+            "scenario": "discount_inquiry"
+        },
+        {
+            "message": "Can I make my burger a combo meal?",
+            "current_order": {"items": [{"name": "cheeseburger", "quantity": 1}]},
+            "expected_intent": "order",
+            "scenario": "combo_upgrade"
+        },
+        {
+            "message": "What size of drinks do you have?",
+            "current_order": {"items": [{"name": "fries", "quantity": 1}]},
+            "expected_intent": "conversation",
+            "scenario": "size_options_inquiry"
+        },
+        {
+            "message": "Change my drink from Coke to Sprite",
+            "current_order": {"items": [{"name": "hamburger", "quantity": 1}, {"name": "cola", "quantity": 1}]},
+            "expected_intent": "order",
+            "scenario": "beverage_substitution"
+        },
+        {
+            "message": "Are your fries gluten-free?",
+            "current_order": {"items": []},
+            "expected_intent": "conversation",
+            "scenario": "dietary_restriction_inquiry"
+        },
+        {
+            "message": "I don't want the fries anymore, but I'll keep everything else",
+            "current_order": {"items": [{"name": "hamburger", "quantity": 1}]},
+            "expected_intent": "order",
+            "scenario": "selective_item_removal"
+        },
+       
+        {
+            "message": "Do you have in store pickup for later today?",
+            "current_order": {"items": [{"name": "hamburger", "quantity": 1}]},
+            "expected_intent": "conversation",
+            "scenario": "pickup_scheduling"
+        },
+        {
+            "message": "Double my entire order",
+            "current_order": {"items": [{"name": "hamburger", "quantity": 1}, {"name": "fries", "quantity": 1}]},
+            "expected_intent": "order",
+            "scenario": "bulk_quantity_increase"        
+        },
+        
+        {
+            "message": "Can you make sure my fries is extra crispy?",
+            "current_order": {"items": []},
+            "expected_intent": "order",
+            "scenario": "cooking_preference"
+        },
+        {
+            "message": "Is your restaurant kid-friendly? Do you have high chairs?",
+            "current_order": {"items": []},
+            "expected_intent": "conversation",
+            "scenario": "family_amenities_inquiry"
+        },
+        {
+            "message": "Add two more of whatever I just ordered",
+            "current_order": {"items": [{"name": "fries", "quantity": 1}]},
+            "expected_intent": "order",
+            "scenario": "repeat_last_item"
+        },
+        {
+            "message": "Do you have home delivery options?.",
+            "current_order": {"items": []},
+            "expected_intent": "conversation",
+            "scenario": "delivery_area_inquiry"
+        },
+        {
+            "message": "I want everything on my burger except pickles and onions",
+            "current_order": {"items": [{"name": "cheeseburger", "quantity": 1}]},
+            "expected_intent": "order",
+            "scenario": "detailed_customization_exclusions"
+        },
+        {
+            "message": "What's your refund policy if I'm not satisfied?",
+            "current_order": {"items": [{"name": "cheeseburger", "quantity": 1}]},
+            "expected_intent": "conversation",
+            "scenario": "refund_policy_inquiry"
+        },
+        {
+            "message": "Can I get the sauce that comes with the chicken tenders on the side?",
+            "current_order": {"items": [{"name": "fries", "quantity": 1}]},
+            "expected_intent": "order",
+            "scenario": "sauce_modification"
+        },
+        {
+            "message": "What's the latest I can place an order for pickup today?",
+            "current_order": {"items": []},
+            "expected_intent": "conversation",
+            "scenario": "ordering_deadline_inquiry"
+        },
+        {
+            "message": "I want to place an order for someone else. Can I put their name on it?",
+            "current_order": {"items": []},
+            "expected_intent": "conversation",
+            "scenario": "third_party_order_name"
+        },
+        {
+            "message": "Never mind, I don't want anything. Cancel the whole order.",
+            "current_order": {"items": [{"name": "cheeseburger", "quantity": 1}, {"name": "fries", "quantity": 1}]},
+            "expected_intent": "order",
+            "scenario": "complete_cancellation"
+        }   
+    ]
+}

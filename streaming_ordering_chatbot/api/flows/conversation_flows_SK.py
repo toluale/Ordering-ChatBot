@@ -85,7 +85,7 @@ class OrderPlugin(ConversationPlugin):
         return cleaned
         
     @kernel_function(description="Prepares order context for prompt template", name="chat")
-    async def prepare_order_context(self, chat_history: list[Message], current_order: dict) -> str:
+    async def prepare_order_context(self, chat_history: list[Message], current_order: dict, brand_name: Optional[str] = None) -> str:
         """Formats order context for prompt template."""
         # Clean and format chat history
         clean_history = []
@@ -101,8 +101,23 @@ class OrderPlugin(ConversationPlugin):
         items = current_order.get("items", [])
         order_str = "Current items in order: " + ", ".join(str(item) for item in items) if items else "No items in order yet"
         
+        # Get brand name from brand plugin if not provided
+        if not brand_name and hasattr(self, 'kernel'):
+            try:
+                # Try to get current brand from brand plugin
+                brand_result = await self.kernel.invoke(
+                    plugin_name="brand",
+                    function_name="get_current_brand"
+                )
+                brand_name = str(brand_result).split(":")[1].strip() if ":" in str(brand_result) else ""
+            except:
+                brand_name = "Contoso Burger"  # Fallback
+
+        # brand_name = brand_name or "Contoso Burger"  # Final fallback
+
         # Format context with clear section markers
         context = (
+            f"Brand Name: {brand_name}\n\n"
             f"Previous Conversation:\n{chat_str}\n\n"
             f"Current Order Status:\n{order_str}\n\n"
             f"Available Menu:\n{self.menu}\n\n"
@@ -249,6 +264,11 @@ class ConversationFlowSK:
     ) -> AsyncGenerator[str, None]:
         """Handle a conversation turn."""
         current_order = current_order if current_order is not None else {"items": []}
+        if hasattr(self, 'brand_plugin'):
+            brand_name = self.brand_plugin.get_current_brand()
+        else:
+            brand_name = None
+        current_brand_name = (brand_name or (self.brand_plugin.current_brand if hasattr(self, 'brand_plugin') else None)) #or "Contoso Burger"
         try:
             # Prepare context arguments
             context_args = KernelArguments()
@@ -257,13 +277,20 @@ class ConversationFlowSK:
             if isinstance(self, OrderAssistantFlowSK):
                 context_args["current_order"] = current_order
                 context_args["chat_history"] = chat_history
+                context_args["brand_name"] = current_brand_name
                 plugin_name = "order_assistant"
                 function_name = "chat"
             else:
                 context_args["chat_history"] = chat_history
+                context_args["brand_name"] = current_brand_name
                 plugin_name = self.PLUGIN_NAME
                 function_name = "chat"
             
+            brand_personality = ""
+            if hasattr(self, 'brand_plugin') and self.brand_plugin.current_brand:
+                brand_personality = self.brand_plugin.get_brand_instructions()
+            
+            context_args["brand_personality"] = brand_personality
             # Get system prompt from template and enhance with brand personality
             system_prompt = await self.kernel.invoke(
                 plugin_name=plugin_name,
@@ -328,7 +355,67 @@ class ConversationFlowSK:
         return cleaned
 
 
-# Specific conversation flows
+class PreamblePlugin(ConversationPlugin):
+    """Plugin for preamble/greeting conversation functions."""
+    
+    def __init__(self, kernel: Kernel):
+        super().__init__(kernel)
+    
+    @kernel_function(description="Prepares preamble context for prompt template", name="chat")
+    async def prepare_preamble_context(self, chat_history: list[Message], brand_name: Optional[str] = None) -> str:
+        """Formats preamble context for prompt template."""
+        # Clean and format chat history
+        clean_history = []
+        for msg in chat_history:
+            content = msg.content
+            if msg.role == "assistant":
+                # Use the same cleaning method from OrderPlugin
+                content = self._clean_assistant_response(content)
+            clean_history.append(f"{msg.role}: {content}")
+        
+        # Get recent conversation history (last 3-4 messages for preamble)
+        chat_str = "\n".join(clean_history[-4:])  # Shorter for preamble
+        
+        # Get brand name fallback
+        brand_name = brand_name or "Contoso Burger"
+        brand_personality = ""
+        
+        template_context = f"""
+Brand Name: {brand_name}
+Brand Personality: {brand_personality}
+Chat History: {chat_str}
+        """.strip()
+        
+        return template_context
+    
+    def _clean_assistant_response(self, content: str) -> str:
+        """Remove context markers from responses."""
+        if not content:
+            return ""
+            
+        markers = [
+            "Previous conversation:",
+            "Current Order:",
+            "Available menu:",
+            "Current order status:",
+            "Menu:",
+            "Chat History:",
+            "Instructions:",
+            "Reference Information",
+            "Brand:",
+            "[CONTEXT]",
+            "[END CONTEXT]"
+        ]
+        
+        cleaned = content
+        for marker in markers:
+            if marker in cleaned:
+                parts = cleaned.split(marker)
+                cleaned = parts[0].strip()
+        
+        return cleaned
+
+
 class PreambleFlowSK(ConversationFlowSK):
     """Initial greeting."""
     PROMPT_PATH = Path(__file__).parent.joinpath("prompts/preamble_SK.prompty")
@@ -336,6 +423,11 @@ class PreambleFlowSK(ConversationFlowSK):
 
     def __init__(self, endpoint: str, api_key: str, deployment_name: str, brand_name: Optional[str] = None):
         super().__init__(endpoint, api_key, deployment_name, brand_name)
+        
+        # Add PreamblePlugin for context formatting
+        self.preamble_plugin = PreamblePlugin(self.kernel)
+        self.kernel.add_plugin(self.preamble_plugin, "preamble")
+        
         self._setup_prompt_function()
         logger.info("Initialized PreambleFlowSK for greetings only")
 

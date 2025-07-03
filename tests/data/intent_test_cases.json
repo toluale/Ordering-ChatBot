@@ -5,24 +5,28 @@
             "current_order": {"items": [{"name": "fries", "quantity": 1}]},
             "expected_intent": "order",
             "scenario": "explicit_modification"
+            
         },
         {
             "message": "Can I add a burger to that?",
             "current_order": {"items": [{"name": "fries", "quantity": 1}]},
             "expected_intent": "order",
             "scenario": "add_item"
+            
         },
         {
             "message": "What's in your chicken sandwich?",
             "current_order": {"items": [{"name": "fries", "quantity": 1}]},
             "expected_intent": "conversation",
             "scenario": "menu_inquiry"
+            
         },
         {
             "message": "Remove the fries please",
             "current_order": {"items": [{"name": "fries", "quantity": 1}]},
             "expected_intent": "order",
             "scenario": "remove_item"
+        
         },
         {
             "message": "How spicy is the chicken?",
@@ -52,7 +56,7 @@
             "message": "Can you add fries to my order?",
             "current_order": {"items": []},
             "expected_intent": "order",
-            "scenario": "quantity_modification"
+            "scenario": "add_item_empty_order"
         },
         {
             "message": "I want to cancel my order",
@@ -65,6 +69,54 @@
             "current_order": {"items": [{"name": "fries", "quantity": 1}]},
             "expected_intent": "conversation",
             "scenario": "receipt_request"
+        },
+        {
+            "message": "I am not certain I want a burger, do you know how many calories it has?",
+            "current_order": {"items": [{"name": "fries", "quantity": 1}]},
+            "expected_intent": "conversation",
+            "scenario": "nutritional_inquiry_with_hesitation"
+        },
+        {
+            "message": "I'm not sure if I want to order the fries. What do you think?",
+            "current_order": {"items": []},
+            "expected_intent": "conversation",
+            "scenario": "seeking_recommendation"
+        },
+        {
+            "message": "Can I modify the burger I just added to have no onions?",
+            "current_order": {"items": [{"name": "cheeseburger", "quantity": 1}, {"name": "fries", "quantity": 1}]},
+            "expected_intent": "order",
+            "scenario": "item_customization"
+        },
+        {
+            "message": "What dessert options do you have? Can you tell me?",
+            "current_order": {"items": [{"name": "hamburger", "quantity": 1}]},
+            "expected_intent": "conversation",
+            "scenario": "dessert_inquiry"
+        },
+        {
+            "message": "Can I get a discount if I order more than one burger?",
+            "current_order": {"items": [{"name": "cheeseburger", "quantity": 1}]},
+            "expected_intent": "conversation",
+            "scenario": "bulk_discount_inquiry"
+        },
+        {
+            "message": "Do any of your items contain nuts?",
+            "current_order": {"items": []},
+            "expected_intent": "conversation",
+            "scenario": "allergy_inquiry"
+        },
+        {
+            "message": "Actually, scratch that. Let me get the cheeseburger instead.",
+            "current_order": {"items": []},
+            "expected_intent": "order",
+            "scenario": "item_substitution"
+        },
+        {
+            "message": "Can I get some toppings with my fries?",
+            "current_order": {"items": [{"name": "fries", "quantity": 1}]},
+            "expected_intent": "order",
+            "scenario": "side_request"
         }
     ]
 }
