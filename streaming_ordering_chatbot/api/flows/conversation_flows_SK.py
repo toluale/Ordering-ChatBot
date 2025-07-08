@@ -22,7 +22,7 @@ load_dotenv()
 ENDPOINT = os.getenv("AZURE_OPENAI_ENDPOINT")
 API_KEY = os.getenv("AZURE_OPENAI_API_KEY")
 DEPLOYMENT_NAME = os.getenv("AZURE_OPENAI_DEPLOYMENT_NAME")
-
+'''
 def get_required_env_var(name: str) -> str:
     value = os.getenv(name)
     if not value:
@@ -30,7 +30,7 @@ def get_required_env_var(name: str) -> str:
             f"{name} environment variable is not set. Please set it in your .env file."
         )
     return value
-
+'''
 # Set up logging
 logger = logging.getLogger(__name__)
 
