@@ -86,6 +86,7 @@ class BrandPersonalityPlugin:
         return f"{context}\n\nResponse in this style: {message}"
 
     #@kernel_function(description="List available brand personalities", name="list_brands")
+    '''
     def list_brands(self) -> str:
         """List all available brand personalities with their key characteristics."""
         if not self.brand_configs:
@@ -99,7 +100,7 @@ class BrandPersonalityPlugin:
                 f"  Values: {', '.join(config['values'])}"
             )
         return "\n\n".join(brands_info)
-
+    '''
     @kernel_function(description="Get the current brand personality", name="get_current_brand")
     def get_current_brand(self) -> str:
         """Get information about the currently selected brand."""
