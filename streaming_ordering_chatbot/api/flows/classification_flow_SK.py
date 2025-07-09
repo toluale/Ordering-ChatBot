@@ -36,7 +36,7 @@ class OrderIntentPlugin:
     @kernel_function(name="classify_intent", description="Classifies user intent for order modification.")
     async def classify_intent(self, user_message: str, current_order: dict) -> str:
         """Classifies whether user message is about ordering or general conversation."""
-        # Now use the registered prompt function
+        # use the registered prompt function
         response = await self.kernel.invoke(
             plugin_name="order_intent_prompts",
             function_name="classify_prompt",
@@ -51,7 +51,7 @@ class OrderIntentPlugin:
 
 
 class OrderIntentFlowSK:
-    """Order intent classification flow using Semantic Kernel."""
+    """Order intent classification flow."""
     
     def __init__(self, ENDPOINT: str, API_KEY: str, DEPLOYMENT_NAME: str):
         """Initialize the order intent classification flow."""
