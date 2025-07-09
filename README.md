@@ -77,3 +77,13 @@ Evaluation results are saved to:
 - `evaluation_results/conversation_metric_scores.csv` - Azure AI evaluation results
 
 ## Notes: 
+### TO DO
+1. Update the menu schema (each brand to evaluate will have its own menu ).
+   - Convert the menu file into a JSON file with dynamic menu-code generation
+   - Transfer the menu configuration to be defined in the environment variable (menu_path)
+   - Run another evaluation of the conversation flow with update menu schema
+2. Complete the implementation of order_flow in Semantic Kernel
+   - Include context file in the implemntation (promptflow implementation lacks context)
+   - Evaluate the order groundness and accuracy against the menu schema
+3. Design the main implementation to integrate the flows.
+   - Final evaluation of the end-to-end implementation 
