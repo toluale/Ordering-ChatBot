@@ -50,8 +50,8 @@ test_conversation_style_optional.py
 setup_brand.py
 conversation_test_new.py
 CONVERSATION_SYSTEM_GUIDE.md
-streaming_ordering_chatbot\evaluation\chatbot_evaluation_data.json
-streaming_ordering_chatbot\api\main.py
-streaming_ordering_chatbot\api\flows\ordering_chatbot_sk_integration.py
+streaming_ordering_chatbot/evaluation/chatbot_evaluation_data.json
+streaming_ordering_chatbot/api/main.py
+streaming_ordering_chatbot/api/flows/ordering_chatbot_sk_integration.py
 .github/
 .codacy/
