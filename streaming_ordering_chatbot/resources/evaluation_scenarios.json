@@ -12,7 +12,7 @@
         },
         {
             "id": "order",
-            "text": "I want hamburger and cheeseburger with large fries",
+            "text": "What do you recommend on your menu",
             "type": "order_specification",
             "expected_outcomes": [
                 "Acknowledge order",

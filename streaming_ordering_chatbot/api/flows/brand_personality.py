@@ -4,6 +4,7 @@ from typing import Dict, Optional
 
 from semantic_kernel import Kernel
 from semantic_kernel.functions.kernel_function_decorator import kernel_function
+from semantic_kernel.functions.kernel_arguments import KernelArguments
 
 
 class BrandPersonalityPlugin:
@@ -111,3 +112,34 @@ class BrandPersonalityPlugin:
             return f"Error: Selected brand '{self.current_brand}' not found in configurations."
             
         return f"Current brand: {brand['name']}\nTone: {brand['tone']}\nStyle: {brand['style']}"
+    
+
+
+    @kernel_function(description="Apply brand personality with conversation style", name="enhance_with_style")
+    def enhance_with_style(self, system_prompt: str, conversation_style: Optional[str] = None) -> str:
+        """Enhance a system prompt with both brand personality and conversation style."""
+        if not self.current_brand:
+            return system_prompt
+        
+        # Get base brand instructions
+        brand_instructions = self.get_brand_instructions()
+        
+        # Get style instructions from style plugin if available
+        style_instructions = ""
+        if hasattr(self, 'kernel'):
+            try:
+                style_result = self.kernel.invoke(
+                    plugin_name="conversation_style",
+                    function_name="get_style_instructions",
+                    arguments=KernelArguments(style=conversation_style) if conversation_style else None
+                )
+                style_instructions = str(style_result) if style_result else ""
+            except:
+                pass  # Style plugin not available or error occurred
+        
+        # Combine brand + style + system prompt
+        enhanced_instructions = brand_instructions
+        if style_instructions:
+            enhanced_instructions = f"{brand_instructions}\n\nCONVERSATION STYLE:\n{style_instructions}"
+        
+        return f"{enhanced_instructions}\n\nBASE INSTRUCTIONS:\n{system_prompt}"

@@ -2,28 +2,28 @@
     "test_cases": [
         {
             "message": "I want to change my order.",
-            "current_order": {"items": [{"name": "fries", "quantity": 1}]},
+            "current_order": {"items": []},
             "expected_intent": "order",
             "scenario": "explicit_modification"
             
         },
         {
-            "message": "Can I add a burger to that?",
-            "current_order": {"items": [{"name": "fries", "quantity": 1}]},
+            "message": "Can I add a vegetarian option to that?",
+            "current_order": {"items": []},
             "expected_intent": "order",
             "scenario": "add_item"
             
         },
         {
-            "message": "What's in your chicken sandwich?",
-            "current_order": {"items": [{"name": "fries", "quantity": 1}]},
+            "message": "What's in your vegan menu?",
+            "current_order": {"items": []},
             "expected_intent": "conversation",
             "scenario": "menu_inquiry"
             
         },
         {
-            "message": "Remove the fries please",
-            "current_order": {"items": [{"name": "fries", "quantity": 1}]},
+            "message": "Remove the drink please",
+            "current_order": {"items": []},
             "expected_intent": "order",
             "scenario": "remove_item"
         
@@ -47,32 +47,32 @@
             "scenario": "general_conversation"
         },
         {
-            "message": "Make that two fries instead of one",
-            "current_order": {"items": [{"name": "fries", "quantity": 1}]},
+            "message": "Make that order two instead of one",
+            "current_order": {"items": []},
             "expected_intent": "order",
             "scenario": "quantity_modification"
         },
         {
-            "message": "Can you add fries to my order?",
+            "message": "Can you add drink to my order?",
             "current_order": {"items": []},
             "expected_intent": "order",
             "scenario": "add_item_empty_order"
         },
         {
             "message": "I want to cancel my order",
-            "current_order": {"items": [{"name": "fries", "quantity": 1}]},
+            "current_order": {"items": []},
             "expected_intent": "order",
             "scenario": "cancel_order"
         },
         {
             "message": "Can I get a receipt for my order?",
-            "current_order": {"items": [{"name": "fries", "quantity": 1}]},
+            "current_order": {"items": []},
             "expected_intent": "conversation",
             "scenario": "receipt_request"
         },
         {
-            "message": "I am not certain I want a burger, do you know how many calories it has?",
-            "current_order": {"items": [{"name": "fries", "quantity": 1}]},
+            "message": "I am not certain I want that, do you know how many calories it has?",
+            "current_order": {"items": []},
             "expected_intent": "conversation",
             "scenario": "nutritional_inquiry_with_hesitation"
         },
@@ -83,20 +83,20 @@
             "scenario": "seeking_recommendation"
         },
         {
-            "message": "Can I modify the burger I just added to have no onions?",
-            "current_order": {"items": [{"name": "cheeseburger", "quantity": 1}, {"name": "fries", "quantity": 1}]},
+            "message": "Can I modify the order I just added to have no onions?",
+            "current_order": {"items": []},
             "expected_intent": "order",
             "scenario": "item_customization"
         },
         {
             "message": "What dessert options do you have? Can you tell me?",
-            "current_order": {"items": [{"name": "hamburger", "quantity": 1}]},
+            "current_order": {"items": []},
             "expected_intent": "conversation",
             "scenario": "dessert_inquiry"
         },
         {
-            "message": "Can I get a discount if I order more than one burger?",
-            "current_order": {"items": [{"name": "cheeseburger", "quantity": 1}]},
+            "message": "Can I get a discount if I order more than one order?",
+            "current_order": {"items": []},
             "expected_intent": "conversation",
             "scenario": "bulk_discount_inquiry"
         },
@@ -113,8 +113,8 @@
             "scenario": "item_substitution"
         },
         {
-            "message": "Can I get some toppings with my fries?",
-            "current_order": {"items": [{"name": "fries", "quantity": 1}]},
+            "message": "Can I get some toppings with my food?",
+            "current_order": {"items": []},
             "expected_intent": "order",
             "scenario": "side_request"
         }

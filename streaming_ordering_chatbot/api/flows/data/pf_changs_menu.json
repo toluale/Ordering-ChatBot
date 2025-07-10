@@ -1,0 +1,160 @@
+{
+  "brand_info": {
+    "name": "P.F. Chang's",
+    "cuisine_type": "Asian-Fusion",
+    "item_categories": ["entree", "appetizer", "soup", "rice", "noodles", "drink"],
+    "description": "Contemporary Asian bistro featuring wok-fired dishes and bold flavors"
+  },
+  "menu_items": {
+    "orange chicken": {
+      "code_pattern": "EN{size}OC",
+      "category": "entree",
+      "sizes": ["R", "L"],
+      "default": {"size": "R"},
+      "toppings": ["SP", "EX", "MI", "NO"],
+      "name_variations": ["orange chicken", "orange glazed chicken"]
+    },
+    "mongolian beef": {
+      "code_pattern": "EN{size}MB",
+      "category": "entree",
+      "sizes": ["R", "L"],
+      "default": {"size": "R"},
+      "toppings": ["SP", "EX", "MI", "NO"],
+      "name_variations": ["mongolian beef", "mongolian stir fry"]
+    },
+    "kung pao chicken": {
+      "code_pattern": "EN{size}KP",
+      "category": "entree",
+      "sizes": ["R", "L"],
+      "default": {"size": "R"},
+      "toppings": ["SP", "EX", "MI", "NO"],
+      "name_variations": ["kung pao chicken", "kung pao"]
+    },
+    "honey chicken": {
+      "code_pattern": "EN{size}HC",
+      "category": "entree",
+      "sizes": ["R", "L"],
+      "default": {"size": "R"},
+      "toppings": ["SP", "EX", "MI", "NO"],
+      "name_variations": ["honey chicken", "honey glazed chicken"]
+    },
+    "pad thai": {
+      "code_pattern": "NO{size}PT{protein}",
+      "category": "noodles",
+      "sizes": ["R", "L"],
+      "protein": ["CH", "SH", "TO", "BE"],
+      "default": {"size": "R", "protein": "CH"},
+      "toppings": ["SP", "EX", "PE", "LI"],
+      "name_variations": ["pad thai", "thai noodles"]
+    },
+    "lo mein": {
+      "code_pattern": "NO{size}LM{protein}",
+      "category": "noodles",
+      "sizes": ["R", "L"],
+      "protein": ["CH", "SH", "TO", "BE"],
+      "default": {"size": "R", "protein": "CH"},
+      "toppings": ["SP", "EX", "VE"],
+      "name_variations": ["lo mein", "soft noodles"]
+    },
+    "fried rice": {
+      "code_pattern": "RI{size}FR{protein}",
+      "category": "rice",
+      "sizes": ["R", "L"],
+      "protein": ["CH", "SH", "BE", "PO"],
+      "default": {"size": "R", "protein": "CH"},
+      "toppings": ["SP", "EX", "VE", "EG"],
+      "name_variations": ["fried rice", "chinese fried rice"]
+    },
+    "vegetable spring rolls": {
+      "code_pattern": "AP{size}VS",
+      "category": "appetizer",
+      "sizes": ["S"],
+      "default": {"size": "S"},
+      "toppings": [],
+      "name_variations": ["vegetable spring rolls", "spring rolls", "veggie rolls"]
+    },
+    "chicken lettuce wraps": {
+      "code_pattern": "AP{size}LW",
+      "category": "appetizer",
+      "sizes": ["S", "L"],
+      "default": {"size": "S"},
+      "toppings": ["SP", "EX"],
+      "name_variations": ["chicken lettuce wraps", "lettuce wraps"]
+    },
+    "hot & sour soup": {
+      "code_pattern": "SO{size}HS",
+      "category": "soup",
+      "sizes": ["S", "L"],
+      "default": {"size": "S"},
+      "toppings": ["SP", "TO"],
+      "name_variations": ["hot and sour soup", "hot sour soup"]
+    },
+    "jasmine tea": {
+      "code_pattern": "DR{size}JT",
+      "category": "drink",
+      "sizes": ["S", "L"],
+      "default": {"size": "S"},
+      "toppings": [],
+      "name_variations": ["jasmine tea", "green tea", "hot tea"]
+    },
+    "thai iced tea": {
+      "code_pattern": "DR{size}TI",
+      "category": "drink",
+      "sizes": ["S", "L"],
+      "default": {"size": "S"},
+      "toppings": [],
+      "name_variations": ["thai iced tea", "iced tea"]
+    }
+  },
+  "toppings": {
+    "SP": {"name": "spicy", "category": "spice_level", "applicable_items": ["entree", "noodles", "rice", "appetizer", "soup"]},
+    "EX": {"name": "extra sauce", "category": "sauce", "applicable_items": ["entree", "noodles", "rice", "appetizer"]},
+    "MI": {"name": "mild", "category": "spice_level", "applicable_items": ["entree", "noodles", "rice"]},
+    "NO": {"name": "no sauce", "category": "sauce", "applicable_items": ["entree", "noodles", "rice"]},
+    "PE": {"name": "peanuts", "category": "nuts", "applicable_items": ["noodles"]},
+    "LI": {"name": "lime", "category": "citrus", "applicable_items": ["noodles"]},
+    "VE": {"name": "extra vegetables", "category": "vegetable", "applicable_items": ["noodles", "rice"]},
+    "EG": {"name": "scrambled egg", "category": "protein", "applicable_items": ["rice"]},
+    "TO": {"name": "tofu", "category": "protein", "applicable_items": ["soup", "entree"]}
+  },
+  "item_types": {
+    "entree": {
+      "default_toppings": [],
+      "customizable": true,
+      "size_mapping": {"R": "regular", "L": "large"}
+    },
+    "noodles": {
+      "default_toppings": [],
+      "customizable": true,
+      "size_mapping": {"R": "regular", "L": "large"},
+      "protein_mapping": {"CH": "chicken", "SH": "shrimp", "TO": "tofu", "BE": "beef", "PO": "pork"}
+    },
+    "rice": {
+      "default_toppings": [],
+      "customizable": true,
+      "size_mapping": {"R": "regular", "L": "large"},
+      "protein_mapping": {"CH": "chicken", "SH": "shrimp", "BE": "beef", "PO": "pork"}
+    },
+    "appetizer": {
+      "default_toppings": [],
+      "customizable": true,
+      "size_mapping": {"S": "small", "L": "large"}
+    },
+    "soup": {
+      "default_toppings": [],
+      "customizable": true,
+      "size_mapping": {"S": "small", "L": "large"}
+    },
+    "drink": {
+      "default_toppings": [],
+      "customizable": false,
+      "size_mapping": {"S": "small", "L": "large"}
+    }
+  },
+  "amount_codes": {
+    "none": "0",
+    "light": "0.5",
+    "normal": "1",
+    "extra": "2"
+  }
+}

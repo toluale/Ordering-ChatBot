@@ -1,0 +1,163 @@
+{
+  "brand_info": {
+    "name": "Chipotle",
+    "cuisine_type": "Mexican",
+    "item_categories": ["bowl", "burrito", "tacos", "salad", "side", "drink"],
+    "description": "Fast-casual Mexican grill with responsibly sourced ingredients and build-your-own options"
+  },
+  "menu_items": {
+    "burrito bowl": {
+      "code_pattern": "BW{protein}",
+      "category": "bowl",
+      "protein": ["CH", "CA", "ST", "BA", "SO", "VE"],
+      "default": {"protein": "CH"},
+      "toppings": ["BL", "WH", "BR", "PI", "CO", "SC", "CH", "LT", "GU", "QU", "SA"],
+      "name_variations": ["burrito bowl", "bowl", "chicken bowl", "steak bowl"]
+    },
+    "burrito": {
+      "code_pattern": "BU{protein}",
+      "category": "burrito",
+      "protein": ["CH", "CA", "ST", "BA", "SO", "VE"],
+      "default": {"protein": "CH"},
+      "toppings": ["BL", "WH", "BR", "PI", "CO", "SC", "CH", "LT", "GU", "QU", "SA"],
+      "name_variations": ["burrito", "chicken burrito", "steak burrito"]
+    },
+    "soft tacos": {
+      "code_pattern": "TA{protein}",
+      "category": "tacos",
+      "protein": ["CH", "CA", "ST", "BA", "SO", "VE"],
+      "default": {"protein": "CH"},
+      "toppings": ["BL", "WH", "BR", "PI", "CO", "SC", "CH", "LT", "GU", "QU", "SA"],
+      "name_variations": ["soft tacos", "tacos", "chicken tacos", "steak tacos"]
+    },
+    "hard tacos": {
+      "code_pattern": "TH{protein}",
+      "category": "tacos",
+      "protein": ["CH", "CA", "ST", "BA", "SO", "VE"],
+      "default": {"protein": "CH"},
+      "toppings": ["BL", "WH", "BR", "PI", "CO", "SC", "CH", "LT", "GU", "QU", "SA"],
+      "name_variations": ["hard tacos", "crispy tacos", "hard shell tacos"]
+    },
+    "salad": {
+      "code_pattern": "SL{protein}",
+      "category": "salad",
+      "protein": ["CH", "CA", "ST", "BA", "SO", "VE"],
+      "default": {"protein": "CH"},
+      "toppings": ["BL", "WH", "BR", "PI", "CO", "SC", "CH", "LT", "GU", "QU", "SA", "VI"],
+      "name_variations": ["salad", "chicken salad", "steak salad", "burrito salad"]
+    },
+    "quesadilla": {
+      "code_pattern": "QU{protein}",
+      "category": "entree",
+      "protein": ["CH", "CA", "ST", "BA", "SO", "VE"],
+      "default": {"protein": "CH"},
+      "toppings": ["PI", "SC", "GU", "SA"],
+      "name_variations": ["quesadilla", "cheese quesadilla"]
+    },
+    "chips": {
+      "code_pattern": "SI{size}CH",
+      "category": "side",
+      "sizes": ["S", "L"],
+      "default": {"size": "S"},
+      "toppings": [],
+      "name_variations": ["chips", "tortilla chips"]
+    },
+    "guacamole": {
+      "code_pattern": "SI{size}GU",
+      "category": "side",
+      "sizes": ["S", "L"],
+      "default": {"size": "S"},
+      "toppings": [],
+      "name_variations": ["guacamole", "guac"]
+    },
+    "queso": {
+      "code_pattern": "SI{size}QU",
+      "category": "side",
+      "sizes": ["S", "L"],
+      "default": {"size": "S"},
+      "toppings": [],
+      "name_variations": ["queso", "cheese dip"]
+    },
+    "horchata": {
+      "code_pattern": "DR{size}HO",
+      "category": "drink",
+      "sizes": ["S", "M", "L"],
+      "default": {"size": "M"},
+      "toppings": [],
+      "name_variations": ["horchata", "rice drink"]
+    },
+    "agua fresca": {
+      "code_pattern": "DR{size}AF",
+      "category": "drink",
+      "sizes": ["S", "M", "L"],
+      "default": {"size": "M"},
+      "toppings": [],
+      "name_variations": ["agua fresca", "fruit water", "flavored water"]
+    },
+    "fountain drink": {
+      "code_pattern": "DR{size}FD",
+      "category": "drink",
+      "sizes": ["S", "M", "L"],
+      "default": {"size": "M"},
+      "toppings": [],
+      "name_variations": ["fountain drink", "soda", "soft drink", "coke", "sprite"]
+    }
+  },
+  "toppings": {
+    "BL": {"name": "black beans", "category": "beans", "applicable_items": ["bowl", "burrito", "tacos", "salad"]},
+    "WH": {"name": "white rice", "category": "rice", "applicable_items": ["bowl", "burrito", "tacos", "salad"]},
+    "BR": {"name": "brown rice", "category": "rice", "applicable_items": ["bowl", "burrito", "tacos", "salad"]},
+    "PI": {"name": "pinto beans", "category": "beans", "applicable_items": ["bowl", "burrito", "tacos", "salad"]},
+    "CO": {"name": "corn salsa", "category": "salsa", "applicable_items": ["bowl", "burrito", "tacos", "salad", "entree"]},
+    "SC": {"name": "sour cream", "category": "dairy", "applicable_items": ["bowl", "burrito", "tacos", "salad", "entree"]},
+    "CH": {"name": "cheese", "category": "dairy", "applicable_items": ["bowl", "burrito", "tacos", "salad", "entree"]},
+    "LT": {"name": "lettuce", "category": "vegetable", "applicable_items": ["bowl", "burrito", "tacos", "salad"]},
+    "GU": {"name": "guacamole", "category": "sauce", "applicable_items": ["bowl", "burrito", "tacos", "salad", "entree"]},
+    "QU": {"name": "queso", "category": "sauce", "applicable_items": ["bowl", "burrito", "tacos", "salad", "entree"]},
+    "SA": {"name": "salsa", "category": "salsa", "applicable_items": ["bowl", "burrito", "tacos", "salad", "entree"]},
+    "VI": {"name": "vinaigrette", "category": "dressing", "applicable_items": ["salad"]}
+  },
+  "item_types": {
+    "bowl": {
+      "default_toppings": ["WH", "BL", "SA"],
+      "customizable": true,
+      "protein_mapping": {"CH": "chicken", "CA": "carnitas", "ST": "steak", "BA": "barbacoa", "SO": "sofritas", "VE": "veggie"}
+    },
+    "burrito": {
+      "default_toppings": ["WH", "BL", "SA"],
+      "customizable": true,
+      "protein_mapping": {"CH": "chicken", "CA": "carnitas", "ST": "steak", "BA": "barbacoa", "SO": "sofritas", "VE": "veggie"}
+    },
+    "tacos": {
+      "default_toppings": ["SA"],
+      "customizable": true,
+      "protein_mapping": {"CH": "chicken", "CA": "carnitas", "ST": "steak", "BA": "barbacoa", "SO": "sofritas", "VE": "veggie"}
+    },
+    "salad": {
+      "default_toppings": ["LT", "SA"],
+      "customizable": true,
+      "protein_mapping": {"CH": "chicken", "CA": "carnitas", "ST": "steak", "BA": "barbacoa", "SO": "sofritas", "VE": "veggie"}
+    },
+    "entree": {
+      "default_toppings": [],
+      "customizable": true,
+      "protein_mapping": {"CH": "chicken", "CA": "carnitas", "ST": "steak", "BA": "barbacoa", "SO": "sofritas", "VE": "veggie"}
+    },
+    "side": {
+      "default_toppings": [],
+      "customizable": false,
+      "size_mapping": {"S": "small", "L": "large"}
+    },
+    "drink": {
+      "default_toppings": [],
+      "customizable": false,
+      "size_mapping": {"S": "small", "M": "medium", "L": "large"}
+    }
+  },
+  "amount_codes": {
+    "none": "0",
+    "light": "0.5",
+    "normal": "1",
+    "extra": "2"
+  }
+}

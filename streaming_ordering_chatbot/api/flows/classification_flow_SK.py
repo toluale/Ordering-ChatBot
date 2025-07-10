@@ -1,5 +1,5 @@
 from pathlib import Path
-from streaming_ordering_chatbot.api.flows.schemas import LLMOrder
+from streaming_ordering_chatbot.api.flows.schemas_generalized import LLMOrder, set_brand_context 
 from streaming_ordering_chatbot.api.models import Message
 
 from semantic_kernel import Kernel
@@ -53,12 +53,19 @@ class OrderIntentPlugin:
 class OrderIntentFlowSK:
     """Order intent classification flow using Semantic Kernel."""
     
-    def __init__(self, ENDPOINT: str, API_KEY: str, DEPLOYMENT_NAME: str):
+    def __init__(self, ENDPOINT: str, API_KEY: str, DEPLOYMENT_NAME: str, brand_name: str = "default"):
         """Initialize the order intent classification flow."""
         self.endpoint = ENDPOINT
         self.api_key = API_KEY
         self.deployment_name = DEPLOYMENT_NAME
-        
+        self.brand_name = brand_name
+
+        if brand_name:
+            try:
+                set_brand_context(brand_name)
+            except Exception as e:
+                # brand_config not needed for intent classification
+                pass
         # Initialize Semantic Kernel
         self.kernel = Kernel()
         
@@ -78,7 +85,13 @@ class OrderIntentFlowSK:
     async def __call__(self, chat_history: list[Message], current_order: dict) -> str:
         """Execute order intent classification."""
         # Validate and prepare order data
-        current_order = LLMOrder.model_validate(current_order).model_dump()
+        try:
+            current_order = LLMOrder.model_validate(current_order).model_dump()
+        except Exception as e:
+            if "No brand context set" in str(e):
+                pass
+            else:
+                raise 
         user_message = chat_history[-1].content
         
         # Now this properly calls the registered plugin function

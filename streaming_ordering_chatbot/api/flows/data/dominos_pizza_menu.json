@@ -1,0 +1,124 @@
+{
+  "brand_info": {
+    "name": "Domino's Pizza",
+    "cuisine_type": "Italian-American",
+    "item_categories": ["pizza", "side", "drink", "dessert"],
+    "description": "Fast pizza delivery with hot and fresh pizza made just for you"
+  },
+  "menu_items": {
+    "cheese pizza": {
+      "code_pattern": "PZ{size}CH",
+      "category": "pizza",
+      "sizes": ["S", "M", "L", "XL"],
+      "default": {"size": "M"},
+      "toppings": ["PE", "SA", "MU", "PP", "ON", "OL", "EC", "JA"],
+      "name_variations": ["cheese pizza", "plain pizza", "margherita"]
+    },
+    "pepperoni pizza": {
+      "code_pattern": "PZ{size}PP",
+      "category": "pizza", 
+      "sizes": ["S", "M", "L", "XL"],
+      "default": {"size": "M"},
+      "toppings": ["PE", "SA", "MU", "PP", "ON", "OL", "EC", "JA"],
+      "name_variations": ["pepperoni pizza", "pepperoni"]
+    },
+    "supreme pizza": {
+      "code_pattern": "PZ{size}SU",
+      "category": "pizza",
+      "sizes": ["S", "M", "L", "XL"],
+      "default": {"size": "M"},
+      "toppings": ["PE", "SA", "MU", "PP", "ON", "OL", "EC", "JA"],
+      "name_variations": ["supreme pizza", "supreme", "deluxe pizza"]
+    },
+    "meat lovers pizza": {
+      "code_pattern": "PZ{size}ML",
+      "category": "pizza",
+      "sizes": ["S", "M", "L", "XL"],
+      "default": {"size": "M"},
+      "toppings": ["PE", "SA", "MU", "PP", "ON", "OL", "EC", "JA"],
+      "name_variations": ["meat lovers pizza", "meat lovers", "meaty pizza"]
+    },
+    "breadsticks": {
+      "code_pattern": "BS{size}",
+      "category": "side",
+      "sizes": ["S", "L"],
+      "default": {"size": "S"},
+      "toppings": ["GA", "CH"],
+      "name_variations": ["breadsticks", "bread sticks", "garlic bread"]
+    },
+    "chicken wings": {
+      "code_pattern": "CW{size}{flavor}",
+      "category": "side",
+      "sizes": ["S", "M", "L"],
+      "flavor": ["PL", "BF", "BB", "HN"],
+      "default": {"size": "M", "flavor": "PL"},
+      "toppings": [],
+      "name_variations": ["chicken wings", "wings", "buffalo wings"]
+    },
+    "cinnamon bread": {
+      "code_pattern": "CB{size}",
+      "category": "dessert",
+      "sizes": ["S", "L"],
+      "default": {"size": "S"},
+      "toppings": [],
+      "name_variations": ["cinnamon bread", "cinnamon sticks", "dessert bread"]
+    },
+    "coca cola": {
+      "code_pattern": "D{size}CC",
+      "category": "drink",
+      "sizes": ["S", "M", "L"],
+      "default": {"size": "M"},
+      "toppings": [],
+      "name_variations": ["coca cola", "coke", "cola"]
+    },
+    "sprite": {
+      "code_pattern": "D{size}SP",
+      "category": "drink",
+      "sizes": ["S", "M", "L"],
+      "default": {"size": "M"},
+      "toppings": [],
+      "name_variations": ["sprite", "lemon-lime", "lemon lime"]
+    }
+  },
+  "toppings": {
+    "PE": {"name": "pepperoni", "category": "meat", "applicable_items": ["pizza"]},
+    "SA": {"name": "sausage", "category": "meat", "applicable_items": ["pizza"]},
+    "MU": {"name": "mushrooms", "category": "vegetable", "applicable_items": ["pizza"]},
+    "PP": {"name": "green peppers", "category": "vegetable", "applicable_items": ["pizza"]},
+    "ON": {"name": "onions", "category": "vegetable", "applicable_items": ["pizza"]},
+    "OL": {"name": "black olives", "category": "vegetable", "applicable_items": ["pizza"]},
+    "EC": {"name": "extra cheese", "category": "cheese", "applicable_items": ["pizza"]},
+    "JA": {"name": "jalapeños", "category": "vegetable", "applicable_items": ["pizza"]},
+    "GA": {"name": "garlic", "category": "seasoning", "applicable_items": ["side"]},
+    "CH": {"name": "cheese", "category": "cheese", "applicable_items": ["side"]}
+  },
+  "item_types": {
+    "pizza": {
+      "default_toppings": [],
+      "customizable": true,
+      "size_mapping": {"S": "small", "M": "medium", "L": "large", "XL": "extra large"}
+    },
+    "side": {
+      "default_toppings": [],
+      "customizable": true,
+      "size_mapping": {"S": "small", "M": "medium", "L": "large"},
+      "flavor_mapping": {"PL": "plain", "BF": "buffalo", "BB": "barbecue", "HN": "honey"}
+    },
+    "drink": {
+      "default_toppings": [],
+      "customizable": false,
+      "size_mapping": {"S": "small", "M": "medium", "L": "large"}
+    },
+    "dessert": {
+      "default_toppings": [],
+      "customizable": false,
+      "size_mapping": {"S": "small", "L": "large"}
+    }
+  },
+  "amount_codes": {
+    "none": "0",
+    "light": "0.5",
+    "normal": "1", 
+    "extra": "2"
+  }
+}

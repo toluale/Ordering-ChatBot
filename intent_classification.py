@@ -13,15 +13,6 @@ load_dotenv()
 
 def get_required_env_var(name: str) -> str:
     """Get a required environment variable or raise an informative error.
-    
-    Args:
-        name (str): Name of the environment variable
-    
-    Returns:
-        str: Value of the environment variable
-        
-    Raises:
-        ValueError: If the environment variable is not set or is empty
     """
     value = os.getenv(name)
     if not value:
@@ -35,18 +26,16 @@ def get_required_env_var(name: str) -> str:
 ENDPOINT = get_required_env_var("AZURE_OPENAI_ENDPOINT")
 API_KEY = get_required_env_var("AZURE_OPENAI_API_KEY")
 DEPLOYMENT_NAME = get_required_env_var("AZURE_OPENAI_DEPLOYMENT_NAME")
+BRAND_NAME = get_required_env_var("RESTAURANT_BRAND")
 
 async def test_order_intent() -> str:
     """Test individual intent classification with a sample message.
-    
-    Returns:
-        str: The classified intent
     """
     chat_history = [Message(role="user", content="What toppings do you have?")]
-    current_order = {"items": [{"name": "fries", "quantity": 1}]}
+    current_order = {"items": []}
     
     try:
-        flow = OrderIntentFlowSK(ENDPOINT, API_KEY, DEPLOYMENT_NAME)
+        flow = OrderIntentFlowSK(ENDPOINT, API_KEY, DEPLOYMENT_NAME, BRAND_NAME)
         result = await flow(chat_history, current_order)
         print("Intent classification result:", result)
         return result
@@ -61,7 +50,7 @@ async def evaluate_intent_classifier() -> dict:
         dict: Evaluation metrics including accuracy, F1 score, precision, and recall
     """
     try:
-        evaluator = SKIntentEvaluator(ENDPOINT, API_KEY, DEPLOYMENT_NAME)
+        evaluator = SKIntentEvaluator(ENDPOINT, API_KEY, DEPLOYMENT_NAME, BRAND_NAME)
         
         # Load test cases
         test_data_path = Path(__file__).parent / "tests" / "data" / "intent_test_cases.json"
@@ -110,7 +99,7 @@ async def evaluate_intent_classifier() -> dict:
 
 async def main():
     # Test individual intent classification
-    print("Testing individual intent classification:")
+    print(f"Testing individual intent classification for brand: {BRAND_NAME}")
     await test_order_intent()
     
     # Run full evaluation

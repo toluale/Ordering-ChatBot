@@ -28,11 +28,12 @@ class IntentEvaluationPlugin:
         return f"Error in {scenario}: Expected {expected}, got {predicted} for message: '{message}'"
 
 class SKIntentEvaluator:
-    def __init__(self, endpoint: str, api_key: str, deployment_name: str):
+    def __init__(self, endpoint: str, api_key: str, deployment_name: str, brand_name: str = "default"):
         self.endpoint = endpoint
         self.api_key = api_key
         self.deployment_name = deployment_name
-        
+        self.brand_name = brand_name
+
         # Initialize Semantic Kernel
         self.kernel = Kernel()
         chat_service = AzureChatCompletion(
@@ -46,7 +47,7 @@ class SKIntentEvaluator:
         self.kernel.add_plugin(IntentEvaluationPlugin(), "evaluation")
         
         # Initialize classifier
-        self.classifier = OrderIntentFlowSK(endpoint, api_key, deployment_name)
+        self.classifier = OrderIntentFlowSK(endpoint, api_key, deployment_name, self.brand_name)
     
     async def __call__(self, test_cases: Optional[List[Dict]] = None) -> Dict:
         """
@@ -187,14 +188,15 @@ async def main():
     ENDPOINT = os.getenv("AZURE_OPENAI_ENDPOINT")
     API_KEY = os.getenv("AZURE_OPENAI_API_KEY")
     DEPLOYMENT_NAME = os.getenv("AZURE_OPENAI_DEPLOYMENT_NAME")
+    BRAND_NAME = os.getenv("RESTAURANT_BRAND")
     
     if not all([ENDPOINT, API_KEY, DEPLOYMENT_NAME]):
         raise ValueError("Missing required environment variables")
     
     # Create evaluator
-    evaluator = SKIntentEvaluator(str(ENDPOINT), str(API_KEY), str(DEPLOYMENT_NAME))
+    evaluator = SKIntentEvaluator(str(ENDPOINT), str(API_KEY), str(DEPLOYMENT_NAME), str(BRAND_NAME))
     
-    print("Running evaluation with default test cases...")
+    print("Running evaluation with default test cases for brand: {BRAND_NAME}")
     results = await evaluator()
     
     # Print metrics

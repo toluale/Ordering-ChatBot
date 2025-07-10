@@ -48,7 +48,10 @@ class BrandVoiceMetric(EvaluationMetric):
         2. Style adherence
         3. Value alignment
         
-        Provide your rating as a decimal number between 0 and 1, followed by a brief explanation.
+        Format your response as:
+        [score as decimal 0.0-1.0]
+        
+        Explanation: [2-3 sentences explaining your rating, highlighting specific examples from the conversation that support your score. Mention what the assistant did well and areas for improvement regarding brand voice consistency.]
         """
     
     def format_conversation(self, conversation: List[Dict[str, str]]) -> str:
@@ -81,7 +84,10 @@ class RelevanceMetric(EvaluationMetric):
         3. Maintains conversation flow
         4. Gives appropriate level of detail
         
-        Provide your rating as a decimal number between 0 and 1, followed by a brief explanation.
+        Format your response as:
+        [score as decimal 0.0-1.0]
+        
+        Explanation: [2-3 sentences explaining your rating, citing specific examples where the assistant provided relevant and appropriate responses or where relevance could be improved. Focus on how well questions were addressed and information accuracy.]
         """
     
     def format_conversation(self, conversation: List[Dict[str, str]]) -> str:
@@ -113,7 +119,10 @@ class TaskCompletionMetric(EvaluationMetric):
         3. Confirms order details
         4. Resolves issues/questions
         
-        Provide your rating as a decimal number between 0 and 1, followed by a brief explanation.
+        Format your response as:
+        [score as decimal 0.0-1.0]
+        
+        Explanation: [2-3 sentences explaining your rating, highlighting how effectively the assistant moved the ordering process forward, captured customer needs, and handled any ordering complexities. Note both successful task progression and areas where the process could be improved.]
         """
     
     def format_conversation(self, conversation: List[Dict[str, str]]) -> str:

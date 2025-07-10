@@ -2,7 +2,7 @@ from typing import Literal, Optional
 
 from pydantic import BaseModel
 
-from streaming_ordering_chatbot.api.flows.schemas import LLMItem, LLMOrder
+from streaming_ordering_chatbot.api.flows.schemas_generalized import LLMItem, LLMOrder
 
 
 class LLMConfig(BaseModel):

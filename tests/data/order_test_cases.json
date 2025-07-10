@@ -1,0 +1,190 @@
+{
+    "test_cases": [
+        {
+            "name": "valid_single_burger",
+            "description": "Order a single hamburger with default options",
+            "message": "I'd like to order a hamburger please",
+            "current_order": {"items": []},
+            "expected_valid": true,
+            "expected_items": ["hamburger"],
+            "category": "valid_single_item"
+        },
+        {
+            "name": "valid_burger_with_options",
+            "description": "Order a cheeseburger with specific options",
+            "message": "I want a double cheeseburger with bacon and no onions on a pretzel bun",
+            "current_order": {"items": []},
+            "expected_valid": true,
+            "expected_items": ["cheeseburger"],
+            "category": "valid_single_item"
+        },
+        {
+            "name": "valid_combo_order",
+            "description": "Order multiple items - burger, fries, and drink",
+            "message": "I'll take a hamburger with fries and a large cola",
+            "current_order": {"items": []},
+            "expected_valid": true,
+            "expected_items": ["hamburger", "fries", "cola"],
+            "category": "valid_multiple_items"
+        },
+        {
+            "name": "valid_vegetarian_order",
+            "description": "Order vegetarian option",
+            "message": "I'd like the black bean burger with medium fries",
+            "current_order": {"items": []},
+            "expected_valid": true,
+            "expected_items": ["black bean burger", "fries"],
+            "category": "valid_multiple_items"
+        },
+        {
+            "name": "valid_drink_only",
+            "description": "Order just a drink",
+            "message": "Can I get a small diet cola?",
+            "current_order": {"items": []},
+            "expected_valid": true,
+            "expected_items": ["diet cola"],
+            "category": "valid_single_item"
+        },
+        {
+            "name": "valid_fries_only",
+            "description": "Order just fries",
+            "message": "I'll have large fries with no salt",
+            "current_order": {"items": []},
+            "expected_valid": true,
+            "expected_items": ["fries"],
+            "category": "valid_single_item"
+        },
+        {
+            "name": "valid_order_modification",
+            "description": "Add item to existing order",
+            "message": "Actually, can I add a cheeseburger to my order?",
+            "current_order": {"items": [{"name": "fries", "size": "medium", "quantity": 1}]},
+            "expected_valid": true,
+            "expected_items": ["fries", "cheeseburger"],
+            "category": "valid_modification"
+        },
+        {
+            "name": "valid_quantity_change",
+            "description": "Change quantity of existing item",
+            "message": "Make that two hamburgers instead of one",
+            "current_order": {"items": [{"name": "hamburger", "quantity": 1}]},
+            "expected_valid": true,
+            "expected_items": ["hamburger"],
+            "category": "valid_modification"
+        },
+        {
+            "name": "valid_remove_item",
+            "description": "Remove item from order",
+            "message": "Remove the fries from my order",
+            "current_order": {"items": [{"name": "hamburger", "quantity": 1}, {"name": "fries", "size": "medium", "quantity": 1}]},
+            "expected_valid": true,
+            "expected_items": ["hamburger"],
+            "category": "valid_modification"
+        },
+        {
+            "name": "invalid_nonexistent_item",
+            "description": "Order item not on menu",
+            "message": "I want a chicken sandwich and pizza",
+            "current_order": {"items": []},
+            "expected_valid": false,
+            "expected_items": [],
+            "category": "invalid_item"
+        },
+        {
+            "name": "invalid_option_combination",
+            "description": "Order with invalid option combination",
+            "message": "I want a black bean burger with double patties",
+            "current_order": {"items": []},
+            "expected_valid": false,
+            "expected_items": [],
+            "category": "invalid_item"
+        },
+        {
+            "name": "invalid_drink_size",
+            "description": "Order drink with invalid size",
+            "message": "Can I get an extra large root beer?",
+            "current_order": {"items": []},
+            "expected_valid": false,
+            "expected_items": [],
+            "category": "invalid_item"
+        },
+        {
+            "name": "invalid_fries_size",
+            "description": "Order fries with invalid size",
+            "message": "I want extra large fries",
+            "current_order": {"items": []},
+            "expected_valid": false,
+            "expected_items": [],
+            "category": "invalid_item"
+        },
+        {
+            "name": "conversation_not_order",
+            "description": "General conversation, not an order",
+            "message": "What time do you close?",
+            "current_order": {"items": []},
+            "expected_valid": false,
+            "expected_items": [],
+            "category": "invalid_request"
+        },
+        {
+            "name": "menu_inquiry",
+            "description": "Asking about menu items",
+            "message": "What toppings do you have for burgers?",
+            "current_order": {"items": []},
+            "expected_valid": false,
+            "expected_items": [],
+            "category": "invalid_request"
+        },
+        {
+            "name": "complex_multi_item_order",
+            "description": "Complex order with multiple items and modifications",
+            "message": "I'll have two cheeseburgers - one with bacon and well done, one regular. Also large fries with no salt, and a medium lemon-lime soda",
+            "current_order": {"items": []},
+            "expected_valid": true,
+            "expected_items": ["cheeseburger", "cheeseburger", "fries", "lemon-lime"],
+            "category": "valid_complex"
+        },
+        {
+            "name": "valid_all_drink_types",
+            "description": "Order all available drink types",
+            "message": "I want a cola, diet cola, lemon-lime, and root beer - all medium size",
+            "current_order": {"items": []},
+            "expected_valid": true,
+            "expected_items": ["cola", "diet cola", "lemon-lime", "root beer"],
+            "category": "valid_multiple_items"
+        },
+        {
+            "name": "valid_all_burger_types",
+            "description": "Order all available burger types",
+            "message": "I want one hamburger, one cheeseburger, and one black bean burger",
+            "current_order": {"items": []},
+            "expected_valid": true,
+            "expected_items": ["hamburger", "cheeseburger", "black bean burger"],
+            "category": "valid_multiple_items"
+        },
+        {
+            "name": "valid_different_fries_sizes",
+            "description": "Order different sizes of fries",
+            "message": "I want small fries and large fries",
+            "current_order": {"items": []},
+            "expected_valid": true,
+            "expected_items": ["fries", "fries"],
+            "category": "valid_multiple_items"
+        }
+    ],
+    "menu_items": {
+        "burgers": ["hamburger", "cheeseburger", "black bean burger"],
+        "fries": ["fries"],
+        "drinks": ["cola", "diet cola", "lemon-lime", "root beer"]
+    },
+    "valid_options": {
+        "burger_patties": ["single", "double"],
+        "burger_sizes": ["quarter lb", "half lb"],
+        "burger_buns": ["sesame", "pretzel"],
+        "burger_cook": ["normal", "well done"],
+        "burger_toppings": ["lettuce", "tomato", "onion", "pickle", "bacon", "mayo", "ketchup", "mustard", "relish"],
+        "fries_sizes": ["small", "medium", "large"],
+        "fries_salt": ["regular", "none"],
+        "drink_sizes": ["small", "medium", "large"]
+    }
+}

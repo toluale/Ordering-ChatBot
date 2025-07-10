@@ -4,7 +4,7 @@ import logging
 import json
 from pathlib import Path
 from dotenv import load_dotenv
-from typing import Optional, AsyncGenerator, Dict, List, Union
+from typing import Optional, AsyncGenerator, Dict, List, Union, Any
 from openai import AzureOpenAI
 from openai.types.chat import (ChatCompletionSystemMessageParam, ChatCompletionUserMessageParam, ChatCompletionAssistantMessageParam)
 from semantic_kernel import Kernel
@@ -34,6 +34,43 @@ def get_required_env_var(name: str) -> str:
 # Set up logging
 logger = logging.getLogger(__name__)
 
+
+def clean_assistant_response(content: str) -> str:
+    """Remove context markers and sections from assistant responses.
+    """
+    if not content:
+        return ""
+        
+    # List of markers that indicate context sections to remove
+    context_markers = [
+        "Previous conversation:",
+        "Current Order:",
+        "Available menu:",
+        "Current order status:",
+        "Menu:",
+        "Chat History:",
+        "Instructions:",
+        "Reference Information",
+        "Brand:",
+        "[CONTEXT]",
+        "[END CONTEXT]",
+        "MENU", 
+        "CURRENT ORDER", 
+        "CHAT HISTORY", 
+        "CONVERSATION HISTORY"
+    ]
+    
+    # Get the content before any context marker
+    cleaned = content
+    for marker in context_markers:
+        if marker in cleaned:
+            # Keep only the first part (before the marker)
+            parts = cleaned.split(marker)
+            cleaned = parts[0].strip()
+    
+    return cleaned
+
+
 class ConversationPlugin:
     """Base plugin for conversation handling with native SK functions."""
     
@@ -49,40 +86,75 @@ class ConversationPlugin:
 
 
 class OrderPlugin(ConversationPlugin):
-    """Plugin for order-related conversation functions."""
+    """Plugin for order-related conversation functions.
+    """
     
     def __init__(self, kernel: Kernel):
         super().__init__(kernel)
-        self.menu_path = Path(__file__).parent.joinpath("prompts/menu.txt")
-        with open(self.menu_path, "r") as f:
-            self.menu = f.read()
-
-    def _clean_assistant_response(self, content: str) -> str:
-        """Remove context markers from responses while preserving order information."""
-        if not content:
-            return ""
+        # Import MenuManager for menu loading
+        from .menu_manager import MenuManager
+        self.menu_manager = MenuManager()
+        self.menu = self._load_menu_for_current_brand()
+        
+    def _load_menu_for_current_brand(self) -> str:
+        """Load menu using MenuManager for the current brand."""
+        try:
+            # Get current brand from MenuManager (required to be set)
+            current_brand = self.menu_manager.require_current_brand()
             
-        # List of markers to remove
-        markers = [
-            "Previous conversation:",
-            "Current Order:",
-            "Available menu:",
-            "Current order status:",
-            "Menu:",
-            "Chat History:",
-            "Instructions:",
-            "Reference Information"
-        ]
-        
-        # Get the content before any system markers
-        cleaned = content
-        for marker in markers:
-            if marker in cleaned:
-                parts = cleaned.split(marker)
-                # Keep only the first part (before the marker)
-                cleaned = parts[0].strip()
-        
-        return cleaned
+            # Generate menu description from configuration
+            menu_config = self.menu_manager.require_current_menu_config()
+            
+            return self._format_menu_from_config(menu_config)
+            
+        except Exception as e:
+            logger.error(f"Failed to load menu using MenuManager: {e}")
+            raise RuntimeError(
+                f"Menu loading failed: {e}. "
+                "Please ensure RESTAURANT_BRAND environment variable is set "
+                "and corresponding menu file exists in the data directory."
+            ) from e
+    
+    def _format_menu_from_config(self, menu_config: Dict[str, Any]) -> str:
+        """Format menu configuration into a readable string."""
+        try:
+            brand_info = menu_config.get("brand_info", {})
+            menu_items = menu_config.get("menu_items", {})
+            toppings = menu_config.get("toppings", {})
+            
+            menu_text = f"# {brand_info.get('name', 'Restaurant')} Menu\n\n"
+            
+            # Group items by category
+            categories = {}
+            for item_name, item_config in menu_items.items():
+                category = item_config.get("category", "other")
+                if category not in categories:
+                    categories[category] = []
+                categories[category].append((item_name, item_config))
+            
+            # Format each category
+            for category, items in categories.items():
+                menu_text += f"## {category.title()}s\n"
+                for item_name, item_config in items:
+                    name_variations = item_config.get("name_variations", [item_name])
+                    menu_text += f"- {name_variations[0].title()}"
+                    if len(name_variations) > 1:
+                        menu_text += f" (also: {', '.join(name_variations[1:])})"
+                    menu_text += "\n"
+                menu_text += "\n"
+            
+            # Add toppings section
+            if toppings:
+                menu_text += "## Available Toppings\n"
+                for topping_code, topping_info in toppings.items():
+                    menu_text += f"- {topping_info.get('name', topping_code)}: {topping_info.get('description', '')}\n"
+                menu_text += "\n"
+            
+            return menu_text
+            
+        except Exception as e:
+            logger.error(f"Error formatting menu from config: {e}")
+            raise RuntimeError(f"Failed to format menu from configuration: {e}") from e
         
     @kernel_function(description="Prepares order context for prompt template", name="chat")
     async def prepare_order_context(self, chat_history: list[Message], current_order: dict, brand_name: Optional[str] = None) -> str:
@@ -92,7 +164,7 @@ class OrderPlugin(ConversationPlugin):
         for msg in chat_history:
             content = msg.content
             if msg.role == "assistant":
-                content = self._clean_assistant_response(content)
+                content = clean_assistant_response(content)
             clean_history.append(f"{msg.role}: {content}")
         
         # Get recent conversation history
@@ -102,18 +174,24 @@ class OrderPlugin(ConversationPlugin):
         order_str = "Current items in order: " + ", ".join(str(item) for item in items) if items else "No items in order yet"
         
         # Get brand name from brand plugin if not provided
-        if not brand_name and hasattr(self, 'kernel'):
-            try:
-                # Try to get current brand from brand plugin
-                brand_result = await self.kernel.invoke(
-                    plugin_name="brand",
-                    function_name="get_current_brand"
-                )
-                brand_name = str(brand_result).split(":")[1].strip() if ":" in str(brand_result) else ""
-            except:
-                brand_name = "Contoso Burger"  # Fallback
-
-        # brand_name = brand_name or "Contoso Burger"  # Final fallback
+        if not brand_name:
+            # Try to get current brand from menu manager first
+            brand_name = self.menu_manager.get_current_brand()
+            
+            # If not available and kernel exists, try brand plugin
+            if not brand_name and hasattr(self, 'kernel'):
+                try:
+                    # Try to get current brand from brand plugin
+                    brand_result = await self.kernel.invoke(
+                        plugin_name="brand",
+                        function_name="get_current_brand"
+                    )
+                    brand_name = str(brand_result).split(":")[1].strip() if ":" in str(brand_result) else ""
+                except:
+                    pass
+            
+            # Final fallback to generic name if still not found
+            brand_name = brand_name or "Restaurant"
 
         # Format context with clear section markers
         context = (
@@ -133,7 +211,7 @@ class ConversationFlowSK:
     PLUGIN_NAME = "conversation"
     MAX_TOKENS = 500  
 
-    def __init__(self, endpoint: str, api_key: str, deployment_name: str, brand_name: Optional[str] = None):
+    def __init__(self, endpoint: str, api_key: str, deployment_name: str, brand_name: Optional[str] = None, conversation_style: Optional[str] = None):
         self.endpoint = endpoint
         self.api_key = api_key
         self.deployment_name = deployment_name
@@ -163,12 +241,29 @@ class ConversationFlowSK:
         from .brand_personality import BrandPersonalityPlugin
         self.brand_plugin = BrandPersonalityPlugin(self.kernel, brand_name)
         self.kernel.add_plugin(self.brand_plugin, "brand")
-          # Load prompt template
+        
+        # Add conversation style plugin only if a specific style is provided
+        # If no style is provided, will default to brand's original style
+        self.style_plugin = None
+        if conversation_style and conversation_style.lower() not in ["default", "none", ""]:
+            try:
+                from .conversation_style import ConversationStylePlugin, ConversationStyle
+                style_enum = ConversationStyle(conversation_style.lower())
+                self.style_plugin = ConversationStylePlugin(self.kernel, style_enum)
+                self.kernel.add_plugin(self.style_plugin, "style")
+                logger.info(f"Added conversation style plugin: {conversation_style}")
+            except (ValueError, ImportError) as e:
+                logger.warning(f"Failed to load conversation style '{conversation_style}': {e}. Using brand's original style.")
+                self.style_plugin = None
+        else:
+            logger.info("No specific conversation style provided. Using brand's original style.")
+        
+        # Load prompt template
         if self.PROMPT_PATH:
             self._setup_prompt_function()
 
     def _setup_prompt_function(self) -> None:
-        """Set up the prompt function with brand personality integration."""
+        """Set up the prompt function with brand personality and conversation style integration."""
         try:
             if not self.PROMPT_PATH:
                 raise ValueError("PROMPT_PATH must be set in the derived class")
@@ -176,17 +271,25 @@ class ConversationFlowSK:
             with open(self.PROMPT_PATH, "r", encoding="utf-8") as f:
                 base_template = f.read()
             
-            # Get brand instructions and combine them with the base template
+            # Get brand instructions and optionally enhance with conversation style
             if hasattr(self, 'brand_plugin'):
                 brand_instructions = self.brand_plugin.get_brand_instructions()
-                prompt_template = f"{brand_instructions}\n\n{base_template}"
+                
+                # Apply conversation style to brand instructions only if style plugin exists
+                # Otherwise, use the brand's original style without modification
+                if hasattr(self, 'style_plugin') and self.style_plugin is not None:
+                    enhanced_instructions = self.style_plugin.enhance_brand_with_style(brand_instructions)
+                    prompt_template = f"{enhanced_instructions}\n\n{base_template}"
+                else:
+                    # Use original brand instructions without style modification
+                    prompt_template = f"{brand_instructions}\n\n{base_template}"
             else:
                 prompt_template = base_template
             
             prompt_config = PromptTemplateConfig(
                 template=prompt_template,
                 name="chat",
-                description="Chat with the assistant using brand personality"
+                description="Chat with the assistant using brand personality and conversation style"
             )
             
             self.kernel.add_function(
@@ -194,26 +297,37 @@ class ConversationFlowSK:
                 function_name="chat",
                 prompt_template_config=prompt_config
             )
-            logger.info("Successfully set up prompt function with brand personality")
+            logger.info("Successfully set up prompt function with brand personality and conversation style")
         except Exception as e:
             logger.error(f"Error setting up prompt function: {e}")
             raise
 
-    async def enhance_prompt_with_brand(self, system_prompt: str) -> str:
+    async def enhance_prompt_with_brand_and_style(self, system_prompt: str) -> str:
+        """Enhance system prompt with both brand personality and conversation style."""
         try:
-            if not hasattr(self, 'brand_plugin'):
-                return system_prompt
-                
-            args = KernelArguments()
-            args["system_prompt"] = system_prompt
-            result = await self.kernel.invoke(
-                plugin_name="brand",
-                function_name="enhance_system_prompt",                
-                arguments=args
-            )
-            return str(result) if result is not None else system_prompt
+            enhanced_prompt = system_prompt
+            
+            # First apply brand enhancement if available
+            if hasattr(self, 'brand_plugin'):
+                args = KernelArguments()
+                args["system_prompt"] = enhanced_prompt
+                result = await self.kernel.invoke(
+                    plugin_name="brand",
+                    function_name="enhance_system_prompt",                
+                    arguments=args
+                )
+                enhanced_prompt = str(result) if result is not None else enhanced_prompt
+            
+            # Then apply conversation style enhancement if available
+            if hasattr(self, 'style_plugin') and self.style_plugin is not None:
+                style_instructions = self.style_plugin.get_style_instructions()
+                if style_instructions:
+                    enhanced_prompt = f"{enhanced_prompt}\n\nCONVERSATION STYLE:\n{style_instructions}"
+            
+            return enhanced_prompt
+            
         except Exception:
-            logger.warning("Failed to enhance prompt with brand personality", exc_info=True)
+            logger.warning("Failed to enhance prompt with brand personality and style", exc_info=True)
             return system_prompt
 
     async def _process_stream(
@@ -268,13 +382,13 @@ class ConversationFlowSK:
             brand_name = self.brand_plugin.get_current_brand()
         else:
             brand_name = None
-        current_brand_name = (brand_name or (self.brand_plugin.current_brand if hasattr(self, 'brand_plugin') else None)) #or "Contoso Burger"
+        current_brand_name = brand_name or (self.brand_plugin.current_brand if hasattr(self, 'brand_plugin') else None)
         try:
             # Prepare context arguments
             context_args = KernelArguments()
             
-            # Handle OrderAssistantFlowSK 
-            if isinstance(self, OrderAssistantFlowSK):
+            # Handle different flow types based on class name
+            if self.__class__.__name__ == "OrderAssistantFlowSK":
                 context_args["current_order"] = current_order
                 context_args["chat_history"] = chat_history
                 context_args["brand_name"] = current_brand_name
@@ -297,7 +411,7 @@ class ConversationFlowSK:
                 function_name=function_name,
                 arguments=context_args
             )
-            enhanced_prompt = await self.enhance_prompt_with_brand(str(system_prompt))
+            enhanced_prompt = await self.enhance_prompt_with_brand_and_style(str(system_prompt))
             
             # Create messages list with system message and recent context
             messages: List[Union[ChatCompletionSystemMessageParam, ChatCompletionUserMessageParam, ChatCompletionAssistantMessageParam]] = [
@@ -312,7 +426,7 @@ class ConversationFlowSK:
                 if msg.role == "user":
                     messages.append(ChatCompletionUserMessageParam(role="user", content=msg.content))
                 elif msg.role == "assistant":
-                    cleaned_content = self._clean_assistant_response(msg.content) if msg.content else ""
+                    cleaned_content = clean_assistant_response(msg.content) if msg.content else ""
                     if cleaned_content:
                         messages.append(ChatCompletionAssistantMessageParam(role="assistant", content=cleaned_content))
 
@@ -337,23 +451,6 @@ class ConversationFlowSK:
             logger.error(error_msg)
             yield "I apologize, but I encountered an error."
 
-    def _clean_assistant_response(self, content: str) -> str:
-        """Remove context markers and sections from assistant responses."""
-        # List of markers that indicate context sections
-        context_markers = [
-            "MENU", "CURRENT ORDER", "CHAT HISTORY", "CONVERSATION HISTORY",
-            "Current Order:", "Menu:", "Chat History:", "Available menu:",
-            "Current order status:", "Previous conversation:"
-        ]
-        
-        # Get the content before any context marker
-        cleaned = content
-        for marker in context_markers:
-            if marker in cleaned:
-                cleaned = cleaned.split(marker)[0].strip()
-        
-        return cleaned
-
 
 class PreamblePlugin(ConversationPlugin):
     """Plugin for preamble/greeting conversation functions."""
@@ -369,15 +466,15 @@ class PreamblePlugin(ConversationPlugin):
         for msg in chat_history:
             content = msg.content
             if msg.role == "assistant":
-                # Use the same cleaning method from OrderPlugin
-                content = self._clean_assistant_response(content)
+                # Use the shared cleaning utility function
+                content = clean_assistant_response(content)
             clean_history.append(f"{msg.role}: {content}")
         
         # Get recent conversation history (last 3-4 messages for preamble)
         chat_str = "\n".join(clean_history[-4:])  # Shorter for preamble
         
         # Get brand name fallback
-        brand_name = brand_name or "Contoso Burger"
+        brand_name = brand_name 
         brand_personality = ""
         
         template_context = f"""
@@ -388,41 +485,13 @@ Chat History: {chat_str}
         
         return template_context
     
-    def _clean_assistant_response(self, content: str) -> str:
-        """Remove context markers from responses."""
-        if not content:
-            return ""
-            
-        markers = [
-            "Previous conversation:",
-            "Current Order:",
-            "Available menu:",
-            "Current order status:",
-            "Menu:",
-            "Chat History:",
-            "Instructions:",
-            "Reference Information",
-            "Brand:",
-            "[CONTEXT]",
-            "[END CONTEXT]"
-        ]
-        
-        cleaned = content
-        for marker in markers:
-            if marker in cleaned:
-                parts = cleaned.split(marker)
-                cleaned = parts[0].strip()
-        
-        return cleaned
-
-
 class PreambleFlowSK(ConversationFlowSK):
     """Initial greeting."""
     PROMPT_PATH = Path(__file__).parent.joinpath("prompts/preamble_SK.prompty")
     PLUGIN_NAME = "preamble"
 
-    def __init__(self, endpoint: str, api_key: str, deployment_name: str, brand_name: Optional[str] = None):
-        super().__init__(endpoint, api_key, deployment_name, brand_name)
+    def __init__(self, endpoint: str, api_key: str, deployment_name: str, brand_name: Optional[str] = None, conversation_style: Optional[str] = None):
+        super().__init__(endpoint, api_key, deployment_name, brand_name, conversation_style)
         
         # Add PreamblePlugin for context formatting
         self.preamble_plugin = PreamblePlugin(self.kernel)
@@ -437,8 +506,8 @@ class OrderAssistantFlowSK(ConversationFlowSK):
     PROMPT_PATH = Path(__file__).parent.joinpath("prompts/assistant_SK.prompty")
     PLUGIN_NAME = "order_assistant"
 
-    def __init__(self, endpoint: str, api_key: str, deployment_name: str, brand_name: Optional[str] = None):
-        super().__init__(endpoint, api_key, deployment_name, brand_name)
+    def __init__(self, endpoint: str, api_key: str, deployment_name: str, brand_name: Optional[str] = None, conversation_style: Optional[str] = None):
+        super().__init__(endpoint, api_key, deployment_name, brand_name, conversation_style)
         # Add OrderPlugin for menu and order context
         self.order_plugin = OrderPlugin(self.kernel)
         self.kernel.add_plugin(self.order_plugin, "order_assistant")
@@ -470,5 +539,5 @@ class SummaryFlowSK(ConversationFlowSK):
     PROMPT_PATH = Path(__file__).parent.joinpath("prompts/summary_SK.prompty")
     PLUGIN_NAME = "summary"
 
-    def __init__(self, endpoint: str, api_key: str, deployment_name: str, brand_name: Optional[str] = None):
-        super().__init__(endpoint, api_key, deployment_name, brand_name)
+    def __init__(self, endpoint: str, api_key: str, deployment_name: str, brand_name: Optional[str] = None, conversation_style: Optional[str] = None):
+        super().__init__(endpoint, api_key, deployment_name, brand_name, conversation_style)
