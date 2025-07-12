@@ -88,27 +88,37 @@ class OrderValidationPlugin:
         """Validates an item and returns validation result."""
         try:
             item_dict = safe_json_parse(item)
+            logger.info("Validating item: %s", item_dict)
             
+            # Remove itemId for validation as it's not part of the LLM item schema
+            if "itemId" in item_dict:
+                item_dict.pop("itemId")
             # Attempt validation using LLMOrder schema
-            items = LLMOrder.model_validate({"items": [item_dict]}).items
-            if not items:
-                logger.warning("Invalid item: %s", item_dict)
-                return json.dumps({"valid": False, "error": "Empty items list"})
-            
-            validated_item = items[0].to_order_item()
-            if validated_item:
-                logger.info("Item validated successfully: %s", validated_item.model_dump())
+            try:
+                items = LLMOrder.model_validate({"items": [item_dict]}).items
+                if not items:
+                    logger.warning("Invalid item: %s", item_dict)
+                    return json.dumps({"valid": False, "error": "Empty items list"})
                 
-                return json.dumps({
-                    "valid": True, 
-                    "item": validated_item.model_dump(),
-                    "item_type": type(validated_item).__name__
-                })
-            else:
-                logger.warning("Item validation returned None: %s", item_dict)
-                return json.dumps({"valid": False, "error": "Validation returned None"})
-            
-        except ValueError as e:
+                validated_item = items[0].to_order_item()
+                if validated_item:
+                    logger.info("Item validated successfully: %s", validated_item.model_dump())
+                    
+                    return json.dumps({
+                        "valid": True, 
+                        "item": validated_item.model_dump(),
+                        "original_item": items[0].model_dump(),  # Preserve original LLM item data
+                        "item_type": type(items[0]).__name__
+                    })
+                else:
+                    logger.warning("Item validation returned None: %s", item_dict)
+                    return json.dumps({"valid": False, "error": "Validation returned None"})
+           
+            except Exception as validation_error:
+                logger.error("LLMOrder validation failed for item %s: %s", item_dict, validation_error)
+                return json.dumps({"valid": False, "error": str(validation_error)})   
+        
+        except Exception as e:
             logger.error("Error validating item: %s", e)
             return json.dumps({"valid": False, "error": str(e)})
     
@@ -232,25 +242,25 @@ class OrderFlowSK:
             validation_result = json.loads(str(result))
             
             if validation_result.get("valid", False):
-                item_data = validation_result.get("item", {})
+                original_item_data = validation_result.get("original_item", {})
                 item_type = validation_result.get("item_type", "")
                 
-                # Reconstruct the appropriate item type
+                # Use the original LLM item data for reconstruction
                 if item_type == "LLMBurgerItem":
-                    return LLMBurgerItem.model_validate(item_data)
+                    return LLMBurgerItem.model_validate(original_item_data)
                 elif item_type == "LLMDrinkItem":
-                    return LLMDrinkItem.model_validate(item_data)
+                    return LLMDrinkItem.model_validate(original_item_data)
                 elif item_type == "LLMFriesItem":
-                    return LLMFriesItem.model_validate(item_data)
+                    return LLMFriesItem.model_validate(original_item_data)
                 else:
-                    # Try to determine type from the item data
-                    if "toppings" in item_data or "bun" in item_data:
-                        return LLMBurgerItem.model_validate(item_data)
-                    elif "size" in item_data and "name" in item_data:
-                        if "fries" in item_data["name"].lower():
-                            return LLMFriesItem.model_validate(item_data)
+                    # Try to determine type from the original item data
+                    if "toppings" in original_item_data or "bun" in original_item_data:
+                        return LLMBurgerItem.model_validate(original_item_data)
+                    elif "size" in original_item_data and "name" in original_item_data:
+                        if "fries" in original_item_data["name"].lower():
+                            return LLMFriesItem.model_validate(original_item_data)
                         else:
-                            return LLMDrinkItem.model_validate(item_data)
+                            return LLMDrinkItem.model_validate(original_item_data)
             
             return None
             
@@ -392,7 +402,7 @@ Please process this order request and provide a structured response with the upd
                         tool_call.function.arguments):
                         
                         arg = tool_call.function.arguments
-                        logger.info("Produced token: %s", arg)
+                        logger.debug("Processing function arguments")  # Avoid logging potentially sensitive tokens
                         
                         if isinstance(arg, str):
                             json_string += arg
@@ -416,8 +426,9 @@ Please process this order request and provide a structured response with the upd
                                                 prev_item_id = current_item_id
                                                 
                                                 # Validate and stream item
+                                                logger.info(f"Attempting to validate item: {latest_item}")
                                                 validated_item = await self.validate_item(latest_item)
-                                                
+                                                                                            
                                                 if validated_item is not None:
                                                     ser_item = validated_item.model_dump()
                                                     
@@ -428,7 +439,8 @@ Please process this order request and provide a structured response with the upd
                                                         yield "," + json.dumps(ser_item) + "\n"
                                                     
                                                     logger.info("Validated and streamed item: %s", ser_item)
-                                    
+                                                else:
+                                                    logger.warning(f"Item validation failed for: {latest_item}")
                                     except json.JSONDecodeError as e:
                                         logger.warning("JSON decode error: %s", e)
                                         continue
@@ -438,9 +450,16 @@ Please process this order request and provide a structured response with the upd
                     continue
         
         # Close JSON structure and return final order state
-        yield "]}\n"
-        final_order = LLMOrder.model_validate(current_order_items)
-        yield json.dumps({"LLMOrder": final_order.model_dump()}) + "\n"
+        if not first_item:
+            yield "]}\n"
+        
+        # Always return the final LLMOrder structure
+        try:
+            final_order = LLMOrder.model_validate(current_order_items)
+            yield json.dumps({"LLMOrder": final_order.model_dump()}) + "\n"
+        except Exception as e:
+            logger.error(f"Error creating final order: {e}")
+            yield json.dumps({"LLMOrder": {"items": []}}) + "\n"
     
     async def __call__(
         self,

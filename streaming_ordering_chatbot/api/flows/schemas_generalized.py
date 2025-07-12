@@ -275,12 +275,129 @@ class LLMBurgerItem(BaseModel):
         super().__init__(**kwargs)
 
     def __str__(self):
-        parts = [self.name.lower()]
-        for field in ['size', 'patties', 'bun', 'cook']:
-            value = getattr(self, field, None)
-            if value:
-                parts.append(value.lower())
-        return ", ".join(parts)
+        """Convert to description format compatible with menu system."""
+        context = get_menu_context()
+        if not context.current_brand:
+            # Fallback to basic format if no brand context
+            parts = [self.name.lower()]
+            for field in ['size', 'patties', 'bun', 'cook']:
+                value = getattr(self, field, None)
+                if value:
+                    parts.append(value.lower())
+            return ", ".join(parts)
+        
+        # Get menu configuration for proper mapping
+        try:
+            menu_config = context.menu_manager.require_current_menu_config()
+            item_types = menu_config.get("item_types", {})
+            burger_config = item_types.get("burger", {})
+            
+            # Get mapping configurations
+            size_mapping = burger_config.get("size_mapping", {})
+            patties_mapping = burger_config.get("patties_mapping", {})
+            buns_mapping = burger_config.get("buns_mapping", {})
+            cook_mapping = burger_config.get("cook_mapping", {})
+            
+            # Create reverse mappings for descriptive to code conversion
+            reverse_size = {v.lower(): k for k, v in size_mapping.items()}
+            reverse_patties = {v.lower(): k for k, v in patties_mapping.items()}
+            reverse_buns = {v.lower(): k for k, v in buns_mapping.items()}
+            reverse_cook = {v.lower(): k for k, v in cook_mapping.items()}
+            
+            # Convert descriptive values to codes, then back to proper descriptions
+            parts = [self.name.lower()]
+            
+            # Handle size conversion
+            size_val = getattr(self, 'size', None)
+            if size_val:
+                size_lower = size_val.lower()
+                # Try direct mapping first, then reverse mapping
+                if size_lower in reverse_size:
+                    code = reverse_size[size_lower]
+                    parts.append(size_mapping.get(code, size_val).lower())
+                elif size_val in size_mapping:
+                    parts.append(size_mapping[size_val].lower())
+                else:
+                    # Handle common LLM terms that don't match menu terms
+                    if size_lower in ['default', 'regular', 'standard', 'medium']:
+                        # Use quarter lb (14) as default since it's most common
+                        parts.append(size_mapping.get('14', 'quarter lb').lower())
+                    elif size_lower in ['large', 'big']:
+                        # Use half lb (13) for large
+                        parts.append(size_mapping.get('13', 'half lb').lower())
+                    elif size_lower in ['small']:
+                        # Use quarter lb (14) for small  
+                        parts.append(size_mapping.get('14', 'quarter lb').lower())
+                    else:
+                        # If size_mapping has values, use first as default
+                        if size_mapping:
+                            first_code = next(iter(size_mapping.keys()))
+                            parts.append(size_mapping[first_code].lower())
+                        else:
+                            parts.append(size_val.lower())
+            
+            # Handle patties conversion  
+            patties_val = getattr(self, 'patties', None)
+            if patties_val:
+                patties_lower = patties_val.lower()
+                if patties_lower in reverse_patties:
+                    code = reverse_patties[patties_lower]
+                    parts.append(patties_mapping.get(code, patties_val).lower())
+                elif patties_val in patties_mapping:
+                    parts.append(patties_mapping[patties_val].lower())
+                else:
+                    parts.append(patties_val.lower())
+            
+            # Handle bun conversion
+            bun_val = getattr(self, 'bun', None)  
+            if bun_val:
+                bun_lower = bun_val.lower()
+                if bun_lower in reverse_buns:
+                    code = reverse_buns[bun_lower]
+                    parts.append(buns_mapping.get(code, bun_val).lower())
+                elif bun_val in buns_mapping:
+                    parts.append(buns_mapping[bun_val].lower())
+                else:
+                    # Handle common LLM terms for buns
+                    if bun_lower in ['default', 'regular', 'standard', 'normal']:
+                        # Use sesame (S) as default  
+                        parts.append(buns_mapping.get('S', 'sesame').lower())
+                    elif bun_lower in ['pretzel', 'pretzel bun']:
+                        # Use pretzel (P)
+                        parts.append(buns_mapping.get('P', 'pretzel').lower())
+                    elif bun_lower in ['sesame', 'sesame bun']:
+                        # Use sesame (S)
+                        parts.append(buns_mapping.get('S', 'sesame').lower())
+                    else:
+                        # Default to sesame if mapping exists
+                        if buns_mapping:
+                            parts.append(buns_mapping.get('S', 'sesame').lower())
+                        else:
+                            parts.append(bun_val.lower())
+            
+            # Handle cook conversion
+            cook_val = getattr(self, 'cook', None)
+            if cook_val:
+                cook_lower = cook_val.lower().replace(' ', '-').replace('_', '-')
+                if cook_lower in reverse_cook:
+                    code = reverse_cook[cook_lower]
+                    parts.append(cook_mapping.get(code, cook_val).lower())
+                elif cook_val in cook_mapping:
+                    parts.append(cook_mapping[cook_val].lower()) 
+                else:
+                    parts.append(cook_val.lower())
+            
+            return ", ".join(parts)
+            
+        except Exception as e:
+            logger.warning(f"Error converting item to description format: {e}")
+            # Fallback to basic format
+            parts = [self.name.lower()]
+            for field in ['size', 'patties', 'bun', 'cook']:
+                value = getattr(self, field, None)
+                if value:
+                    parts.append(value.lower())
+            return ", ".join(parts)
 
     @model_validator(mode="after")
     def validate_toppings(self):
@@ -434,9 +551,24 @@ class LLMFriesItem(BaseModel):
         return self
 
     def __str__(self):
-        size_str = self.size.lower() if self.size else "medium"
-        salt_str = ItemConversionHelper.get_fries_salt_description(self.toppings)
-        return f"{self.name.lower()}, {size_str}, {salt_str}"
+        """Convert to description format compatible with menu system."""
+        context = get_menu_context()
+        if not context.current_brand:
+            # Fallback to basic format - fries only have salt variants, no size
+            salt_str = ItemConversionHelper.get_fries_salt_description(self.toppings)
+            return f"{self.name.lower()}, {salt_str}"
+        
+        try:
+            # For fries, the menu system only uses salt variants, not size
+            # Format: "fries, salted" or "fries, unsalted"
+            salt_str = ItemConversionHelper.get_fries_salt_description(self.toppings)
+            return f"{self.name.lower()}, {salt_str}"
+            
+        except Exception as e:
+            logger.warning(f"Error converting fries item to description format: {e}")
+            # Fallback to basic format
+            salt_str = ItemConversionHelper.get_fries_salt_description(self.toppings)
+            return f"{self.name.lower()}, {salt_str}"
 
     @model_serializer
     def ser_model(self):
@@ -461,8 +593,10 @@ class LLMDrinkItem(BaseModel):
         super().__init__(**kwargs)
 
     def __str__(self):
-        size_str = self.size.lower() if self.size else "medium"
-        return f"{self.name.lower()}, {size_str}"
+        """Convert to description format compatible with menu system."""
+        # For drinks, the menu system only uses flavor names, not size
+        # Format: "cola", "diet cola", "lemon-lime", "root beer"
+        return self.name.lower()
 
     @model_serializer
     def ser_model(self):

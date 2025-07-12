@@ -1,0 +1,253 @@
+{
+  "results": [
+    {
+      "input_message": "I'd like to order a hamburger please",
+      "expected_items": [
+        "hamburger"
+      ],
+      "extracted_items": [
+        "hamburger"
+      ],
+      "response": "{\"LLMOrder\": {\"items\": [{\"name\": \"Hamburger\", \"quantity\": 1, \"size\": \"default\"}]}}",
+      "raw_response": "{\"order\": [{\"name\": \"Hamburger\", \"quantity\": 1, \"size\": \"default\"}\n]}\n{\"LLMOrder\": {\"items\": [{\"name\": \"Hamburger\", \"quantity\": 1, \"size\": \"default\"}]}}\n",
+      "positive": true,
+      "timestamp": "2025-07-12T09:37:30.729672"
+    },
+    {
+      "input_message": "I want a double cheeseburger with bacon and no onions on a pretzel bun",
+      "expected_items": [
+        "cheeseburger"
+      ],
+      "extracted_items": [
+        "cheeseburger"
+      ],
+      "response": "{\"LLMOrder\": {\"items\": [{\"name\": \"Cheeseburger\", \"quantity\": 1, \"size\": \"double\", \"bun\": \"pretzel\", \"toppings\": [{\"name\": \"bacon\", \"amount\": \"normal\"}]}]}}",
+      "raw_response": "{\"order\": [{\"name\": \"Cheeseburger\", \"quantity\": 1, \"size\": \"double\", \"bun\": \"pretzel\", \"toppings\": [{\"name\": \"bacon\", \"amount\": \"normal\"}]}\n]}\n{\"LLMOrder\": {\"items\": [{\"name\": \"Cheeseburger\", \"quantity\": 1, \"size\": \"double\", \"bun\": \"pretzel\", \"toppings\": [{\"name\": \"bacon\", \"amount\": \"normal\"}]}]}}\n",
+      "positive": true,
+      "timestamp": "2025-07-12T09:37:35.664767"
+    },
+    {
+      "input_message": "I'll take a hamburger with fries and a large cola",
+      "expected_items": [
+        "hamburger",
+        "fries",
+        "cola"
+      ],
+      "extracted_items": [
+        "hamburger",
+        "cola"
+      ],
+      "response": "{\"LLMOrder\": {\"items\": [{\"name\": \"Hamburger\", \"quantity\": 1, \"size\": \"default\"}, {\"name\": \"Cola\", \"quantity\": 1, \"size\": \"large\"}]}}",
+      "raw_response": "{\"order\": [{\"name\": \"Hamburger\", \"quantity\": 1, \"size\": \"default\"}\n,{\"name\": \"Cola\", \"quantity\": 1, \"size\": \"large\"}\n]}\n{\"LLMOrder\": {\"items\": [{\"name\": \"Hamburger\", \"quantity\": 1, \"size\": \"default\"}, {\"name\": \"Cola\", \"quantity\": 1, \"size\": \"large\"}]}}\n",
+      "positive": false,
+      "timestamp": "2025-07-12T09:37:39.612228"
+    },
+    {
+      "input_message": "I'd like the black bean burger with medium fries",
+      "expected_items": [
+        "black bean burger",
+        "fries"
+      ],
+      "extracted_items": [
+        "fries"
+      ],
+      "response": "{\"LLMOrder\": {\"items\": [{\"name\": \"Fries\", \"quantity\": 1}]}}",
+      "raw_response": "{\"order\": [{\"name\": \"Fries\", \"quantity\": 1}\n]}\n{\"LLMOrder\": {\"items\": [{\"name\": \"Fries\", \"quantity\": 1}]}}\n",
+      "positive": false,
+      "timestamp": "2025-07-12T09:37:42.478876"
+    },
+    {
+      "input_message": "Can I get a small diet cola?",
+      "expected_items": [
+        "diet cola"
+      ],
+      "extracted_items": [
+        "diet cola"
+      ],
+      "response": "{\"LLMOrder\": {\"items\": [{\"name\": \"diet cola\", \"quantity\": 1, \"size\": \"small\"}]}}",
+      "raw_response": "{\"order\": [{\"name\": \"diet cola\", \"quantity\": 1, \"size\": \"small\"}\n]}\n{\"LLMOrder\": {\"items\": [{\"name\": \"diet cola\", \"quantity\": 1, \"size\": \"small\"}]}}\n",
+      "positive": true,
+      "timestamp": "2025-07-12T09:37:44.194711"
+    },
+    {
+      "input_message": "I'll have large fries with no salt",
+      "expected_items": [
+        "fries"
+      ],
+      "extracted_items": [
+        "fries"
+      ],
+      "response": "{\"LLMOrder\": {\"items\": [{\"name\": \"Fries\", \"quantity\": 1, \"size\": \"large\"}]}}",
+      "raw_response": "{\"order\": [{\"name\": \"Fries\", \"quantity\": 1, \"size\": \"large\"}\n]}\n{\"LLMOrder\": {\"items\": [{\"name\": \"Fries\", \"quantity\": 1, \"size\": \"large\"}]}}\n",
+      "positive": true,
+      "timestamp": "2025-07-12T09:37:46.655865"
+    },
+    {
+      "input_message": "Actually, can I add a cheeseburger to my order?",
+      "expected_items": [
+        "fries",
+        "cheeseburger"
+      ],
+      "extracted_items": [
+        "fries",
+        "cheeseburger"
+      ],
+      "response": "{\"LLMOrder\": {\"items\": [{\"name\": \"fries\", \"quantity\": 1}, {\"name\": \"cheeseburger\", \"quantity\": 1}]}}",
+      "raw_response": "{\"order\": [{\"name\": \"fries\", \"quantity\": 1}\n]}\n{\"LLMOrder\": {\"items\": [{\"name\": \"fries\", \"quantity\": 1}, {\"name\": \"cheeseburger\", \"quantity\": 1}]}}\n",
+      "positive": true,
+      "timestamp": "2025-07-12T09:37:48.533559"
+    },
+    {
+      "input_message": "Make that two hamburgers instead of one",
+      "expected_items": [
+        "hamburger"
+      ],
+      "extracted_items": [
+        "hamburger"
+      ],
+      "response": "{\"LLMOrder\": {\"items\": [{\"name\": \"hamburger\", \"quantity\": 2}]}}",
+      "raw_response": "{\"order\": [{\"name\": \"hamburger\", \"quantity\": 2}\n]}\n{\"LLMOrder\": {\"items\": [{\"name\": \"hamburger\", \"quantity\": 2}]}}\n",
+      "positive": true,
+      "timestamp": "2025-07-12T09:37:49.743847"
+    },
+    {
+      "input_message": "Remove the fries from my order",
+      "expected_items": [
+        "hamburger"
+      ],
+      "extracted_items": [
+        "hamburger"
+      ],
+      "response": "{\"LLMOrder\": {\"items\": [{\"name\": \"hamburger\", \"quantity\": 1}]}}",
+      "raw_response": "{\"order\": [{\"name\": \"hamburger\", \"quantity\": 1}\n]}\n{\"LLMOrder\": {\"items\": [{\"name\": \"hamburger\", \"quantity\": 1}]}}\n",
+      "positive": true,
+      "timestamp": "2025-07-12T09:37:50.955112"
+    },
+    {
+      "input_message": "I want a chicken sandwich and pizza",
+      "expected_items": [],
+      "extracted_items": [],
+      "response": "{\"LLMOrder\": {\"items\": []}}",
+      "raw_response": "{\"LLMOrder\": {\"items\": []}}\n",
+      "positive": true,
+      "timestamp": "2025-07-12T09:37:53.703496"
+    },
+    {
+      "input_message": "I want a black bean burger with double patties",
+      "expected_items": [],
+      "extracted_items": [],
+      "response": "{\"LLMOrder\": {\"items\": []}}",
+      "raw_response": "{\"LLMOrder\": {\"items\": []}}\n",
+      "positive": true,
+      "timestamp": "2025-07-12T09:37:56.190279"
+    },
+    {
+      "input_message": "Can I get an extra large root beer?",
+      "expected_items": [],
+      "extracted_items": [
+        "root beer"
+      ],
+      "response": "{\"LLMOrder\": {\"items\": [{\"name\": \"Root Beer\", \"quantity\": 1, \"size\": \"extra large\"}]}}",
+      "raw_response": "{\"order\": [{\"name\": \"Root Beer\", \"quantity\": 1, \"size\": \"extra large\"}\n]}\n{\"LLMOrder\": {\"items\": [{\"name\": \"Root Beer\", \"quantity\": 1, \"size\": \"extra large\"}]}}\n",
+      "positive": false,
+      "timestamp": "2025-07-12T09:37:58.080273"
+    },
+    {
+      "input_message": "I want extra large fries",
+      "expected_items": [],
+      "extracted_items": [
+        "fries"
+      ],
+      "response": "{\"LLMOrder\": {\"items\": [{\"name\": \"Fries\", \"quantity\": 1, \"size\": \"extra large\"}]}}",
+      "raw_response": "{\"order\": [{\"name\": \"Fries\", \"quantity\": 1, \"size\": \"extra large\"}\n]}\n{\"LLMOrder\": {\"items\": [{\"name\": \"Fries\", \"quantity\": 1, \"size\": \"extra large\"}]}}\n",
+      "positive": false,
+      "timestamp": "2025-07-12T09:38:00.322483"
+    },
+    {
+      "input_message": "What time do you close?",
+      "expected_items": [],
+      "extracted_items": [],
+      "response": "{\"LLMOrder\": {\"items\": []}}",
+      "raw_response": "{\"LLMOrder\": {\"items\": []}}\n",
+      "positive": true,
+      "timestamp": "2025-07-12T09:38:00.954020"
+    },
+    {
+      "input_message": "What toppings do you have for burgers?",
+      "expected_items": [],
+      "extracted_items": [],
+      "response": "{\"LLMOrder\": {\"items\": []}}",
+      "raw_response": "{\"LLMOrder\": {\"items\": []}}\n",
+      "positive": true,
+      "timestamp": "2025-07-12T09:38:01.570528"
+    },
+    {
+      "input_message": "I'll have two cheeseburgers - one with bacon and well done, one regular. Also large fries with no salt, and a medium lemon-lime soda",
+      "expected_items": [
+        "cheeseburger",
+        "cheeseburger",
+        "fries",
+        "lemon-lime"
+      ],
+      "extracted_items": [
+        "cheeseburger",
+        "cheeseburger",
+        "fries"
+      ],
+      "response": "{\"LLMOrder\": {\"items\": [{\"name\": \"Cheeseburger\", \"quantity\": 1, \"size\": \"Regular\", \"cook\": \"Well Done\", \"toppings\": [{\"name\": \"Bacon\", \"amount\": \"normal\"}]}, {\"name\": \"Cheeseburger\", \"quantity\": 1, \"size\": \"Regular\"}, {\"name\": \"Fries\", \"quantity\": 1, \"size\": \"Large\"}]}}",
+      "raw_response": "{\"order\": [{\"name\": \"Cheeseburger\", \"quantity\": 1, \"size\": \"Regular\", \"cook\": \"Well Done\", \"toppings\": [{\"name\": \"Bacon\", \"amount\": \"normal\"}]}\n,{\"name\": \"Cheeseburger\", \"quantity\": 1, \"size\": \"Regular\"}\n,{\"name\": \"Fries\", \"quantity\": 1, \"size\": \"Large\"}\n]}\n{\"LLMOrder\": {\"items\": [{\"name\": \"Cheeseburger\", \"quantity\": 1, \"size\": \"Regular\", \"cook\": \"Well Done\", \"toppings\": [{\"name\": \"Bacon\", \"amount\": \"normal\"}]}, {\"name\": \"Cheeseburger\", \"quantity\": 1, \"size\": \"Regular\"}, {\"name\": \"Fries\", \"quantity\": 1, \"size\": \"Large\"}]}}\n",
+      "positive": false,
+      "timestamp": "2025-07-12T09:38:08.638803"
+    },
+    {
+      "input_message": "I want a cola, diet cola, lemon-lime, and root beer - all medium size",
+      "expected_items": [
+        "cola",
+        "diet cola",
+        "lemon-lime",
+        "root beer"
+      ],
+      "extracted_items": [
+        "cola",
+        "diet cola",
+        "lemon-lime",
+        "root beer"
+      ],
+      "response": "{\"LLMOrder\": {\"items\": [{\"name\": \"Cola\", \"quantity\": 1}, {\"name\": \"Diet Cola\", \"quantity\": 1}, {\"name\": \"Lemon-Lime\", \"quantity\": 1}, {\"name\": \"Root Beer\", \"quantity\": 1}]}}",
+      "raw_response": "{\"order\": [{\"name\": \"Cola\", \"quantity\": 1}\n,{\"name\": \"Diet Cola\", \"quantity\": 1}\n,{\"name\": \"Lemon-Lime\", \"quantity\": 1}\n,{\"name\": \"Root Beer\", \"quantity\": 1}\n]}\n{\"LLMOrder\": {\"items\": [{\"name\": \"Cola\", \"quantity\": 1}, {\"name\": \"Diet Cola\", \"quantity\": 1}, {\"name\": \"Lemon-Lime\", \"quantity\": 1}, {\"name\": \"Root Beer\", \"quantity\": 1}]}}\n",
+      "positive": true,
+      "timestamp": "2025-07-12T09:38:13.563126"
+    },
+    {
+      "input_message": "I want one hamburger, one cheeseburger, and one black bean burger",
+      "expected_items": [
+        "hamburger",
+        "cheeseburger",
+        "black bean burger"
+      ],
+      "extracted_items": [
+        "hamburger",
+        "cheeseburger"
+      ],
+      "response": "{\"LLMOrder\": {\"items\": [{\"name\": \"Hamburger\", \"quantity\": 1, \"size\": \"Default\"}, {\"name\": \"Cheeseburger\", \"quantity\": 1, \"size\": \"Default\"}]}}",
+      "raw_response": "{\"order\": [{\"name\": \"Hamburger\", \"quantity\": 1, \"size\": \"Default\"}\n,{\"name\": \"Cheeseburger\", \"quantity\": 1, \"size\": \"Default\"}\n]}\n{\"LLMOrder\": {\"items\": [{\"name\": \"Hamburger\", \"quantity\": 1, \"size\": \"Default\"}, {\"name\": \"Cheeseburger\", \"quantity\": 1, \"size\": \"Default\"}]}}\n",
+      "positive": false,
+      "timestamp": "2025-07-12T09:38:17.579058"
+    },
+    {
+      "input_message": "I want small fries and large fries",
+      "expected_items": [
+        "fries",
+        "fries"
+      ],
+      "extracted_items": [
+        "fries",
+        "fries"
+      ],
+      "response": "{\"LLMOrder\": {\"items\": [{\"name\": \"fries\", \"quantity\": 1, \"size\": \"small\"}, {\"name\": \"fries\", \"quantity\": 1, \"size\": \"large\"}]}}",
+      "raw_response": "{\"order\": [{\"name\": \"fries\", \"quantity\": 1, \"size\": \"small\"}\n,{\"name\": \"fries\", \"quantity\": 1, \"size\": \"large\"}\n]}\n{\"LLMOrder\": {\"items\": [{\"name\": \"fries\", \"quantity\": 1, \"size\": \"small\"}, {\"name\": \"fries\", \"quantity\": 1, \"size\": \"large\"}]}}\n",
+      "positive": true,
+      "timestamp": "2025-07-12T09:38:20.367858"
+    }
+  ]
+}

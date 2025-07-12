@@ -1,0 +1,36 @@
+{
+  "results": [
+    {
+      "input_message": "I want a hamburger please",
+      "expected_items": [
+        "hamburger"
+      ],
+      "extracted_items": [],
+      "response": "{\"error\": \"1 validation error for LLMOrder\\nitems\\n  Field required [type=missing, input_value={}, input_type=dict]\\n    For further information visit https://errors.pydantic.dev/2.11/v/missing\"}",
+      "raw_response": "{\"error\": \"1 validation error for LLMOrder\\nitems\\n  Field required [type=missing, input_value={}, input_type=dict]\\n    For further information visit https://errors.pydantic.dev/2.11/v/missing\"}\n",
+      "positive": false,
+      "timestamp": "2025-07-12T09:47:32.493818"
+    },
+    {
+      "input_message": "I want a hamburger and large fries",
+      "expected_items": [
+        "hamburger",
+        "fries"
+      ],
+      "extracted_items": [],
+      "response": "{\"error\": \"1 validation error for LLMOrder\\nitems\\n  Field required [type=missing, input_value={}, input_type=dict]\\n    For further information visit https://errors.pydantic.dev/2.11/v/missing\"}",
+      "raw_response": "{\"error\": \"1 validation error for LLMOrder\\nitems\\n  Field required [type=missing, input_value={}, input_type=dict]\\n    For further information visit https://errors.pydantic.dev/2.11/v/missing\"}\n",
+      "positive": false,
+      "timestamp": "2025-07-12T09:47:32.494828"
+    },
+    {
+      "input_message": "I want pizza",
+      "expected_items": [],
+      "extracted_items": [],
+      "response": "{\"error\": \"1 validation error for LLMOrder\\nitems\\n  Field required [type=missing, input_value={}, input_type=dict]\\n    For further information visit https://errors.pydantic.dev/2.11/v/missing\"}",
+      "raw_response": "{\"error\": \"1 validation error for LLMOrder\\nitems\\n  Field required [type=missing, input_value={}, input_type=dict]\\n    For further information visit https://errors.pydantic.dev/2.11/v/missing\"}\n",
+      "positive": true,
+      "timestamp": "2025-07-12T09:47:32.495823"
+    }
+  ]
+}

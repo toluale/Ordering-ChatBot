@@ -12,7 +12,7 @@ from streaming_ordering_chatbot.api.flows.order_flow_SK import OrderFlowSK
 from streaming_ordering_chatbot.api.models import Message
 
 # Configure logging
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
 load_dotenv()
@@ -105,13 +105,82 @@ class OrderFlowTester:
             
             # Parse the response
             try:
-                # Try to parse as JSON first
-                if raw_response.strip().startswith('{'):
-                    parsed_response = json.loads(raw_response.strip())
-                else:
-                    # If not JSON, treat as text response
-                    parsed_response = {"text_response": raw_response.strip()}
-            except json.JSONDecodeError:
+                # Clean the raw response first
+                cleaned_response = raw_response.strip()
+                
+                # Handle multiple JSON objects concatenated together
+                parsed_response = {}
+                if cleaned_response:
+                    # Use a more robust approach to handle concatenated JSON objects
+                    json_objects = []
+                    current_obj = ""
+                    brace_count = 0
+                    in_string = False
+                    escape_next = False
+                    
+                    # Parse character by character to properly handle nested JSON
+                    for char in cleaned_response:
+                        if escape_next:
+                            current_obj += char
+                            escape_next = False
+                            continue
+                            
+                        if char == '\\' and in_string:
+                            current_obj += char
+                            escape_next = True
+                            continue
+                            
+                        if char == '"' and not escape_next:
+                            in_string = not in_string
+                            
+                        current_obj += char
+                        
+                        if not in_string:
+                            if char == '{':
+                                brace_count += 1
+                            elif char == '}':
+                                brace_count -= 1
+                                
+                                # Complete JSON object found
+                                if brace_count == 0 and current_obj.strip():
+                                    json_objects.append(current_obj.strip())
+                                    current_obj = ""
+                    
+                    # Parse each JSON object separately
+                    for json_str in json_objects:
+                        try:
+                            json_obj = json.loads(json_str)
+                            if isinstance(json_obj, dict):
+                                # Merge all JSON objects into a single response
+                                parsed_response.update(json_obj)
+                        except json.JSONDecodeError as e:
+                            logger.warning(f"Failed to parse JSON object: {json_str[:100]}... Error: {e}")
+                            continue
+                    
+                    # If no valid JSON was parsed, try fallback approaches
+                    if not parsed_response:
+                        # Try parsing as a single JSON object
+                        try:
+                            parsed_response = json.loads(cleaned_response)
+                        except json.JSONDecodeError:
+                            # Try extracting JSON objects using regex as last resort
+                            import re
+                            json_pattern = r'\{[^{}]*\}'
+                            matches = re.findall(json_pattern, cleaned_response)
+                            for match in matches:
+                                try:
+                                    json_obj = json.loads(match)
+                                    if isinstance(json_obj, dict):
+                                        parsed_response.update(json_obj)
+                                except json.JSONDecodeError:
+                                    continue
+                            
+                            # If still no valid JSON, store as text response
+                            if not parsed_response:
+                                parsed_response = {"text_response": cleaned_response}
+                        
+            except Exception as e:
+                logger.warning(f"Response parsing error: {e}, raw_response: {raw_response[:200]}")
                 parsed_response = {"text_response": raw_response.strip()}
             
             # Analyze the result
@@ -119,10 +188,13 @@ class OrderFlowTester:
             extracted_items = self._extract_items_from_response(parsed_response)
             
             # Create result record
+            response_text = parsed_response.get("text_response", json.dumps(parsed_response))
             result = {
                 "input_message": test_case["chat_history"][-1].content,
                 "expected_items": test_case["expected_items"],
-                "response": parsed_response,
+                "extracted_items": extracted_items,
+                "response": response_text,
+                "raw_response": raw_response,
                 "positive": (extracted_items == test_case["expected_items"]),
                 "timestamp": datetime.now().isoformat()
             }
@@ -164,20 +236,143 @@ class OrderFlowTester:
         """Extract item names from the response."""
         items = []
         
-        # Extract from structured items list
-        if "items" in parsed_response and isinstance(parsed_response["items"], list):
-            for item in parsed_response["items"]:
+        # Debug logging to see the structure
+        logger.debug(f"Extracting items from response structure: {list(parsed_response.keys())}")
+        
+        # Extract from single item format (simple product_code + description format)
+        if "product_code" in parsed_response and "description" in parsed_response:
+            logger.debug("Found single product_code format")
+            # Extract the first word from the description which is usually the item name
+            description = parsed_response["description"].lower()
+            item_name = description.split(",")[0].strip()
+            items.append(item_name)
+            logger.debug(f"Extracted from single item: {item_name}")
+        
+        # Extract from order_items format (structured format)
+        if "order_items" in parsed_response and isinstance(parsed_response["order_items"], list):
+            logger.debug("Found order_items format")
+            for item in parsed_response["order_items"]:
+                if isinstance(item, dict):
+                    if "description" in item:
+                        # Parse the description to extract the main item name
+                        description = item["description"].lower()
+                        item_name = description.split(",")[0].strip()
+                        items.append(item_name)
+                        logger.debug(f"Extracted from order_items description: {item_name}")
+                    elif "product_code" in item:
+                        # Map product codes to item names for testing
+                        mapped_name = self._map_product_code_to_name(item["product_code"])
+                        items.append(mapped_name)
+                        logger.debug(f"Mapped product code {item['product_code']} to {mapped_name}")
+        
+        # Extract from updated_order format (new validation format)
+        if "updated_order" in parsed_response and isinstance(parsed_response["updated_order"], list):
+            logger.debug("Found updated_order format")
+            for item in parsed_response["updated_order"]:
+                if isinstance(item, dict):
+                    if "description" in item:
+                        # Parse the description to extract the main item name
+                        description = item["description"].lower()
+                        # Extract the first word which is usually the item name
+                        item_name = description.split(",")[0].strip()
+                        items.append(item_name)
+                        logger.debug(f"Extracted from description: {item_name}")
+                    elif "product_code" in item:
+                        # Map product codes to item names for testing
+                        mapped_name = self._map_product_code_to_name(item["product_code"])
+                        items.append(mapped_name)
+                        logger.debug(f"Mapped product code {item['product_code']} to {mapped_name}")
+        
+        # Extract from order array (previous format)
+        if "order" in parsed_response and isinstance(parsed_response["order"], list):
+            logger.debug("Found order format")
+            for item in parsed_response["order"]:
                 if isinstance(item, dict) and "name" in item:
-                    items.append(item["name"].lower())
+                    item_name = item["name"].lower()
+                    items.append(item_name)
+                    logger.debug(f"Extracted from order: {item_name}")
+        
+        # Extract from structured items list (standard format)
+        if "items" in parsed_response and isinstance(parsed_response["items"], list):
+            logger.debug("Found items format")
+            for item in parsed_response["items"]:
+                if isinstance(item, dict):
+                    # Handle different item formats
+                    if "name" in item:
+                        item_name = item["name"].lower()
+                        items.append(item_name)
+                        logger.debug(f"Extracted from items: {item_name}")
+                    elif "productCode" in item:
+                        # Map product codes to item names for testing
+                        mapped_name = self._map_product_code_to_name(item["productCode"])
+                        items.append(mapped_name)
+                        logger.debug(f"Mapped product code {item['productCode']} to {mapped_name}")
+        
+        # Extract from LLMOrder format (streaming responses)
+        if "LLMOrder" in parsed_response and isinstance(parsed_response["LLMOrder"], dict):
+            logger.debug("Found LLMOrder format")
+            llm_order = parsed_response["LLMOrder"]
+            if "items" in llm_order and isinstance(llm_order["items"], list):
+                for item in llm_order["items"]:
+                    if isinstance(item, dict) and "name" in item:
+                        item_name = item["name"].lower()
+                        items.append(item_name)
+                        logger.debug(f"Extracted from LLMOrder: {item_name}")
         
         # Extract from categorized items
         for category in ["burgers", "drinks", "fries", "sides"]:
             if category in parsed_response and isinstance(parsed_response[category], list):
+                logger.debug(f"Found {category} format")
                 for item in parsed_response[category]:
                     if isinstance(item, dict) and "name" in item:
-                        items.append(item["name"].lower())
+                        item_name = item["name"].lower()
+                        items.append(item_name)
+                        logger.debug(f"Extracted from {category}: {item_name}")
         
-        return items
+        # Remove duplicates while preserving order
+        unique_items = []
+        for item in items:
+            if item not in unique_items:
+                unique_items.append(item)
+        
+        logger.debug(f"Final extracted items: {unique_items}")
+        return unique_items
+    
+    def _map_product_code_to_name(self, product_code: str) -> str:
+        """Map product codes to item names for testing purposes."""
+        # Basic mapping for common items - extend as needed
+        # ** MOVE THE MAPPING OUT OF THE CODE BLOCK **
+        code_to_name = {
+            # Hamburgers
+            "HB14SSN": "hamburger",
+            "HB14DSN": "hamburger", 
+            "HB12SSN": "hamburger",
+            "HB12DSN": "hamburger",
+            
+            # Cheeseburgers  
+            "CZHB14SSN": "cheeseburger",
+            "CZHB14DSN": "cheeseburger",
+            "CZHB14DSW": "cheeseburger",
+            "CZHB14DPN": "cheeseburger",
+            "CZHB12SSN": "cheeseburger",
+            
+            # Black bean burgers
+            "BBSS": "black bean burger",
+            "BBDS": "black bean burger",
+            
+            # Fries
+            "FSS": "fries", "FSNS": "fries",
+            "FMS": "fries", "FMNS": "fries", 
+            "FLS": "fries", "FLNS": "fries",
+            
+            # Drinks
+            "DSC": "cola", "DMC": "cola", "DLC": "cola",
+            "DSD": "diet cola", "DMD": "diet cola", "DLD": "diet cola",
+            "DSLL": "lemon-lime", "DMLL": "lemon-lime", "DLLL": "lemon-lime",
+            "DSR": "root beer", "DMR": "root beer", "DLR": "root beer"
+        }
+        
+        return code_to_name.get(product_code, product_code.lower())
     
     async def run_all_tests(self, test_streaming: bool = True) -> Dict[str, Any]:
         """Run all test cases."""
@@ -189,7 +384,6 @@ class OrderFlowTester:
         for test_case in test_cases:
             if test_streaming:
                 result = await self.run_single_test(test_case, use_streaming=True)
-            #result = await self.run_single_test(test_case, use_streaming=False)
                 all_results.append(result)
 
         results = {

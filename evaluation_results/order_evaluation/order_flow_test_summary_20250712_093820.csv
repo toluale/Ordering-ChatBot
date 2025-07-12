@@ -1,0 +1,77 @@
+input_message,expected_items,extracted_items,response,raw_response,positive,timestamp
+I'd like to order a hamburger please,['hamburger'],['hamburger'],"{""LLMOrder"": {""items"": [{""name"": ""Hamburger"", ""quantity"": 1, ""size"": ""default""}]}}","{""order"": [{""name"": ""Hamburger"", ""quantity"": 1, ""size"": ""default""}
+]}
+{""LLMOrder"": {""items"": [{""name"": ""Hamburger"", ""quantity"": 1, ""size"": ""default""}]}}
+",True,2025-07-12T09:37:30.729672
+I want a double cheeseburger with bacon and no onions on a pretzel bun,['cheeseburger'],['cheeseburger'],"{""LLMOrder"": {""items"": [{""name"": ""Cheeseburger"", ""quantity"": 1, ""size"": ""double"", ""bun"": ""pretzel"", ""toppings"": [{""name"": ""bacon"", ""amount"": ""normal""}]}]}}","{""order"": [{""name"": ""Cheeseburger"", ""quantity"": 1, ""size"": ""double"", ""bun"": ""pretzel"", ""toppings"": [{""name"": ""bacon"", ""amount"": ""normal""}]}
+]}
+{""LLMOrder"": {""items"": [{""name"": ""Cheeseburger"", ""quantity"": 1, ""size"": ""double"", ""bun"": ""pretzel"", ""toppings"": [{""name"": ""bacon"", ""amount"": ""normal""}]}]}}
+",True,2025-07-12T09:37:35.664767
+I'll take a hamburger with fries and a large cola,"['hamburger', 'fries', 'cola']","['hamburger', 'cola']","{""LLMOrder"": {""items"": [{""name"": ""Hamburger"", ""quantity"": 1, ""size"": ""default""}, {""name"": ""Cola"", ""quantity"": 1, ""size"": ""large""}]}}","{""order"": [{""name"": ""Hamburger"", ""quantity"": 1, ""size"": ""default""}
+,{""name"": ""Cola"", ""quantity"": 1, ""size"": ""large""}
+]}
+{""LLMOrder"": {""items"": [{""name"": ""Hamburger"", ""quantity"": 1, ""size"": ""default""}, {""name"": ""Cola"", ""quantity"": 1, ""size"": ""large""}]}}
+",False,2025-07-12T09:37:39.612228
+I'd like the black bean burger with medium fries,"['black bean burger', 'fries']",['fries'],"{""LLMOrder"": {""items"": [{""name"": ""Fries"", ""quantity"": 1}]}}","{""order"": [{""name"": ""Fries"", ""quantity"": 1}
+]}
+{""LLMOrder"": {""items"": [{""name"": ""Fries"", ""quantity"": 1}]}}
+",False,2025-07-12T09:37:42.478876
+Can I get a small diet cola?,['diet cola'],['diet cola'],"{""LLMOrder"": {""items"": [{""name"": ""diet cola"", ""quantity"": 1, ""size"": ""small""}]}}","{""order"": [{""name"": ""diet cola"", ""quantity"": 1, ""size"": ""small""}
+]}
+{""LLMOrder"": {""items"": [{""name"": ""diet cola"", ""quantity"": 1, ""size"": ""small""}]}}
+",True,2025-07-12T09:37:44.194711
+I'll have large fries with no salt,['fries'],['fries'],"{""LLMOrder"": {""items"": [{""name"": ""Fries"", ""quantity"": 1, ""size"": ""large""}]}}","{""order"": [{""name"": ""Fries"", ""quantity"": 1, ""size"": ""large""}
+]}
+{""LLMOrder"": {""items"": [{""name"": ""Fries"", ""quantity"": 1, ""size"": ""large""}]}}
+",True,2025-07-12T09:37:46.655865
+"Actually, can I add a cheeseburger to my order?","['fries', 'cheeseburger']","['fries', 'cheeseburger']","{""LLMOrder"": {""items"": [{""name"": ""fries"", ""quantity"": 1}, {""name"": ""cheeseburger"", ""quantity"": 1}]}}","{""order"": [{""name"": ""fries"", ""quantity"": 1}
+]}
+{""LLMOrder"": {""items"": [{""name"": ""fries"", ""quantity"": 1}, {""name"": ""cheeseburger"", ""quantity"": 1}]}}
+",True,2025-07-12T09:37:48.533559
+Make that two hamburgers instead of one,['hamburger'],['hamburger'],"{""LLMOrder"": {""items"": [{""name"": ""hamburger"", ""quantity"": 2}]}}","{""order"": [{""name"": ""hamburger"", ""quantity"": 2}
+]}
+{""LLMOrder"": {""items"": [{""name"": ""hamburger"", ""quantity"": 2}]}}
+",True,2025-07-12T09:37:49.743847
+Remove the fries from my order,['hamburger'],['hamburger'],"{""LLMOrder"": {""items"": [{""name"": ""hamburger"", ""quantity"": 1}]}}","{""order"": [{""name"": ""hamburger"", ""quantity"": 1}
+]}
+{""LLMOrder"": {""items"": [{""name"": ""hamburger"", ""quantity"": 1}]}}
+",True,2025-07-12T09:37:50.955112
+I want a chicken sandwich and pizza,[],[],"{""LLMOrder"": {""items"": []}}","{""LLMOrder"": {""items"": []}}
+",True,2025-07-12T09:37:53.703496
+I want a black bean burger with double patties,[],[],"{""LLMOrder"": {""items"": []}}","{""LLMOrder"": {""items"": []}}
+",True,2025-07-12T09:37:56.190279
+Can I get an extra large root beer?,[],['root beer'],"{""LLMOrder"": {""items"": [{""name"": ""Root Beer"", ""quantity"": 1, ""size"": ""extra large""}]}}","{""order"": [{""name"": ""Root Beer"", ""quantity"": 1, ""size"": ""extra large""}
+]}
+{""LLMOrder"": {""items"": [{""name"": ""Root Beer"", ""quantity"": 1, ""size"": ""extra large""}]}}
+",False,2025-07-12T09:37:58.080273
+I want extra large fries,[],['fries'],"{""LLMOrder"": {""items"": [{""name"": ""Fries"", ""quantity"": 1, ""size"": ""extra large""}]}}","{""order"": [{""name"": ""Fries"", ""quantity"": 1, ""size"": ""extra large""}
+]}
+{""LLMOrder"": {""items"": [{""name"": ""Fries"", ""quantity"": 1, ""size"": ""extra large""}]}}
+",False,2025-07-12T09:38:00.322483
+What time do you close?,[],[],"{""LLMOrder"": {""items"": []}}","{""LLMOrder"": {""items"": []}}
+",True,2025-07-12T09:38:00.954020
+What toppings do you have for burgers?,[],[],"{""LLMOrder"": {""items"": []}}","{""LLMOrder"": {""items"": []}}
+",True,2025-07-12T09:38:01.570528
+"I'll have two cheeseburgers - one with bacon and well done, one regular. Also large fries with no salt, and a medium lemon-lime soda","['cheeseburger', 'cheeseburger', 'fries', 'lemon-lime']","['cheeseburger', 'cheeseburger', 'fries']","{""LLMOrder"": {""items"": [{""name"": ""Cheeseburger"", ""quantity"": 1, ""size"": ""Regular"", ""cook"": ""Well Done"", ""toppings"": [{""name"": ""Bacon"", ""amount"": ""normal""}]}, {""name"": ""Cheeseburger"", ""quantity"": 1, ""size"": ""Regular""}, {""name"": ""Fries"", ""quantity"": 1, ""size"": ""Large""}]}}","{""order"": [{""name"": ""Cheeseburger"", ""quantity"": 1, ""size"": ""Regular"", ""cook"": ""Well Done"", ""toppings"": [{""name"": ""Bacon"", ""amount"": ""normal""}]}
+,{""name"": ""Cheeseburger"", ""quantity"": 1, ""size"": ""Regular""}
+,{""name"": ""Fries"", ""quantity"": 1, ""size"": ""Large""}
+]}
+{""LLMOrder"": {""items"": [{""name"": ""Cheeseburger"", ""quantity"": 1, ""size"": ""Regular"", ""cook"": ""Well Done"", ""toppings"": [{""name"": ""Bacon"", ""amount"": ""normal""}]}, {""name"": ""Cheeseburger"", ""quantity"": 1, ""size"": ""Regular""}, {""name"": ""Fries"", ""quantity"": 1, ""size"": ""Large""}]}}
+",False,2025-07-12T09:38:08.638803
+"I want a cola, diet cola, lemon-lime, and root beer - all medium size","['cola', 'diet cola', 'lemon-lime', 'root beer']","['cola', 'diet cola', 'lemon-lime', 'root beer']","{""LLMOrder"": {""items"": [{""name"": ""Cola"", ""quantity"": 1}, {""name"": ""Diet Cola"", ""quantity"": 1}, {""name"": ""Lemon-Lime"", ""quantity"": 1}, {""name"": ""Root Beer"", ""quantity"": 1}]}}","{""order"": [{""name"": ""Cola"", ""quantity"": 1}
+,{""name"": ""Diet Cola"", ""quantity"": 1}
+,{""name"": ""Lemon-Lime"", ""quantity"": 1}
+,{""name"": ""Root Beer"", ""quantity"": 1}
+]}
+{""LLMOrder"": {""items"": [{""name"": ""Cola"", ""quantity"": 1}, {""name"": ""Diet Cola"", ""quantity"": 1}, {""name"": ""Lemon-Lime"", ""quantity"": 1}, {""name"": ""Root Beer"", ""quantity"": 1}]}}
+",True,2025-07-12T09:38:13.563126
+"I want one hamburger, one cheeseburger, and one black bean burger","['hamburger', 'cheeseburger', 'black bean burger']","['hamburger', 'cheeseburger']","{""LLMOrder"": {""items"": [{""name"": ""Hamburger"", ""quantity"": 1, ""size"": ""Default""}, {""name"": ""Cheeseburger"", ""quantity"": 1, ""size"": ""Default""}]}}","{""order"": [{""name"": ""Hamburger"", ""quantity"": 1, ""size"": ""Default""}
+,{""name"": ""Cheeseburger"", ""quantity"": 1, ""size"": ""Default""}
+]}
+{""LLMOrder"": {""items"": [{""name"": ""Hamburger"", ""quantity"": 1, ""size"": ""Default""}, {""name"": ""Cheeseburger"", ""quantity"": 1, ""size"": ""Default""}]}}
+",False,2025-07-12T09:38:17.579058
+I want small fries and large fries,"['fries', 'fries']","['fries', 'fries']","{""LLMOrder"": {""items"": [{""name"": ""fries"", ""quantity"": 1, ""size"": ""small""}, {""name"": ""fries"", ""quantity"": 1, ""size"": ""large""}]}}","{""order"": [{""name"": ""fries"", ""quantity"": 1, ""size"": ""small""}
+,{""name"": ""fries"", ""quantity"": 1, ""size"": ""large""}
+]}
+{""LLMOrder"": {""items"": [{""name"": ""fries"", ""quantity"": 1, ""size"": ""small""}, {""name"": ""fries"", ""quantity"": 1, ""size"": ""large""}]}}
+",True,2025-07-12T09:38:20.367858

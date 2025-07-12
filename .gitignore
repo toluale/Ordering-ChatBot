@@ -55,3 +55,10 @@ streaming_ordering_chatbot/api/main.py
 streaming_ordering_chatbot/api/flows/ordering_chatbot_sk_integration.py
 .github/
 .codacy/
+SCHEMAS_GENERALIZED_REFACTORING.md
+test_extraction_debug.py
+test_mapping.py
+test_quick_extraction.py
+test_single_extraction.py
+MENU_SYSTEM_README.md
+MENU_QUICK_REFERENCE.md

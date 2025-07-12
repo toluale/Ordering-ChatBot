@@ -1,0 +1,7 @@
+input_message,expected_items,extracted_items,response,raw_response,positive,timestamp
+I want a hamburger please,['hamburger'],[],"{""error"": ""1 validation error for LLMOrder\nitems\n  Field required [type=missing, input_value={}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.11/v/missing""}","{""error"": ""1 validation error for LLMOrder\nitems\n  Field required [type=missing, input_value={}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.11/v/missing""}
+",False,2025-07-12T09:47:32.493818
+I want a hamburger and large fries,"['hamburger', 'fries']",[],"{""error"": ""1 validation error for LLMOrder\nitems\n  Field required [type=missing, input_value={}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.11/v/missing""}","{""error"": ""1 validation error for LLMOrder\nitems\n  Field required [type=missing, input_value={}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.11/v/missing""}
+",False,2025-07-12T09:47:32.494828
+I want pizza,[],[],"{""error"": ""1 validation error for LLMOrder\nitems\n  Field required [type=missing, input_value={}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.11/v/missing""}","{""error"": ""1 validation error for LLMOrder\nitems\n  Field required [type=missing, input_value={}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.11/v/missing""}
+",True,2025-07-12T09:47:32.495823
