@@ -53,16 +53,16 @@ class OrderIntentPlugin:
 class OrderIntentFlowSK:
     """Order intent classification flow using Semantic Kernel."""
     
-    def __init__(self, ENDPOINT: str, API_KEY: str, DEPLOYMENT_NAME: str, brand_name: str = "default"):
+    def __init__(self, ENDPOINT: str, API_KEY: str, DEPLOYMENT_NAME: str, BRAND_NAME: str = "default"):
         """Initialize the order intent classification flow."""
-        self.endpoint = ENDPOINT
-        self.api_key = API_KEY
-        self.deployment_name = DEPLOYMENT_NAME
-        self.brand_name = brand_name
+        self.ENDPOINT = ENDPOINT
+        self.API_KEY = API_KEY
+        self.DEPLOYMENT_NAME = DEPLOYMENT_NAME
+        self.BRAND_NAME = BRAND_NAME
 
-        if brand_name:
+        if BRAND_NAME:
             try:
-                set_brand_context(brand_name)
+                set_brand_context(BRAND_NAME)
             except Exception as e:
                 # brand_config not needed for intent classification
                 pass
@@ -71,9 +71,9 @@ class OrderIntentFlowSK:
         
         # Set up Azure Chat Service
         self.azure_chat = AzureChatCompletion(
-            deployment_name=self.deployment_name,
-            endpoint=self.endpoint,
-            api_key=self.api_key
+            deployment_name=self.DEPLOYMENT_NAME,
+            endpoint=self.ENDPOINT,
+            api_key=self.API_KEY
         )
         self.kernel.add_service(self.azure_chat)
         

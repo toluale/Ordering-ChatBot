@@ -49,7 +49,7 @@ class ConversationStylePlugin:
             self.style_instructions = {
                 ConversationStyle.DEFAULT: "",
                 ConversationStyle.CASUAL: "Keep it chill and real, like talking to a buddy.",
-                ConversationStyle.GENZ: "Talk like you're on TikTok—use Gen Z slang, keep it hype."
+                ConversationStyle.GENZ: "Talk like you're on TikTok—use Gen Z slang, keep it hype. Drop those 'lit', 'fam', and 'no cap' vibes. Stay trendy and fresh."
             }
 
     def set_style(self, style: ConversationStyle) -> bool:

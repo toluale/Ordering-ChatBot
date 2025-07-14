@@ -4,29 +4,34 @@ from pathlib import Path
 from uuid import uuid4
 
 import httpx
-
 import streamlit as st
+import os
 
-ORDER_ENDPOINT = "http://localhost:8000/order"
-PREAMBLE_ENDPOINT = "http://localhost:8000/preamble"
-SUMMARY_ENDPOINT = "http://localhost:8000/summary"
-SCREENING_ENDPOINT = "http://localhost:8000/screen"
-CONVERSATION_ENDPOINT = "http://localhost:8000/assistant"
+# Environment-configurable API base
+API_BASE_URL = os.getenv("STREAMLIT_API_BASE_URL", "http://localhost:8000")
 
+# API Endpoints
+ORDER_ENDPOINT = f"{API_BASE_URL}/order"
+PREAMBLE_ENDPOINT = f"{API_BASE_URL}/preamble"
+SUMMARY_ENDPOINT = f"{API_BASE_URL}/summary"
+SCREENING_ENDPOINT = f"{API_BASE_URL}/screen"
+CONVERSATION_ENDPOINT = f"{API_BASE_URL}/assistant"
+
+# Frontend resources
 BASE_DIR = Path(__file__).resolve().parent.parent
-PREAMBLE_PROMPT_PATH = BASE_DIR.joinpath("api/flows/prompts/preamble.prompty")
-SUMMARY_PROMPT_PATH = BASE_DIR.joinpath("api/flows/prompts/summary.prompty")
-
-DEFAULT_PREAMBLE_PATH = BASE_DIR.joinpath("resources/default_preamble.txt")
-DEFAULT_SUMMARY_PATH = BASE_DIR.joinpath("resources/default_summary.txt")
-
 TONE_FILES = {
     "Casual": BASE_DIR.joinpath("resources/casual.txt"),
     "GenZ": BASE_DIR.joinpath("resources/genZ.txt"),
 }
 
-
 TONE_CHOICES = ["Default"] + list(TONE_FILES.keys())
+
+# Add this mapping to convert UI choices to API values
+TONE_TO_STYLE_MAPPING = {
+    "Default": "default",
+    "Casual": "casual", 
+    "GenZ": "genz"
+}
 
 
 MODEL_CHOICES = {
@@ -40,7 +45,7 @@ MODEL_CHOICES = {
 async def fetch_stream(url, container, json_data):
     async with httpx.AsyncClient(timeout=30) as client:
         headers = {
-            "contoso-session-id": st.session_state.session_id,
+            "brand-session-id": st.session_state.session_id,
             "request-id": str(uuid4()),
         }
         async with client.stream(
@@ -57,14 +62,16 @@ async def fetch_stream(url, container, json_data):
                     container.markdown(current_content)
     return current_content
 
-
 async def fetch_order(current_order, container, items_list, chat_history, state):
     order_obj = ""
     first_line = True
     order_finished = False
+    desc = []  # Initialize desc at the beginning of the function
+    order = None  # Initialize order as well
+    
     async with httpx.AsyncClient(timeout=30) as client:
         headers = {
-            "contoso-session-id": st.session_state.session_id,
+            "brand-session-id": st.session_state.session_id,
             "request-id": str(uuid4()),
         }
         async with client.stream(
@@ -87,27 +94,81 @@ async def fetch_order(current_order, container, items_list, chat_history, state)
                         order_obj += line
                         first_line = False
                     elif order_finished:
-                        state.llm_order = json.loads(line)["LLMOrder"]
+                        try:
+                            state.llm_order = json.loads(line)["LLMOrder"]
+                        except (json.JSONDecodeError, KeyError) as e:
+                            st.warning(f"Could not parse final order: {e}")
                     else:
                         order_obj += line
                         if line == "]}":
                             order_finished = True
-                            order = json.loads(order_obj)
+                            try:
+                                order = json.loads(order_obj)
+                            except json.JSONDecodeError:
+                                st.error("Could not parse order JSON")
+                                return "Error parsing order", None
                         else:
                             try:
                                 order = json.loads(
                                     order_obj + "]}"
                                 )  # Attempt to decode the JSON
                             except json.JSONDecodeError:
-                                return None
-                        desc = []
-                        for item in order["order"]:
-                            if description := item.pop("description"):
-                                desc.append(description)
-                        container.markdown(order)
-                        items_list.markdown("- " + "\n - ".join(desc))
-    return "- " + "\n - ".join(desc), order
+                                continue  # Continue instead of return None to keep streaming
+                        
+                        # Safely extract descriptions (only if we have a valid order)
+                        if order:
+                            desc = []  # Reset desc for this iteration
+                            order_items = order.get("order", [])
+                            
+                            for item in order_items:
+                                # Try different ways to get item description
+                                description = None
+                                
+                                # Method 1: Check for 'description' field
+                                if "description" in item:
+                                    description = item["description"]
+                                
+                                # Method 2: Build from name and quantity
+                                elif "name" in item:
+                                    name = item["name"]
+                                    quantity = item.get("quantity", 1)
+                                    description = f"{quantity}x {name}"
+                                    
+                                    # Add size/options if available
+                                    if "size" in item:
+                                        description += f" ({item['size']})"
+                                
+                                # Method 3: Fallback to string representation
+                                else:
+                                    description = str(item)
+                                
+                                if description:
+                                    desc.append(description)
+                            
+                            # Update UI
+                            container.markdown(order)
+                            if desc:
+                                items_list.markdown("- " + "\n - ".join(desc))
+                            else:
+                                items_list.markdown("- No items in order")
+                            
+    return ("- " + "\n - ".join(desc)) if desc else "No items", order
 
+async def fetch_brand_info():
+    """Fetch brand information from the API."""
+    try:
+        async with httpx.AsyncClient(timeout=10) as client:
+            # Try to get conversation styles first (which includes brand info)
+            response = await client.get(f"{API_BASE_URL}/conversation-styles")
+            if response.status_code == 200:
+                data = response.json()
+                # Extract brand name from the response if available
+                return data.get("current_brand", "Restaurant")
+            else:
+                return "Restaurant"  # Fallback
+    except Exception as e:
+        st.warning(f"Could not connect to API: {e}")
+        return "Restaurant"
 
 def load_prompt(prompt_path):
     """
@@ -126,6 +187,10 @@ def load_prompt(prompt_path):
 async def main():
 
     # st.set_page_config(layout="wide")
+    # Initialize brand name from API
+    if "brand_name" not in st.session_state:
+        st.session_state.brand_name = await fetch_brand_info()
+
     # Initialize chat history
     if "session_id" not in st.session_state:
         st.session_state.session_id = str(uuid4())
@@ -135,7 +200,7 @@ async def main():
         st.session_state.messages = [
             {
                 "role": "assistant",
-                "content": "Welcome to Contoso Burger's ordering chatbot! How can I help you today?",
+                "content": f"Welcome to {st.session_state.brand_name} ordering chatbot! How can I help you today?",
                 "filtered": False,
             }
         ]
@@ -248,8 +313,8 @@ async def main():
                         json_data = {
                             "chat_history": chat_history,
                             "config": {
-                                "personality": st.session_state.prompts.get(
-                                    st.session_state.selected_prompt
+                                "conversation_style": TONE_TO_STYLE_MAPPING.get(
+                                    st.session_state.selected_prompt, "default"
                                 ),
                                 "deployment": MODEL_CHOICES[
                                     st.session_state.selected_model
@@ -296,8 +361,8 @@ async def main():
                                 "chat_history": chat_history,
                                 "current_order": st.session_state.llm_order,
                                 "config": {
-                                    "personality": st.session_state.prompts.get(
-                                        st.session_state.selected_prompt
+                                    "conversation_style": TONE_TO_STYLE_MAPPING.get(
+                                        st.session_state.selected_prompt, "default"
                                     ),
                                     "deployment": MODEL_CHOICES[
                                         st.session_state.selected_model

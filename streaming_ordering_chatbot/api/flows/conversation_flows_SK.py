@@ -22,7 +22,7 @@ load_dotenv()
 ENDPOINT = os.getenv("AZURE_OPENAI_ENDPOINT")
 API_KEY = os.getenv("AZURE_OPENAI_API_KEY")
 DEPLOYMENT_NAME = os.getenv("AZURE_OPENAI_DEPLOYMENT_NAME")
-
+'''
 def get_required_env_var(name: str) -> str:
     value = os.getenv(name)
     if not value:
@@ -30,7 +30,7 @@ def get_required_env_var(name: str) -> str:
             f"{name} environment variable is not set. Please set it in your .env file."
         )
     return value
-
+'''
 # Set up logging
 logger = logging.getLogger(__name__)
 
@@ -211,26 +211,26 @@ class ConversationFlowSK:
     PLUGIN_NAME = "conversation"
     MAX_TOKENS = 500  
 
-    def __init__(self, endpoint: str, api_key: str, deployment_name: str, brand_name: Optional[str] = None, conversation_style: Optional[str] = None):
-        self.endpoint = endpoint
-        self.api_key = api_key
-        self.deployment_name = deployment_name
-        
+    def __init__(self, ENDPOINT: str, API_KEY: str, DEPLOYMENT_NAME: str, BRAND_NAME: Optional[str] = None, CONVERSATION_STYLE: Optional[str] = None):
+        self.ENDPOINT = ENDPOINT
+        self.API_KEY = API_KEY
+        self.DEPLOYMENT_NAME = DEPLOYMENT_NAME
+
         # Initialize Semantic Kernel
         self.kernel = Kernel()
         self.chat_service = AzureChatCompletion(
-            deployment_name=deployment_name,
-            endpoint=endpoint,
-            api_key=api_key,
+            deployment_name=self.DEPLOYMENT_NAME,
+            endpoint=self.ENDPOINT,
+            api_key=self.API_KEY,
             service_id="azurechat"
         )
         self.kernel.add_service(self.chat_service)
         
         # Initialize Azure OpenAI client
         self.client = AzureOpenAI(
-            api_key=api_key,
+            api_key=self.API_KEY,
             api_version="2024-12-01-preview",
-            azure_endpoint=endpoint
+            azure_endpoint=self.ENDPOINT
         )
         
         # Set up plugins
@@ -239,21 +239,21 @@ class ConversationFlowSK:
         
         # Add brand personality plugin
         from .brand_personality import BrandPersonalityPlugin
-        self.brand_plugin = BrandPersonalityPlugin(self.kernel, brand_name)
+        self.brand_plugin = BrandPersonalityPlugin(self.kernel, BRAND_NAME)
         self.kernel.add_plugin(self.brand_plugin, "brand")
         
         # Add conversation style plugin only if a specific style is provided
         # If no style is provided, will default to brand's original style
         self.style_plugin = None
-        if conversation_style and conversation_style.lower() not in ["default", "none", ""]:
+        if CONVERSATION_STYLE and CONVERSATION_STYLE.lower() not in ["default", "none", ""]:
             try:
                 from .conversation_style import ConversationStylePlugin, ConversationStyle
-                style_enum = ConversationStyle(conversation_style.lower())
+                style_enum = ConversationStyle(CONVERSATION_STYLE.lower())
                 self.style_plugin = ConversationStylePlugin(self.kernel, style_enum)
                 self.kernel.add_plugin(self.style_plugin, "style")
-                logger.info(f"Added conversation style plugin: {conversation_style}")
+                logger.info(f"Added conversation style plugin: {CONVERSATION_STYLE}")
             except (ValueError, ImportError) as e:
-                logger.warning(f"Failed to load conversation style '{conversation_style}': {e}. Using brand's original style.")
+                logger.warning(f"Failed to load conversation style '{CONVERSATION_STYLE}': {e}. Using brand's original style.")
                 self.style_plugin = None
         else:
             logger.info("No specific conversation style provided. Using brand's original style.")
@@ -432,7 +432,7 @@ class ConversationFlowSK:
 
             # completion parameters
             completion = self.client.chat.completions.create(
-                model=model_deployment or self.deployment_name,
+                model=model_deployment or self.DEPLOYMENT_NAME,
                 messages=messages,
                 temperature=0.7,
                 top_p=0.95,
@@ -459,7 +459,7 @@ class PreamblePlugin(ConversationPlugin):
         super().__init__(kernel)
     
     @kernel_function(description="Prepares preamble context for prompt template", name="chat")
-    async def prepare_preamble_context(self, chat_history: list[Message], brand_name: Optional[str] = None) -> str:
+    async def prepare_preamble_context(self, chat_history: list[Message], BRAND_NAME: Optional[str] = None) -> str:
         """Formats preamble context for prompt template."""
         # Clean and format chat history
         clean_history = []
@@ -474,7 +474,7 @@ class PreamblePlugin(ConversationPlugin):
         chat_str = "\n".join(clean_history[-4:])  # Shorter for preamble
         
         # Get brand name fallback
-        brand_name = brand_name 
+        brand_name = BRAND_NAME 
         brand_personality = ""
         
         template_context = f"""
@@ -490,9 +490,9 @@ class PreambleFlowSK(ConversationFlowSK):
     PROMPT_PATH = Path(__file__).parent.joinpath("prompts/preamble_SK.prompty")
     PLUGIN_NAME = "preamble"
 
-    def __init__(self, endpoint: str, api_key: str, deployment_name: str, brand_name: Optional[str] = None, conversation_style: Optional[str] = None):
-        super().__init__(endpoint, api_key, deployment_name, brand_name, conversation_style)
-        
+    def __init__(self, ENDPOINT: str, API_KEY: str, DEPLOYMENT_NAME: str, BRAND_NAME: Optional[str] = None, CONVERSATION_STYLE: Optional[str] = None):
+        super().__init__(ENDPOINT, API_KEY, DEPLOYMENT_NAME, BRAND_NAME, CONVERSATION_STYLE)
+
         # Add PreamblePlugin for context formatting
         self.preamble_plugin = PreamblePlugin(self.kernel)
         self.kernel.add_plugin(self.preamble_plugin, "preamble")
@@ -506,8 +506,8 @@ class OrderAssistantFlowSK(ConversationFlowSK):
     PROMPT_PATH = Path(__file__).parent.joinpath("prompts/assistant_SK.prompty")
     PLUGIN_NAME = "order_assistant"
 
-    def __init__(self, endpoint: str, api_key: str, deployment_name: str, brand_name: Optional[str] = None, conversation_style: Optional[str] = None):
-        super().__init__(endpoint, api_key, deployment_name, brand_name, conversation_style)
+    def __init__(self, ENDPOINT: str, API_KEY: str, DEPLOYMENT_NAME: str, BRAND_NAME: Optional[str] = None, CONVERSATION_STYLE: Optional[str] = None):
+        super().__init__(ENDPOINT, API_KEY, DEPLOYMENT_NAME, BRAND_NAME, CONVERSATION_STYLE)
         # Add OrderPlugin for menu and order context
         self.order_plugin = OrderPlugin(self.kernel)
         self.kernel.add_plugin(self.order_plugin, "order_assistant")
@@ -539,5 +539,5 @@ class SummaryFlowSK(ConversationFlowSK):
     PROMPT_PATH = Path(__file__).parent.joinpath("prompts/summary_SK.prompty")
     PLUGIN_NAME = "summary"
 
-    def __init__(self, endpoint: str, api_key: str, deployment_name: str, brand_name: Optional[str] = None, conversation_style: Optional[str] = None):
-        super().__init__(endpoint, api_key, deployment_name, brand_name, conversation_style)
+    def __init__(self, ENDPOINT: str, API_KEY: str, DEPLOYMENT_NAME: str, BRAND_NAME: Optional[str] = None, CONVERSATION_STYLE: Optional[str] = None):
+        super().__init__(ENDPOINT, API_KEY, DEPLOYMENT_NAME, BRAND_NAME, CONVERSATION_STYLE)

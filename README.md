@@ -1,3 +1,14 @@
+# To Launch the Ordering Chatbot:
+  1. Open terminal. From the home directory run 
+```bash
+  python server_test.py
+```
+  2. Open another terminal. Then run
+```bash
+  streamlit run streaming_ordering_chatbot/streamlit/app.py
+```
+  3. Copy Local URL to browser
+
 # Restaurant Ordering Chatbot - Testing and Evaluation Guide
 
 ## Intent Classification Testing
