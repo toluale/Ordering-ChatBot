@@ -363,7 +363,7 @@ Please process this order request and provide a structured response with the upd
                 tools=self.tools.get("tools", []),
                 tool_choice=self.tools.get("tool_choice", "auto"),
                 stream=True,
-                max_tokens=500
+                max_tokens=1000
             )
             
             # Process streaming response for structured order items

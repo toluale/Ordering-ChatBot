@@ -34,9 +34,9 @@ def validate_environment():
         raise ValueError(f"Missing required environment variables: {', '.join(missing_vars)}")
     
     return {
-        "endpoint": str(os.getenv("AZURE_OPENAI_ENDPOINT")),
-        "api_key": str(os.getenv("AZURE_OPENAI_API_KEY")),
-        "deployment_name": str(os.getenv("AZURE_OPENAI_DEPLOYMENT_NAME"))
+        "ENDPOINT": str(os.getenv("AZURE_OPENAI_ENDPOINT")),
+        "API_KEY": str(os.getenv("AZURE_OPENAI_API_KEY")),
+        "DEPLOYMENT_NAME": str(os.getenv("AZURE_OPENAI_DEPLOYMENT_NAME"))
     }
 
 
@@ -63,9 +63,9 @@ async def run_generation_phase(azure_config, brand_configs):
     
     # Initialize conversation generator
     generator = ConversationGenerator(
-        endpoint=azure_config["endpoint"],
-        api_key=azure_config["api_key"],
-        deployment_name=azure_config["deployment_name"],
+        ENDPOINT=azure_config["ENDPOINT"],
+        API_KEY=azure_config["API_KEY"],
+        DEPLOYMENT_NAME=azure_config["DEPLOYMENT_NAME"],
         scenarios_file=scenarios_path if scenarios_path.exists() else None
     )
     
@@ -87,9 +87,9 @@ async def run_evaluation_phase(azure_config):
     
     # Initialize evaluator
     evaluator = ConversationEvaluator(
-        endpoint=azure_config["endpoint"],
-        api_key=azure_config["api_key"],
-        deployment_name=azure_config["deployment_name"]
+        endpoint=azure_config["ENDPOINT"],
+        api_key=azure_config["API_KEY"],
+        deployment_name=azure_config["DEPLOYMENT_NAME"]
     )
     
     # Evaluate all conversations

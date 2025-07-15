@@ -44,19 +44,19 @@ class ConversationGenerator:
     
     def __init__(
         self,
-        endpoint: str,
-        api_key: str,
-        deployment_name: str,
+        ENDPOINT: str,
+        API_KEY: str,
+        DEPLOYMENT_NAME: str,
         scenarios_file: Optional[Path] = None,
         results_dir: Optional[Path] = None
     ):
         """Initialize the conversation generator."""
-        if not all([endpoint, api_key, deployment_name]):
+        if not all([ENDPOINT, API_KEY, DEPLOYMENT_NAME]):
             raise ValueError("All Azure OpenAI credentials (endpoint, api_key, deployment_name) are required")
-            
-        self.endpoint = str(endpoint)
-        self.api_key = str(api_key)
-        self.deployment_name = str(deployment_name)
+
+        self.ENDPOINT = str(ENDPOINT)
+        self.API_KEY = str(API_KEY)
+        self.DEPLOYMENT_NAME = str(DEPLOYMENT_NAME)
         
         # Load scenarios
         self.scenarios = self._load_scenarios(scenarios_file)
@@ -96,25 +96,25 @@ class ConversationGenerator:
         """
         return {
             "preamble": PreambleFlowSK(
-                endpoint=self.endpoint,
-                api_key=self.api_key,
-                deployment_name=self.deployment_name,
-                brand_name=brand_name,
-                conversation_style=conversation_style
+                ENDPOINT=self.ENDPOINT,
+                API_KEY=self.API_KEY,
+                DEPLOYMENT_NAME=self.DEPLOYMENT_NAME,
+                BRAND_NAME=brand_name,
+                CONVERSATION_STYLE=conversation_style
             ),
             "order": OrderAssistantFlowSK(
-                endpoint=self.endpoint,
-                api_key=self.api_key,
-                deployment_name=self.deployment_name,
-                brand_name=brand_name,
-                conversation_style=conversation_style
+                ENDPOINT=self.ENDPOINT,
+                API_KEY=self.API_KEY,
+                DEPLOYMENT_NAME=self.DEPLOYMENT_NAME,
+                BRAND_NAME=brand_name,
+                CONVERSATION_STYLE=conversation_style
             ),
             "summary": SummaryFlowSK(
-                endpoint=self.endpoint,
-                api_key=self.api_key,
-                deployment_name=self.deployment_name,
-                brand_name=brand_name,
-                conversation_style=conversation_style
+                ENDPOINT=self.ENDPOINT,
+                API_KEY=self.API_KEY,
+                DEPLOYMENT_NAME=self.DEPLOYMENT_NAME,
+                BRAND_NAME=brand_name,
+                CONVERSATION_STYLE=conversation_style
             )
         }
         
@@ -250,18 +250,18 @@ async def main():
     load_dotenv()
     
     # Get Azure OpenAI configuration
-    endpoint = os.getenv("AZURE_OPENAI_ENDPOINT")
-    api_key = os.getenv("AZURE_OPENAI_API_KEY")
-    deployment_name = os.getenv("AZURE_OPENAI_DEPLOYMENT_NAME")
-    
-    if not all([endpoint, api_key, deployment_name]):
+    ENDPOINT = os.getenv("AZURE_OPENAI_ENDPOINT")
+    API_KEY = os.getenv("AZURE_OPENAI_API_KEY")
+    DEPLOYMENT_NAME = os.getenv("AZURE_OPENAI_DEPLOYMENT_NAME")
+
+    if not all([ENDPOINT, API_KEY, DEPLOYMENT_NAME]):
         raise ValueError("Missing required environment variables")
     
     # Type assertions since we've validated they're not None
-    endpoint = str(endpoint)
-    api_key = str(api_key)
-    deployment_name = str(deployment_name)
-    
+    ENDPOINT = str(ENDPOINT)
+    API_KEY = str(API_KEY)
+    DEPLOYMENT_NAME = str(DEPLOYMENT_NAME)
+
     # Load brand configurations
     brand_config_path = Path("streaming_ordering_chatbot/resources/brand_configs.json")
     if not brand_config_path.exists():
@@ -277,9 +277,9 @@ async def main():
     
     # Initialize conversation generator
     generator = ConversationGenerator(
-        endpoint=endpoint,
-        api_key=api_key,
-        deployment_name=deployment_name,
+        ENDPOINT=ENDPOINT,
+        API_KEY=API_KEY,
+        DEPLOYMENT_NAME=DEPLOYMENT_NAME,
         scenarios_file=scenarios_path if scenarios_path.exists() else None
     )
     

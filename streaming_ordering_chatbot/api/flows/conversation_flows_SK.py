@@ -209,7 +209,7 @@ class ConversationFlowSK:
     """Base class for conversation flows using Semantic Kernel."""
     PROMPT_PATH = None
     PLUGIN_NAME = "conversation"
-    MAX_TOKENS = 500  
+    MAX_TOKENS = 2500  
 
     def __init__(self, ENDPOINT: str, API_KEY: str, DEPLOYMENT_NAME: str, BRAND_NAME: Optional[str] = None, CONVERSATION_STYLE: Optional[str] = None):
         self.ENDPOINT = ENDPOINT

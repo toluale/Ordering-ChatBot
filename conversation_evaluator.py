@@ -139,7 +139,7 @@ class ConversationEvaluator:
             explanation = re.sub(r'\b0?\.[0-9]+\b', '', response)
             explanation = ' '.join(explanation.split())
         
-        return explanation[:500] if explanation else "No explanation provided"
+        return explanation if explanation else "No explanation provided"
     
     async def evaluate_conversation(
         self, 
@@ -173,7 +173,7 @@ class ConversationEvaluator:
                     ],
                     temperature=0.7,
                     top_p=0.95,
-                    max_tokens=500
+                    max_tokens=3500
                 )
                 
                 content = response.choices[0].message.content
