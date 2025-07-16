@@ -144,9 +144,9 @@ def wrap_content_safety(generator_func, validation_interval: int = 5):
         if hasattr(token, 'items') and token.items:
             for item in token.items:
                 if hasattr(item, 'text') and item.text is not None:
-                    return item.text.strip()
+                    return item.text
         elif isinstance(token, str):
-            return token.strip()
+            return token
         return None
 
     async def safety_redaction(*args: Any, **kwargs: Any) -> AsyncGenerator[str, None]:

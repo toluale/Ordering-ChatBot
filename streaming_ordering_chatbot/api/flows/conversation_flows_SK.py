@@ -330,6 +330,33 @@ class ConversationFlowSK:
             logger.warning("Failed to enhance prompt with brand personality and style", exc_info=True)
             return system_prompt
 
+    @staticmethod
+    def fix_concatenated_words(text: str) -> str:
+        """Post-process text to fix common word concatenation issues."""
+        import re
+        
+        # Fix punctuation followed immediately by letters (Restaurant!We're -> Restaurant! We're)
+        text = re.sub(r'([.!?])([A-Z])', r'\1 \2', text)
+        
+        # Fix comma/semicolon/colon followed immediately by letters (fresh,we're -> fresh, we're)
+        text = re.sub(r'([,;:])([a-zA-Z])', r'\1 \2', text)
+        
+        # Fix lowercase letter followed immediately by uppercase (andComfort -> and Comfort)
+        text = re.sub(r'([a-z])([A-Z])', r'\1 \2', text)
+        
+        # Fix word boundaries with numbers (for4 -> for 4, 4people -> 4 people)
+        text = re.sub(r'([a-zA-Z])(\d)', r'\1 \2', text)
+        text = re.sub(r'(\d)([a-zA-Z])', r'\1 \2', text)
+        
+        # Fix specific markdown/formatting issues
+        text = re.sub(r'(\*\*)([A-Z])', r'\1 \2', text)  # **Drinks: -> ** Drinks:
+        text = re.sub(r'([!.?])(\*\*)', r'\1 \2', text)  # sharing!** -> sharing! **
+        
+        # Fix compound words that should have spaces (Lemon-Limesoda -> Lemon-Lime soda)
+        text = re.sub(r'([a-z])([A-Z][a-z]+)([a-z])', lambda m: f"{m.group(1)} {m.group(2).lower()}{m.group(3)}", text)
+        
+        return text
+
     async def _process_stream(
         self,
         completion,
@@ -351,23 +378,41 @@ class ConversationFlowSK:
                 token = chunk.choices[0].delta.content
                 buffer.append(token)
                 
-                # Yield on natural breaks or when buffer gets too large
-                if (token in ".!?,;:\n" or len(buffer) > 10):
+                # More intelligent buffering - yield on proper word boundaries
+                should_yield = False
+                
+                # Yield on sentence endings
+                if token in '.!?\n':
+                    should_yield = True
+                # Yield on clause boundaries
+                elif token in ',;:' and len(buffer) > 2:
+                    should_yield = True
+                # Yield when we hit a space after building up some content
+                elif token == ' ' and len(buffer) > 3:
+                    should_yield = True
+                # Safety valve for very long buffers
+                elif len(buffer) > 15:
+                    should_yield = True
+                if should_yield:
                     text = "".join(buffer)
-                    if text.strip(): 
-                        yield text
+                    if text and text !=' ':
+                        # Apply post-processing to fix concatenation issues
+                        fixed_text = ConversationFlowSK.fix_concatenated_words(text)
+                        yield fixed_text
                     buffer = []
-            
-            # Yield any remaining content in buffer
+                    
+            # Yield remaining content with post-processing
             if buffer:
                 final_text = "".join(buffer)
-                if final_text.strip():
-                    yield final_text
-                
+                if final_text and final_text != ' ':
+                    fixed_final_text = ConversationFlowSK.fix_concatenated_words(final_text)
+                    yield fixed_final_text
+                    yield fixed_final_text
+                    
         except Exception as e:
             logger.error(f"Error in stream processing: {e}")
             yield f"\nError: {str(e)}"
-
+            
     @wrap_content_safety
     async def __call__(
         self,
@@ -418,8 +463,8 @@ class ConversationFlowSK:
                 ChatCompletionSystemMessageParam(role="system", content=str(enhanced_prompt))
             ]
 
-            # Get the last 6 messages from chat history
-            recent_history = chat_history[-6:]
+            # Get the last 8 messages from chat history
+            recent_history = chat_history[-8:]
             
             # Add cleaned conversation history
             for msg in recent_history:
