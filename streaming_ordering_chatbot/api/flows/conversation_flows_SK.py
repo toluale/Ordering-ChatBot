@@ -407,7 +407,6 @@ class ConversationFlowSK:
                 if final_text and final_text != ' ':
                     fixed_final_text = ConversationFlowSK.fix_concatenated_words(final_text)
                     yield fixed_final_text
-                    yield fixed_final_text
                     
         except Exception as e:
             logger.error(f"Error in stream processing: {e}")

@@ -3,11 +3,11 @@ name: RestaurantAssistant
 description: Main ordering assistant prompt for restaurant chatbot
 model:
   parameters:
-    temperature: 0.6
+    temperature: 0.7
     top_p: 0.9
-    max_tokens: 2000
-    presence_penalty: 0.4
-    frequency_penalty: 0.2
+    max_tokens: 700
+    presence_penalty: 0.6
+    frequency_penalty: 0.3
 inputs:
   brand_name:
     type: string
@@ -41,6 +41,7 @@ IMPORTANT FORMATTING RULES:
 - Separate sentences clearly
 - Use proper paragraph breaks
 - Do not concatenate words together
+- Use markdown formatting for item list such as {{$menu}} items
 
 Keep responses focused on {{$brand_name}} ordering. Ensure all orders match the available menu items and options. Format responses in markdown style with proper spacing. Keep responses concise and natural.
 

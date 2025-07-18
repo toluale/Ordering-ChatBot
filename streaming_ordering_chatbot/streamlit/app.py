@@ -41,7 +41,6 @@ MODEL_CHOICES = {
     "GPT-3.5-turbo": "gpt-35-turbo",
 }
 
-
 async def fetch_stream(url, container, json_data):
     async with httpx.AsyncClient(timeout=30) as client:
         headers = {
@@ -183,6 +182,53 @@ def load_prompt(prompt_path):
     with open(prompt_path, "r") as file:
         return file.read()
 
+async def generate_initial_greeting():
+    """Generate an initial greeting using the brand personality system."""
+    try:
+        async with httpx.AsyncClient(timeout=10) as client:
+            headers = {
+                "brand-session-id": st.session_state.session_id,
+                "request-id": str(uuid4()),
+            }
+            
+            # Create a minimal chat history with a greeting trigger
+            initial_chat_history = [
+                {
+                    "role": "user",
+                    "content": "Hello",
+                    "filtered": False
+                }
+            ]
+            
+            json_data = {
+                "chat_history": initial_chat_history,
+                "config": {
+                    "conversation_style": "default",  # Use default style for initial greeting
+                    "deployment": "gpt-4o",  # Use a default model
+                },
+            }
+            
+            response = await client.post(
+                PREAMBLE_ENDPOINT,
+                json=json_data,
+                headers=headers
+            )
+            
+            if response.status_code == 200:
+                # For streaming responses, we need to collect all chunks
+                greeting = ""
+                async for line in response.aiter_lines():
+                    if line:
+                        greeting += line
+                return greeting.strip()
+            else:
+                # Fallback if API fails
+                return f"Welcome to {st.session_state.brand_name}! How can I help you today?"
+                
+    except Exception as e:
+        st.warning(f"Could not generate dynamic greeting: {e}")
+        # Fallback to basic greeting
+        return f"Welcome to {st.session_state.brand_name}! How can I help you today?"
 
 async def main():
 
@@ -197,10 +243,11 @@ async def main():
     if "llm_order" not in st.session_state:
         st.session_state.llm_order = {"items": []}
     if "messages" not in st.session_state:
+        initial_greeting = await generate_initial_greeting()
         st.session_state.messages = [
             {
                 "role": "assistant",
-                "content": f"Welcome to {st.session_state.brand_name} ordering chatbot! How can I help you today?",
+                "content": initial_greeting,
                 "filtered": False,
             }
         ]
@@ -298,9 +345,10 @@ async def main():
 
                     chat_history.append(user_message)
                     if screening_result["intent"] == "order":
-                        preamble = st.empty()
+                        # Remove preamble = st.empty()
                         items_list = st.empty()
                         summary = st.empty()
+                        
                         order = asyncio.create_task(
                             fetch_order(
                                 {"items": []},
@@ -322,36 +370,31 @@ async def main():
                             },
                         }
 
-                        preamble = asyncio.create_task(
-                            fetch_stream(
-                                PREAMBLE_ENDPOINT,
-                                preamble,
-                                json_data,
-                            )
-                        )
-                        # Execute ordering and preamble concurrently
-                        results = await asyncio.gather(preamble, order)
-
-                        # Add partial assistant response to chat history for summary generation
-                        if results[1] is None:
-                            assistant_response = (
-                                results[0]
-                                + "\n"
-                                + "Failed to fetch order, item might have not existed"
-                            )
+                        # Wait for order processing to complete
+                        order_result = await order
+                        
+                        # Add order info to chat history for summary generation
+                        if order_result[1] is None:
+                            order_info = "Failed to fetch order, item might have not existed"
                         else:
-                            assistant_response = results[0] + "\n" + results[1][0]
-                        assistant_message = {
-                            "role": "assistant",
-                            "content": assistant_response,
-                        }
-                        chat_history.append(assistant_message)
-                        summary = await fetch_stream(
+                            order_info = order_result[0]
+                        
+                        # Add order info to chat history
+                        chat_history.append({
+                            "role": "assistant", 
+                            "content": f"Order processed: {order_info}"
+                        })
+                        
+                        # Generate summary response
+                        summary_response = await fetch_stream(
                             SUMMARY_ENDPOINT,
                             summary,
                             json_data,
                         )
-                        assistant_message["content"] += "\n\n" + summary
+                        assistant_message = {
+                            "role": "assistant",
+                            "content": summary_response,
+                        }
                     else:
                         conversation = st.empty()
                         response = await fetch_stream(
