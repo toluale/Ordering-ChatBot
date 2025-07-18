@@ -57,9 +57,12 @@ async def fetch_stream(url, container, json_data):
                         # All previous content is sent with redacted information
                         current_content = line
                     else:
-                        current_content += line
-                    container.markdown(current_content)
+                        current_content += line + "\n"
+                    
+                    # Post-process the content to ensure proper markdown formatting
+                    container.markdown(current_content, unsafe_allow_html=True)
     return current_content
+
 
 async def fetch_order(current_order, container, items_list, chat_history, state):
     order_obj = ""
