@@ -41,12 +41,42 @@
         },
         {
             "id": "order_modification",
-            "text": "Increase the order by 2 people and give me a summary of the total order",
+            "text": "let me have a cheeseburger. Increase the order by 2 people and give me a summary of the total order",
             "type": "order_modification",
             "expected_outcomes": [
                 "Acknowledge order increase",
                 "Update quantities",
                 "Suggest additional items"
+            ]
+        },
+        {
+            "id": "order_request",
+            "text": "Can I get a pretzel hamburger with unsalted fries and a medium drink? Make the drink a Coke",
+            "type": "order_request",
+            "expected_outcomes": [
+                "Provide a detailed summary of the order",
+                "Confirm all items and quantities",
+                "Ask for any final modifications"
+            ]
+        },
+        {
+            "id": "repeat_order",
+            "text": "I ordered a cheeseburger with unsalted fries and a medium Coke last time, can I get the same? But make it a large Coke this time",
+            "type": "repeat_order",
+            "expected_outcomes": [
+                "Confirm previous order details",
+                "Update drink size",
+                "Provide a summary of the updated order"
+            ]
+        },
+        {
+            "id": "invalid_order",
+            "text": "I want a pizza with pineapple and olives as toppings, I am a vegetarian",
+            "type": "invalid_order",
+            "expected_outcomes": [
+                "Acknowledge dietary restriction",
+                "Confirm that it is an invalid order",
+                "Suggest alternative vegetarian options"
             ]
         }
     ]

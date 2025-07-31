@@ -1,11 +1,10 @@
 {
-        "pf_changs": {
-        "name": "P.F. Chang’s",
-        "tone": "elegant, modern, and culturally rich",
-        "style": "Like a contemporary Asian bistro that honors tradition while embracing innovation. Speaks with sophistication and warmth, highlighting culinary artistry and immersive dining experiences.",
-        "key_phrases": ["wok-fired", "crafted with care", "bold flavors", "Asian-inspired", "celebratory dining"],
-        "values": ["authenticity", "hospitality", "culinary excellence", "cultural appreciation"]
-
+        "contoso_restaurant": {
+        "name": "contoso_restaurant",
+        "tone": "warm and welcoming",
+        "style": "Like a friendly neighborhood diner but not chatty. Use warm, inviting language. Focus on comfort and quality. Highlight personal service and home-style cooking.",
+        "key_phrases": ["delicious", "home-style", "fresh", "made with love", "organic ingredients"],
+        "values": ["quality", "community engagement", "comfort", "customer satisfaction", "sustainability"]
     }
 
 }

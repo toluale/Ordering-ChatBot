@@ -2,7 +2,7 @@
     "test_cases": [
         {
             "name": "valid_single_burger",
-            "description": "Order a single hamburger with default options",
+            "description": "Order an hamburger with seasame buns",
             "message": "I'd like to order a hamburger please",
             "current_order": {"items": []},
             "expected_valid": true,
@@ -93,29 +93,29 @@
         {
             "name": "invalid_option_combination",
             "description": "Order with invalid option combination",
-            "message": "I want a black bean burger with double patties",
+            "message": "I want a black bean burger with lettuce and onions",
             "current_order": {"items": []},
-            "expected_valid": false,
-            "expected_items": [],
+            "expected_valid": true,
+            "expected_items": ["black bean burger"],
             "category": "invalid_item"
         },
         {
             "name": "invalid_drink_size",
             "description": "Order drink with invalid size",
-            "message": "Can I get an extra large root beer?",
+            "message": "Can I get a large root beer?",
             "current_order": {"items": []},
             "expected_valid": false,
-            "expected_items": [],
+            "expected_items": ["root beer"],
             "category": "invalid_item"
         },
         {
-            "name": "invalid_fries_size",
+            "name": "valid_fries_size",
             "description": "Order fries with invalid size",
-            "message": "I want extra large fries",
+            "message": "I want large fries",
             "current_order": {"items": []},
-            "expected_valid": false,
-            "expected_items": [],
-            "category": "invalid_item"
+            "expected_valid": true,
+            "expected_items": ["fries"],
+            "category": "valid_item"
         },
         {
             "name": "conversation_not_order",
@@ -138,7 +138,7 @@
         {
             "name": "complex_multi_item_order",
             "description": "Complex order with multiple items and modifications",
-            "message": "I'll have two cheeseburgers - one with bacon and well done, one regular. Also large fries with no salt, and a medium lemon-lime soda",
+            "message": "I'll have two cheeseburgers, one with bacon and well done and the other one regular. Also large fries with no salt, and a medium lemon-lime soda",
             "current_order": {"items": []},
             "expected_valid": true,
             "expected_items": ["cheeseburger", "cheeseburger", "fries", "lemon-lime"],

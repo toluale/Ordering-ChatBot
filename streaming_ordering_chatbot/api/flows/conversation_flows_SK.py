@@ -116,13 +116,15 @@ class OrderPlugin(ConversationPlugin):
             ) from e
     
     def _format_menu_from_config(self, menu_config: Dict[str, Any]) -> str:
-        """Format menu configuration into a readable string."""
+        """Format menu configuration into a readable string with all customization options."""
         try:
             brand_info = menu_config.get("brand_info", {})
             menu_items = menu_config.get("menu_items", {})
             toppings = menu_config.get("toppings", {})
+            item_types = menu_config.get("item_types", {})
             
             menu_text = f"# {brand_info.get('name', 'Restaurant')} Menu\n\n"
+            menu_text += f"**Cuisine**: {brand_info.get('cuisine_type', 'Various')}\n\n"
             
             # Group items by category
             categories = {}
@@ -132,23 +134,146 @@ class OrderPlugin(ConversationPlugin):
                     categories[category] = []
                 categories[category].append((item_name, item_config))
             
-            # Format each category
+            # Format each category with customization options
             for category, items in categories.items():
                 menu_text += f"## {category.title()}s\n"
+                
+                # Get category-specific customization options
+                category_config = item_types.get(category, {})
+                
                 for item_name, item_config in items:
                     name_variations = item_config.get("name_variations", [item_name])
-                    menu_text += f"- {name_variations[0].title()}"
+                    menu_text += f"- **{name_variations[0].title()}**"
                     if len(name_variations) > 1:
-                        menu_text += f" (also: {', '.join(name_variations[1:])})"
+                        menu_text += f" *(also known as: {', '.join(name_variations[1:])})*"
                     menu_text += "\n"
+                
+                # Add customization options for this category
+                if category_config and category_config.get("customizable", False):
+                    customizations = []
+                    
+                    # Size options
+                    size_mapping = category_config.get("size_mapping", {})
+                    if size_mapping:
+                        sizes = list(size_mapping.values())
+                        default_size_code = None
+                        # Find default size from items in this category
+                        for item_name, item_config in items:
+                            default_size_code = item_config.get("default", {}).get("size")
+                            if default_size_code:
+                                break
+                        default_size = size_mapping.get(default_size_code, sizes[0]) if default_size_code else sizes[0]
+                        customizations.append(f"**Sizes**: {', '.join(sizes)} *(default: {default_size})*")
+                    
+                    # Category-specific options
+                    if category == "burger":
+                        # Patty options
+                        patties_mapping = category_config.get("patties_mapping", {})
+                        if patties_mapping:
+                            patties = list(patties_mapping.values())
+                            default_patty_code = None
+                            for item_name, item_config in items:
+                                default_patty_code = item_config.get("default", {}).get("patties")
+                                if default_patty_code:
+                                    break
+                            default_patty = patties_mapping.get(default_patty_code, patties[0]) if default_patty_code else patties[0]
+                            customizations.append(f"**Patties**: {', '.join(patties)} *(default: {default_patty})*")
+                        
+                        # Bun options
+                        buns_mapping = category_config.get("buns_mapping", {})
+                        if buns_mapping:
+                            buns = list(buns_mapping.values())
+                            default_bun_code = None
+                            for item_name, item_config in items:
+                                default_bun_code = item_config.get("default", {}).get("buns")
+                                if default_bun_code:
+                                    break
+                            default_bun = buns_mapping.get(default_bun_code, buns[0]) if default_bun_code else buns[0]
+                            customizations.append(f"**Buns**: {', '.join(buns)} *(default: {default_bun})*")
+                        
+                        # Cook levels
+                        cook_mapping = category_config.get("cook_mapping", {})
+                        if cook_mapping:
+                            cook_levels = list(cook_mapping.values())
+                            default_cook_code = None
+                            for item_name, item_config in items:
+                                default_cook_code = item_config.get("default", {}).get("cook")
+                                if default_cook_code:
+                                    break
+                            default_cook = cook_mapping.get(default_cook_code, cook_levels[0]) if default_cook_code else cook_levels[0]
+                            customizations.append(f"**Cook levels**: {', '.join(cook_levels)} *(default: {default_cook})*")
+                    
+                    elif category == "side":
+                        # Salt options for fries/sides
+                        salt_mapping = category_config.get("salt_mapping", {})
+                        if salt_mapping:
+                            salt_options = list(salt_mapping.values())
+                            default_salt_code = None
+                            for item_name, item_config in items:
+                                default_salt_code = item_config.get("default", {}).get("salt")
+                                if default_salt_code:
+                                    break
+                            default_salt = salt_mapping.get(default_salt_code, salt_options[0]) if default_salt_code else salt_options[0]
+                            customizations.append(f"**Salt options**: {', '.join(salt_options)} *(default: {default_salt})*")
+                    
+                    elif category == "pizza":
+                        # Pizza-specific options (for brands like Domino's)
+                        crust_mapping = category_config.get("crust_mapping", {})
+                        if crust_mapping:
+                            crusts = list(crust_mapping.values())
+                            customizations.append(f"**Crust types**: {', '.join(crusts)}")
+                        
+                        cheese_mapping = category_config.get("cheese_mapping", {})
+                        if cheese_mapping:
+                            cheese_options = list(cheese_mapping.values())
+                            customizations.append(f"**Cheese options**: {', '.join(cheese_options)}")
+                    
+                    elif category in ["taco", "burrito", "bowl"]:
+                        # Mexican food options (for brands like Chipotle)
+                        protein_mapping = category_config.get("protein_mapping", {})
+                        if protein_mapping:
+                            proteins = list(protein_mapping.values())
+                            customizations.append(f"**Proteins**: {', '.join(proteins)}")
+                        
+                        rice_mapping = category_config.get("rice_mapping", {})
+                        if rice_mapping:
+                            rice_options = list(rice_mapping.values())
+                            customizations.append(f"**Rice options**: {', '.join(rice_options)}")
+                        
+                        beans_mapping = category_config.get("beans_mapping", {})
+                        if beans_mapping:
+                            beans_options = list(beans_mapping.values())
+                            customizations.append(f"**Beans**: {', '.join(beans_options)}")
+                    
+                    # Add customization info
+                    if customizations:
+                        menu_text += f"  *Available customizations*: {' | '.join(customizations)}\n"
+                
                 menu_text += "\n"
             
-            # Add toppings section
+            # Add toppings section with amounts
             if toppings:
-                menu_text += "## Available Toppings\n"
+                menu_text += "## Available Toppings & Add-ons\n"
+                menu_text += "*Note: All toppings can be ordered as none, light, normal, or extra*\n\n"
+                
+                # Group toppings by category
+                topping_categories = {}
                 for topping_code, topping_info in toppings.items():
-                    menu_text += f"- {topping_info.get('name', topping_code)}: {topping_info.get('description', '')}\n"
+                    topping_category = topping_info.get('category', 'other')
+                    if topping_category not in topping_categories:
+                        topping_categories[topping_category] = []
+                    topping_categories[topping_category].append(topping_info.get('name', topping_code))
+                
+                for topping_category, topping_names in topping_categories.items():
+                    menu_text += f"**{topping_category.title()}**: {', '.join(sorted(topping_names))}\n"
+                
                 menu_text += "\n"
+            
+            # Add brand-specific notes if available
+            brand_description = brand_info.get("description")
+            if brand_description:
+                menu_text += f"## About {brand_info.get('name', 'Us')}\n"
+                menu_text += f"{brand_description}\n\n"
             
             return menu_text
             
@@ -447,7 +572,7 @@ class ConversationFlowSK:
             completion = self.client.chat.completions.create(
                 model=model_deployment or self.DEPLOYMENT_NAME,
                 messages=messages,
-                temperature=0.7,
+                temperature=0.75,
                 top_p=0.95,
                 max_tokens=self.MAX_TOKENS,
                 presence_penalty=0.6,  
@@ -483,7 +608,7 @@ class PreamblePlugin(ConversationPlugin):
                 content = clean_assistant_response(content)
             clean_history.append(f"{msg.role}: {content}")
         
-        # Get recent conversation history (last 3-4 messages for preamble)
+        # Get recent conversation history 
         chat_str = "\n".join(clean_history[-4:])  # Shorter for preamble
         
         # Get brand name fallback

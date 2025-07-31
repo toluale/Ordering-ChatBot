@@ -10,7 +10,7 @@
       "code_pattern": "HB{size}{patties}{bun}{cook}",
       "category": "burger",
       "sizes": ["14", "13"],
-      "patties": ["S1", "D"],
+      "patties": ["S", "D"],
       "buns": ["S", "P"],
       "cooks": ["N", "W"],
       "default": {"size": "14", "patties": "S", "buns": "S", "cook": "N"},
@@ -21,7 +21,7 @@
       "code_pattern": "CZHB{size}{patties}{bun}{cook}",
       "category": "burger",
       "sizes": ["14", "13"],
-      "patties": ["S1", "D"],
+      "patties": ["S", "D"],
       "buns": ["S", "P"],
       "cooks": ["N", "W"],
       "default": {"size": "14", "patties": "S", "buns": "S", "cook": "N"},
@@ -29,10 +29,10 @@
       "name_variations": ["cheeseburger", "cheese burger"]
     },
     "black bean burger": {
-      "code_pattern": "BB{patties}S",
+      "code_pattern": "BB{size}{patties}{bun}{cook}",
       "category": "burger",
       "sizes": ["14", "13"],
-      "patties": ["S1", "D"],
+      "patties": ["S", "D"],
       "buns": ["S", "P"],
       "cooks": ["N", "W"],
       "default": {"size": "14", "patties": "S", "buns": "S", "cook": "N"},
@@ -97,19 +97,19 @@
       "default_toppings": ["L", "T", "O", "C"],
       "customizable": true,
       "size_mapping": {"14": "quarter lb", "13": "half lb"},
-      "patties_mapping": {"S1": "single", "D": "double"},
+      "patties_mapping": {"S": "single", "D": "double"},
       "buns_mapping": {"S": "sesame", "P": "pretzel"},
       "cook_mapping": {"N": "normal", "W": "well-done"}
     },
     "side": {
       "default_toppings": [],
-      "customizable": false,
+      "customizable": true,
       "size_mapping": {"S": "small", "M": "medium", "L": "large"},
       "salt_mapping": {"S": "salted", "NS": "unsalted"}
     },
     "drink": {
       "default_toppings": [],
-      "customizable": false,
+      "customizable": true,
       "size_mapping": {"S": "small", "M": "medium", "L": "large"}
     }
   },

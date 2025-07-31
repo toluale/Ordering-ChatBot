@@ -98,9 +98,10 @@ class MenuManager:
         item_types = self._get_item_types_config(menu_config)
         burger_config = item_types.get("burger", {})
         side_config = item_types.get("side", {})
+        drink_config = item_types.get("drink", {})
         
         return {
-            "size_mapping": burger_config.get("size_mapping", {}) or side_config.get("size_mapping", {}),
+            "size_mapping": burger_config.get("size_mapping", {}) or side_config.get("size_mapping", {}) or drink_config.get("size_mapping", {}),
             "patties_mapping": burger_config.get("patties_mapping", {}),
             "buns_mapping": burger_config.get("buns_mapping", {}),
             "cook_mapping": burger_config.get("cook_mapping", {}),
@@ -239,6 +240,11 @@ class MenuManager:
         if not isinstance(toppings, dict):
             return False
         
+        # Validate item_types structure
+        item_types = config["item_types"]
+        if not isinstance(item_types, dict):
+            return False
+
         return True
     
     def generate_product_codes(self, brand_name: str) -> Dict[str, str]:
@@ -364,36 +370,97 @@ class MenuManager:
             return False
     
     def get_menu_text_format(self, brand_name: str) -> str:
-        """Get menu in text format for prompts.
+        """Get menu in text format for prompts with full customization options.
         Args:
             brand_name: Name of the brand   
         Returns:
-            Menu formatted as text for AI prompts
+            Menu formatted as text for AI prompts with all customization details
         """
         menu_config = self._get_menu_config_for_brand(brand_name)
-        product_codes = self.generate_product_codes(brand_name)
-        toppings = self.get_toppings_for_brand(brand_name)
+        brand_info = menu_config.get("brand_info", {})
+        menu_items = menu_config.get("menu_items", {})
+        toppings = menu_config.get("toppings", {})
+        item_types = menu_config.get("item_types", {})
         
-        lines = [f"# {menu_config['brand_info']['name']} Menu\n"]
+        lines = [f"# {brand_info.get('name', 'Restaurant')} Menu"]
+        lines.append(f"Cuisine Type: {brand_info.get('cuisine_type', 'Unknown')}")
+        lines.append("")
         
-        # Add cuisine type
-        lines.append(f"Cuisine Type: {menu_config['brand_info']['cuisine_type']}\n")
+        # Group items by category
+        categories = {}
+        for item_name, item_config in menu_items.items():
+            category = item_config.get("category", "other")
+            if category not in categories:
+                categories[category] = []
+            categories[category].append((item_name, item_config))
         
-        # Add menu items
-        lines.append("## Menu Items")
-        lines.append("ProductCode: Description")
-        for code, description in product_codes.items():
-            lines.append(f"{code}: {description}")
+        # Format each category with customization options
+        for category, items in categories.items():
+            lines.append(f"## {category.title()}s")
+            
+            # Get category-specific customization options
+            category_config = item_types.get(category, {})
+            
+            for item_name, item_config in items:
+                name_variations = item_config.get("name_variations", [item_name])
+                item_line = f"- {name_variations[0].title()}"
+                if len(name_variations) > 1:
+                    item_line += f" (also: {', '.join(name_variations[1:])})"
+                lines.append(item_line)
+            
+            # Add customization options for this category
+            if category_config:
+                customizations = []
+                
+                # Size options
+                size_mapping = category_config.get("size_mapping", {})
+                if size_mapping:
+                    sizes = list(size_mapping.values())
+                    customizations.append(f"Sizes: {', '.join(sizes)}")
+                
+                # Burger-specific options
+                if category == "burger":
+                    # Patty options
+                    patties_mapping = category_config.get("patties_mapping", {})
+                    if patties_mapping:
+                        patties = list(patties_mapping.values())
+                        customizations.append(f"Patties: {', '.join(patties)}")
+                    
+                    # Bun options
+                    buns_mapping = category_config.get("buns_mapping", {})
+                    if buns_mapping:
+                        buns = list(buns_mapping.values())
+                        customizations.append(f"Buns: {', '.join(buns)}")
+                    
+                    # Cook levels
+                    cook_mapping = category_config.get("cook_mapping", {})
+                    if cook_mapping:
+                        cook_levels = list(cook_mapping.values())
+                        customizations.append(f"Cook levels: {', '.join(cook_levels)}")
+                
+                # Side-specific options (fries)
+                elif category == "side":
+                    salt_mapping = category_config.get("salt_mapping", {})
+                    if salt_mapping:
+                        salt_options = list(salt_mapping.values())
+                        customizations.append(f"Salt options: {', '.join(salt_options)}")
+                
+                # Add customization info
+                if customizations:
+                    lines.append(f"  Customization options: {' | '.join(customizations)}")
+            
+            lines.append("")
         
-        # Add toppings
+        # Add toppings section
         if toppings:
-            lines.append("\n## Available Toppings")
+            lines.append("## Available Toppings")
+            lines.append("Note: All toppings can be ordered as none, light, normal, or extra")
+            lines.append("")
             lines.append("ToppingCode: Description")
             for code, topping_info in toppings.items():
-                lines.append(f"{code}: {topping_info['name']}")
+                lines.append(f"{code}: {topping_info['name']} ({topping_info.get('category', 'general')})")
         
         return "\n".join(lines)
-
 
 # Global menu manager instance
 _menu_manager: Optional[MenuManager] = None

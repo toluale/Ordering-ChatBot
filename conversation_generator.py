@@ -232,7 +232,7 @@ class ConversationGenerator:
         for brand_name, brand_config in brand_configs.items():
             try:
                 self.logger.info(f"Generating conversation for brand: {brand_config['name']}")
-                conversation_data = await self.generate_conversation(brand_config["name"])
+                conversation_data = await self.generate_conversation(brand_name)
                 filepath = self.save_conversation(conversation_data)
                 generated_files.append(filepath)
             except Exception as e:

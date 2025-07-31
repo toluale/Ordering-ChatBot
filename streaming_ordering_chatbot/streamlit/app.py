@@ -36,9 +36,7 @@ TONE_TO_STYLE_MAPPING = {
 
 MODEL_CHOICES = {
     "GPT-4o": "gpt-4o",
-    "GPT-4o-mini": "gpt-4o-mini",
-    "GPT-4-turbo": "gpt-4-turbo",
-    "GPT-3.5-turbo": "gpt-35-turbo",
+    "GPT-4.1": "gpt-4.1"
 }
 
 async def fetch_stream(url, container, json_data):
@@ -309,7 +307,7 @@ async def main():
             with last_asst:
                 async with httpx.AsyncClient(timeout=30) as client:
                     headers = {
-                        "contoso-session-id": st.session_state.session_id,
+                        "brand-session-id": st.session_state.session_id,
                         "request-id": str(uuid4()),
                     }
                     data = {

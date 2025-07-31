@@ -3,9 +3,9 @@ name: OrderSummary
 description: Generates order summaries and completion prompts
 model:
   parameters:
-    temperature: 0.7
-    top_p: 0.9
-    max_tokens: 300
+    temperature: 0.75
+    top_p: 0.95
+    max_tokens: 1000
 inputs:
   brand_name:
     type: string
