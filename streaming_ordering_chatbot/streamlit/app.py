@@ -1,11 +1,17 @@
 import asyncio
 import json
+import time
+import csv
+from datetime import datetime
 from pathlib import Path
 from uuid import uuid4
+from typing import Dict, List, Any
 
 import httpx
 import streamlit as st
+import pandas as pd
 import os
+import tiktoken
 
 # Environment-configurable API base
 API_BASE_URL = os.getenv("STREAMLIT_API_BASE_URL", "http://localhost:8000")
@@ -21,7 +27,7 @@ CONVERSATION_ENDPOINT = f"{API_BASE_URL}/assistant"
 BASE_DIR = Path(__file__).resolve().parent.parent
 TONE_FILES = {
     "Casual": BASE_DIR.joinpath("resources/casual.txt"),
-    "GenZ": BASE_DIR.joinpath("resources/genZ.txt"),
+    "Gen Z": BASE_DIR.joinpath("resources/genZ.txt"),
 }
 
 TONE_CHOICES = ["Default"] + list(TONE_FILES.keys())
@@ -30,16 +36,73 @@ TONE_CHOICES = ["Default"] + list(TONE_FILES.keys())
 TONE_TO_STYLE_MAPPING = {
     "Default": "default",
     "Casual": "casual", 
-    "GenZ": "genz"
+    "Gen Z": "genz"
 }
-
 
 MODEL_CHOICES = {
     "GPT-4o": "gpt-4o",
     "GPT-4.1": "gpt-4.1"
 }
 
-async def fetch_stream(url, container, json_data):
+# Evaluation metrics storage
+EVALUATION_DATA_PATH = BASE_DIR.parent / "evaluation_results" / "streamlit_evaluation_metrics.csv"
+
+class LatencyTracker:
+    """Track latency and performance metrics for the chatbot."""
+    
+    def __init__(self):
+        self.start_time = None
+        self.end_time = None
+        self.first_token_time = None
+        self.token_count = 0
+        
+    def start(self):
+        """Start timing the request."""
+        self.start_time = time.perf_counter()
+        self.first_token_time = None
+        self.token_count = 0
+        
+    def first_token(self):
+        """Mark when the first token is received."""
+        if self.first_token_time is None:
+            self.first_token_time = time.perf_counter()
+            
+    def add_token(self):
+        """Increment token count."""
+        self.token_count += 1
+        
+    def end(self):
+        """End timing and calculate metrics."""
+        self.end_time = time.perf_counter()
+        
+    def get_metrics(self) -> Dict[str, float]:
+        """Get calculated timing metrics."""
+        if not self.start_time or not self.end_time:
+            return {}
+            
+        total_latency = self.end_time - self.start_time
+        time_to_first_token = (self.first_token_time - self.start_time) if self.first_token_time else total_latency
+        tokens_per_second = self.token_count / total_latency if total_latency > 0 else 0
+        
+        # Model latency is the time from first token to end (actual generation time)
+        model_latency = (self.end_time - self.first_token_time) if self.first_token_time else total_latency
+        
+        return {
+            "total_latency": total_latency,
+            "model_latency": model_latency,
+            "time_to_first_token": time_to_first_token,
+            "tokens_per_second": tokens_per_second,
+            "token_count": self.token_count
+        }
+
+# Initialize encoding for token counting
+encoding = tiktoken.encoding_for_model("gpt-4o")
+
+async def fetch_stream(url, container, json_data, tracker: LatencyTracker = None):
+    """Enhanced fetch_stream with optional metrics tracking that doesn't interfere with streaming."""
+    if tracker:
+        tracker.start()
+    
     async with httpx.AsyncClient(timeout=30) as client:
         headers = {
             "brand-session-id": st.session_state.session_id,
@@ -49,25 +112,50 @@ async def fetch_stream(url, container, json_data):
             "POST", url, json=json_data, headers=headers
         ) as response:
             current_content = ""
+            first_chunk = True
+            
             async for line in response.aiter_lines():
                 if line:
+                    # Track first token timing (non-interfering)
+                    if first_chunk and tracker:
+                        tracker.first_token()
+                        first_chunk = False
+                    
+                    # Original streaming logic - unchanged
                     if "<REDACTED" in line:
-                        # All previous content is sent with redacted information
                         current_content = line
                     else:
                         current_content += line + "\n"
                     
                     # Post-process the content to ensure proper markdown formatting
                     container.markdown(current_content, unsafe_allow_html=True)
+                    
+                    # Count tokens after content processing (non-interfering)
+                    if tracker:
+                        try:
+                            actual_tokens = len(encoding.encode(line))
+                            for _ in range(actual_tokens):
+                                tracker.add_token()
+                        except:
+                            # Fallback to simple counting if encoding fails
+                            tracker.add_token()
+    
+    if tracker:
+        tracker.end()
+    
     return current_content
 
-
-async def fetch_order(current_order, container, items_list, chat_history, state):
+async def fetch_order(current_order, container, items_list, chat_history, state, tracker: LatencyTracker = None):
+    """Enhanced fetch_order with optional metrics tracking."""
+    if tracker:
+        tracker.start()
+    
     order_obj = ""
     first_line = True
     order_finished = False
-    desc = []  # Initialize desc at the beginning of the function
-    order = None  # Initialize order as well
+    desc = []
+    order = None
+    first_chunk = True
     
     async with httpx.AsyncClient(timeout=30) as client:
         headers = {
@@ -90,6 +178,16 @@ async def fetch_order(current_order, container, items_list, chat_history, state)
         ) as response:
             async for line in response.aiter_lines():
                 if line:
+                    # Track first token timing (non-interfering)
+                    if first_chunk and tracker:
+                        tracker.first_token()
+                        first_chunk = False
+                    
+                    # Count tokens (non-interfering)
+                    if tracker:
+                        tracker.add_token()
+                    
+                    # Original order processing logic - unchanged
                     if first_line:
                         order_obj += line
                         first_line = False
@@ -106,39 +204,32 @@ async def fetch_order(current_order, container, items_list, chat_history, state)
                                 order = json.loads(order_obj)
                             except json.JSONDecodeError:
                                 st.error("Could not parse order JSON")
+                                if tracker:
+                                    tracker.end()
                                 return "Error parsing order", None
                         else:
                             try:
-                                order = json.loads(
-                                    order_obj + "]}"
-                                )  # Attempt to decode the JSON
+                                order = json.loads(order_obj + "]}")
                             except json.JSONDecodeError:
-                                continue  # Continue instead of return None to keep streaming
+                                continue
                         
                         # Safely extract descriptions (only if we have a valid order)
                         if order:
-                            desc = []  # Reset desc for this iteration
+                            desc = []
                             order_items = order.get("order", [])
                             
                             for item in order_items:
-                                # Try different ways to get item description
                                 description = None
                                 
-                                # Method 1: Check for 'description' field
                                 if "description" in item:
                                     description = item["description"]
-                                
-                                # Method 2: Build from name and quantity
                                 elif "name" in item:
                                     name = item["name"]
                                     quantity = item.get("quantity", 1)
                                     description = f"{quantity}x {name}"
                                     
-                                    # Add size/options if available
                                     if "size" in item:
                                         description += f" ({item['size']})"
-                                
-                                # Method 3: Fallback to string representation
                                 else:
                                     description = str(item)
                                 
@@ -151,48 +242,103 @@ async def fetch_order(current_order, container, items_list, chat_history, state)
                                 items_list.markdown("- " + "\n - ".join(desc))
                             else:
                                 items_list.markdown("- No items in order")
+    
+    if tracker:
+        tracker.end()
                             
     return ("- " + "\n - ".join(desc)) if desc else "No items", order
+
+def save_evaluation_metrics(metrics: Dict[str, Any]):
+    """Save evaluation metrics to CSV file."""
+    EVALUATION_DATA_PATH.parent.mkdir(exist_ok=True)
+    
+    file_exists = EVALUATION_DATA_PATH.exists()
+    metrics["timestamp"] = datetime.now().isoformat()
+    
+    with open(EVALUATION_DATA_PATH, 'a', newline='', encoding='utf-8') as f:
+        writer = csv.DictWriter(f, fieldnames=metrics.keys())
+        if not file_exists:
+            writer.writeheader()
+        writer.writerow(metrics)
+
+def load_evaluation_data() -> pd.DataFrame:
+    """Load evaluation data from CSV file."""
+    if EVALUATION_DATA_PATH.exists():
+        return pd.read_csv(EVALUATION_DATA_PATH)
+    return pd.DataFrame()
+
+def display_evaluation_dashboard():
+    """Display evaluation metrics dashboard in sidebar."""
+    st.sidebar.header("Performance Metrics")
+    
+    df = load_evaluation_data()
+    
+    if df.empty:
+        st.sidebar.info("No metrics data yet.")
+        return
+    
+    # Basic stats
+    st.sidebar.metric("Total Interactions", len(df))
+    
+    if 'total_latency' in df.columns:
+        avg_latency = df['total_latency'].mean()
+        st.sidebar.metric("Avg Total Latency", f"{avg_latency:.2f}s")
+    
+    if 'time_to_first_token' in df.columns:
+        avg_ttft = df['time_to_first_token'].mean()
+        st.sidebar.metric("Avg Time to First Token", f"{avg_ttft:.2f}s")
+    
+    if 'tokens_per_second' in df.columns:
+        avg_tps = df['tokens_per_second'].mean()
+        st.sidebar.metric("Avg Speed", f"{avg_tps:.1f} tok/s")
+
+    if 'token_count' in df.columns:
+        avg_tokens = df['token_count'].mean()
+        st.sidebar.metric("Avg Token", f"{avg_tokens:.0f}")
+    
+    if 'model_latency' in df.columns:
+        avg_model_latency = df['model_latency'].mean()
+        st.sidebar.metric("Avg Model Latency", f"{avg_model_latency:.2f}s")
+    
+    # Show detailed dashboard button
+    if st.sidebar.button("Show Detailed Analytics"):
+        st.session_state.show_analytics = True
+
+    # Clear data option
+    if st.sidebar.button("Clear Metrics Data"):
+        if EVALUATION_DATA_PATH.exists():
+            EVALUATION_DATA_PATH.unlink()
+            st.success("Metrics data cleared!")
+            st.rerun()
 
 async def fetch_brand_info():
     """Fetch brand information from the API."""
     try:
         async with httpx.AsyncClient(timeout=10) as client:
-            # Try to get conversation styles first (which includes brand info)
             response = await client.get(f"{API_BASE_URL}/conversation-styles")
             if response.status_code == 200:
                 data = response.json()
-                # Extract brand name from the response if available
                 return data.get("current_brand", "Restaurant")
             else:
-                return "Restaurant"  # Fallback
+                return "Restaurant"
     except Exception as e:
         st.warning(f"Could not connect to API: {e}")
         return "Restaurant"
 
 def load_prompt(prompt_path):
-    """
-    Load prompt from a file.
-
-    Parameters:
-    - prompt_path (str): The path to the file containing the prompt.
-
-    Returns:
-    - str: The content of the file as a string.
-    """
+    """Load prompt from a file."""
     with open(prompt_path, "r") as file:
         return file.read()
 
 async def generate_initial_greeting():
     """Generate an initial greeting using the brand personality system."""
     try:
-        async with httpx.AsyncClient(timeout=10) as client:
+        async with httpx.AsyncClient(timeout=20) as client:
             headers = {
                 "brand-session-id": st.session_state.session_id,
                 "request-id": str(uuid4()),
             }
             
-            # Create a minimal chat history with a greeting trigger
             initial_chat_history = [
                 {
                     "role": "user",
@@ -201,11 +347,16 @@ async def generate_initial_greeting():
                 }
             ]
             
+            current_style = TONE_TO_STYLE_MAPPING.get(
+                getattr(st.session_state, 'selected_prompt', 'Default'), 
+                "default"
+            )
+            
             json_data = {
                 "chat_history": initial_chat_history,
                 "config": {
-                    "conversation_style": "default",  # Use default style for initial greeting
-                    "deployment": "gpt-4o",  # Use a default model
+                    "conversation_style": current_style,
+                    "deployment": "gpt-4o",
                 },
             }
             
@@ -216,24 +367,21 @@ async def generate_initial_greeting():
             )
             
             if response.status_code == 200:
-                # For streaming responses, we need to collect all chunks
                 greeting = ""
                 async for line in response.aiter_lines():
                     if line:
                         greeting += line
                 return greeting.strip()
             else:
-                # Fallback if API fails
                 return f"Welcome to {st.session_state.brand_name}! How can I help you today?"
                 
     except Exception as e:
         st.warning(f"Could not generate dynamic greeting: {e}")
-        # Fallback to basic greeting
         return f"Welcome to {st.session_state.brand_name}! How can I help you today?"
 
 async def main():
+    st.set_page_config(page_title="Ordering ChatBot")
 
-    # st.set_page_config(layout="wide")
     # Initialize brand name from API
     if "brand_name" not in st.session_state:
         st.session_state.brand_name = await fetch_brand_info()
@@ -259,6 +407,8 @@ async def main():
     if "prompts" not in st.session_state:
         st.session_state.prompts = {k: load_prompt(v) for k, v in TONE_FILES.items()}
         st.session_state.selected_prompt = "Default"
+    
+    st.title(f"Ordering ChatBot")
 
     prompt = st.chat_input("")
     chat_col, cart_col = st.columns([7, 3], gap="large")
@@ -268,7 +418,15 @@ async def main():
 
         if st.button("Apply Tone"):
             st.session_state.selected_prompt = tone_choice
-            st.success(f"{tone_choice} tone applied to the system message!")
+            try:
+                async with httpx.AsyncClient(timeout=10) as client:
+                    await client.post(f"{API_BASE_URL}/clear-flow-cache")
+                st.success(f"{tone_choice} tone applied successfully!")
+            except:
+                st.success(f"{tone_choice} tone applied! (Cache clear failed, but style should still work)")
+                
+            api_style = TONE_TO_STYLE_MAPPING.get(tone_choice, "default")
+            st.info(f"Using conversation style: `{api_style}`")
 
         model_choice = st.selectbox("Select Model", options=MODEL_CHOICES)
 
@@ -276,13 +434,14 @@ async def main():
             st.session_state.selected_model = model_choice
             st.success(f"Model updated to {model_choice}!")
 
+        # Add evaluation dashboard
+        st.divider()
+        display_evaluation_dashboard()
+
     with cart_col:
         cart = st.empty()
 
     with chat_col:
-        if "messages" not in st.session_state:
-            st.session_state.messages = []
-
         # Display chat messages from history on app rerun
         for message in st.session_state.messages:
             with st.chat_message(message["role"]):
@@ -294,9 +453,7 @@ async def main():
             last_user = st.chat_message("user")
             last_user_content = last_user.empty()
             last_user_content.markdown(prompt)
-            # Add user message to chat history
 
-            response = f"Echo: {prompt}"
             # Display assistant response in chat message container
             last_asst = st.chat_message("assistant")
             chat_history = [
@@ -304,6 +461,15 @@ async def main():
                 for message in st.session_state.messages
                 if not message.get("filtered")
             ]
+            
+            # Initialize evaluation metrics
+            evaluation_metrics = {
+                "user_input": prompt,
+                "model": st.session_state.selected_model,
+                "conversation_style": TONE_TO_STYLE_MAPPING.get(st.session_state.selected_prompt, "default"),
+                "session_id": st.session_state.session_id,
+            }
+            
             with last_asst:
                 async with httpx.AsyncClient(timeout=30) as client:
                     headers = {
@@ -319,6 +485,7 @@ async def main():
                         SCREENING_ENDPOINT, json=data, headers=headers
                     )
                     screening_result = res.json()
+                    
                 if len(screening_result["failed_categories"]) > 0:
                     text = "I'm sorry, I can't process your request. Could you please try again?"
                     last_asst.markdown(text)
@@ -328,7 +495,18 @@ async def main():
                         + ">"
                     )
                     last_user_content.markdown(user_message)
-                    # Edit last user message
+                    
+                    # Update metrics for filtered content
+                    evaluation_metrics.update({
+                        "intent": "filtered",
+                        "content_filtered": True,
+                        "total_latency": 0,
+                        "model_latency": 0,
+                        "time_to_first_token": 0,
+                        "tokens_per_second": 0,
+                        "token_count": 0
+                    })
+                    
                     st.session_state.messages.append(
                         {"role": "user", "content": user_message, "filtered": True}
                     )
@@ -336,7 +514,6 @@ async def main():
                         {"role": "assistant", "content": text, "filtered": True}
                     )
                 else:
-
                     last_user_content.markdown(screening_result["redacted_message"])
                     user_message = {
                         "role": "user",
@@ -345,11 +522,15 @@ async def main():
                     }
 
                     chat_history.append(user_message)
+                    
+                    # Create tracker for metrics
+                    tracker = LatencyTracker()
+                    
                     if screening_result["intent"] == "order":
-                        # Remove preamble = st.empty()
                         items_list = st.empty()
                         summary = st.empty()
                         
+                        # Process order with metrics tracking
                         order = asyncio.create_task(
                             fetch_order(
                                 {"items": []},
@@ -357,6 +538,7 @@ async def main():
                                 items_list,
                                 chat_history,
                                 st.session_state,
+                                tracker  # Add tracker here
                             )
                         )
                         json_data = {
@@ -371,33 +553,51 @@ async def main():
                             },
                         }
 
-                        # Wait for order processing to complete
                         order_result = await order
                         
-                        # Add order info to chat history for summary generation
                         if order_result[1] is None:
                             order_info = "Failed to fetch order, item might have not existed"
                         else:
                             order_info = order_result[0]
                         
-                        # Add order info to chat history
                         chat_history.append({
                             "role": "assistant", 
                             "content": f"Order processed: {order_info}"
                         })
                         
-                        # Generate summary response
+                        # Generate summary response with separate tracker
+                        summary_tracker = LatencyTracker()
                         summary_response = await fetch_stream(
                             SUMMARY_ENDPOINT,
                             summary,
                             json_data,
+                            summary_tracker  # Add tracker here
                         )
+                        
+                        # Combine metrics
+                        order_metrics = tracker.get_metrics()
+                        summary_metrics = summary_tracker.get_metrics()
+                        
+                        evaluation_metrics.update({
+                            "intent": "order",
+                            "content_filtered": False,
+                            "total_latency": summary_metrics.get("total_latency", 0),
+                            "model_latency": summary_metrics.get("model_latency", 0),
+                            "time_to_first_token": order_metrics.get("time_to_first_token", 0),
+                            "tokens_per_second": (summary_metrics.get("token_count", 0)) / 
+                                               (summary_metrics.get("total_latency", 0)) 
+                                               if (summary_metrics.get("total_latency", 0)) > 0 else 0,
+                            "token_count": summary_metrics.get("token_count", 0)
+                        })
+                        
                         assistant_message = {
                             "role": "assistant",
                             "content": summary_response,
                         }
                     else:
                         conversation = st.empty()
+                        
+                        # Process conversation with metrics tracking
                         response = await fetch_stream(
                             CONVERSATION_ENDPOINT,
                             conversation,
@@ -413,14 +613,39 @@ async def main():
                                     ],
                                 },
                             },
+                            tracker  # Add tracker here
                         )
+
+                        # Update metrics
+                        metrics = tracker.get_metrics()
+                        evaluation_metrics.update({
+                            "intent": "conversation",
+                            "content_filtered": False,
+                            **metrics
+                        })
+
                         assistant_message = {
                             "role": "assistant",
                             "content": response,
                         }
+                    
                     st.session_state.messages.append(user_message)
                     st.session_state.messages.append(assistant_message)
-
+                
+                # Save evaluation metrics
+                save_evaluation_metrics(evaluation_metrics)
+                
+                # Show real-time metrics in sidebar
+                if evaluation_metrics.get("total_latency"):
+                    st.sidebar.success(f"Response: {evaluation_metrics['total_latency']:.2f}s")
+                    if evaluation_metrics.get("model_latency"):
+                        st.sidebar.info(f"Model latency: {evaluation_metrics['model_latency']:.2f}s")
+                    if evaluation_metrics.get("time_to_first_token"):
+                        st.sidebar.info(f"First token: {evaluation_metrics['time_to_first_token']:.2f}s")
+                    if evaluation_metrics.get("token_count"):
+                        st.sidebar.info(f"Tokens: {evaluation_metrics['token_count']}")
+                    if evaluation_metrics.get("tokens_per_second"):
+                        st.sidebar.info(f"Speed: {evaluation_metrics['tokens_per_second']:.1f} tok/s")
 
 if __name__ == "__main__":
     asyncio.run(main())

@@ -117,7 +117,4 @@ Evaluation results are saved to:
 - `evaluation_results/conversation_metric_scores.csv` - Azure AI evaluation results
 
 ## Notes: 
-### To Do
-1. Evaluate order flow
-2. Integrate conversation style option (casual, gen z or default brand style)
-3. Implement `main.py` file, integrating all the flows
+update app.py to change deployment and convo style

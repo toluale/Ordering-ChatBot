@@ -26,20 +26,24 @@ class ConversationStylePlugin:
     def _load_style_instructions(self):
         """Load style instruction files."""
         self.style_instructions = {}
-        resources_dir = Path(__file__).parent.parent.joinpath("resources")
-        
+        resources_dir = Path(__file__).resolve().parent.parent.parent / "resources"
+
         try:
             # Load casual style
             casual_path = resources_dir / "casual.txt"
             if casual_path.exists():
                 with open(casual_path, "r", encoding="utf-8") as f:
                     self.style_instructions[ConversationStyle.CASUAL] = f.read().strip()
+            else:
+                print(f"[conversation_style] Missing casual.txt at {casual_path}")
             
             # Load GenZ style
             genz_path = resources_dir / "genZ.txt"
             if genz_path.exists():
                 with open(genz_path, "r", encoding="utf-8") as f:
                     self.style_instructions[ConversationStyle.GENZ] = f.read().strip()
+            else:
+                print(f"[conversation_style] Missing genZ.txt at {genz_path}")
             
             # Default style has no additional instructions
             self.style_instructions[ConversationStyle.DEFAULT] = ""
@@ -48,8 +52,8 @@ class ConversationStylePlugin:
             print(f"Error loading style instructions: {e}")
             self.style_instructions = {
                 ConversationStyle.DEFAULT: "",
-                ConversationStyle.CASUAL: "Keep it chill and real, like talking to a buddy.",
-                ConversationStyle.GENZ: "Talk like you're on TikTok—use Gen Z slang, keep it hype. Drop those 'lit', 'fam', and 'no cap' vibes. Stay trendy and fresh."
+                ConversationStyle.CASUAL: "Use a relaxed, friendly, conversational tone—like chatting with a helpful friend.",
+                ConversationStyle.GENZ: "Talk like you're on TikTok, use authentic Gen Z slang and vibes, keep it hype. Stay trendy, fresh, energetic but still helpful."
             }
 
     def set_style(self, style: ConversationStyle) -> bool:

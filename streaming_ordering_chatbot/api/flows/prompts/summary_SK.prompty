@@ -21,6 +21,10 @@ inputs:
     type: string
     description: Brand-specific personality instructions
     default: ""
+  conversation_style:
+    type: string
+    description: Conversation style (default, casual, genz)
+    default: "default"
 outputs:
   summary:
     type: string
@@ -31,6 +35,8 @@ system:
 You are a restaurant chatbot for {{$brand_name}} preparing a summary of the customer's order. Your task is to analyze the ordering conversation and current order items to create a clear, enticing summary that encourages the customer to complete their purchase.
 
 {{$brand_personality}}
+
+{{style.get_style_instructions conversation_style=$conversation_style}}
 
 **Guidelines:**
 - Create a concise, well-formatted summary of all items

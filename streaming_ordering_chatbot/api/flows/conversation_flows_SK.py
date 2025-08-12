@@ -334,7 +334,7 @@ class ConversationFlowSK:
     """Base class for conversation flows using Semantic Kernel."""
     PROMPT_PATH = None
     PLUGIN_NAME = "conversation"
-    MAX_TOKENS = 2500  
+    MAX_TOKENS = 2500
 
     def __init__(self, ENDPOINT: str, API_KEY: str, DEPLOYMENT_NAME: str, BRAND_NAME: Optional[str] = None, CONVERSATION_STYLE: Optional[str] = None):
         self.ENDPOINT = ENDPOINT
@@ -367,21 +367,19 @@ class ConversationFlowSK:
         self.brand_plugin = BrandPersonalityPlugin(self.kernel, BRAND_NAME)
         self.kernel.add_plugin(self.brand_plugin, "brand")
         
-        # Add conversation style plugin only if a specific style is provided
-        # If no style is provided, will default to brand's original style
-        self.style_plugin = None
-        if CONVERSATION_STYLE and CONVERSATION_STYLE.lower() not in ["default", "none", ""]:
-            try:
-                from .conversation_style import ConversationStylePlugin, ConversationStyle
-                style_enum = ConversationStyle(CONVERSATION_STYLE.lower())
-                self.style_plugin = ConversationStylePlugin(self.kernel, style_enum)
-                self.kernel.add_plugin(self.style_plugin, "style")
-                logger.info(f"Added conversation style plugin: {CONVERSATION_STYLE}")
-            except (ValueError, ImportError) as e:
-                logger.warning(f"Failed to load conversation style '{CONVERSATION_STYLE}': {e}. Using brand's original style.")
-                self.style_plugin = None
-        else:
-            logger.info("No specific conversation style provided. Using brand's original style.")
+        # Store conversation style for use in prompt templates
+        self.conversation_style = CONVERSATION_STYLE or "default"
+        
+        # Always add conversation style plugin (not conditional)
+        from .conversation_style import ConversationStylePlugin, ConversationStyle
+        try:
+            style_enum = ConversationStyle(self.conversation_style.lower())
+        except ValueError:
+            style_enum = ConversationStyle.DEFAULT
+        
+        self.style_plugin = ConversationStylePlugin(self.kernel, style_enum)
+        self.kernel.add_plugin(self.style_plugin, "style")
+        logger.info(f"Added conversation style plugin: {self.conversation_style}")
         
         # Load prompt template
         if self.PROMPT_PATH:
@@ -479,12 +477,29 @@ class ConversationFlowSK:
                 
                 # Simple, markdown-friendly streaming logic
                 should_yield = False
+                buffer_text = "".join(buffer)
+            
+                # Don't break markdown headers - wait for complete line
+                if buffer_text.strip().startswith('#') and not buffer_text.endswith('\n'):
+                    # We're in a header, don't yield until we have the complete line
+                    continue
                 
+                # Don't break markdown formatting like **bold** or *italic*
+                open_bold = buffer_text.count('**') % 2
+                open_italic = buffer_text.count('*') % 2
+                if open_bold != 0 or open_italic != 0:
+                    # We're inside markdown formatting, wait for it to close
+                    if not (token in ['\n', '.', '!', '?']):
+                        continue
+            
                 # Yield on natural sentence boundaries (preserves markdown structure)
                 if token in '.!?\n':
                     should_yield = True
                 # Yield on paragraph breaks (double newlines)
                 elif token == '\n' and len(buffer) > 1 and buffer[-2] == '\n':
+                    should_yield = True
+                # Yield after complete markdown headers
+                elif token == '\n' and buffer_text.strip().startswith('#'):
                     should_yield = True
                 # Safety valve for very long content (but much more conservative)
                 elif len(buffer) > 50:  # Increased threshold to avoid breaking markdown
@@ -512,29 +527,33 @@ class ConversationFlowSK:
         chat_history: List[Message],
         current_order: Optional[Dict] = None,
         delay: float = 0.05,
-        model_deployment: Optional[str] = None
+        model_deployment: Optional[str] = None,     
+        conversation_style: Optional[str] = None
     ) -> AsyncGenerator[str, None]:
         """Handle a conversation turn."""
         current_order = current_order if current_order is not None else {"items": []}
+        effective_style = conversation_style or self.conversation_style
+    
         if hasattr(self, 'brand_plugin'):
             brand_name = self.brand_plugin.get_current_brand()
         else:
             brand_name = None
         current_brand_name = brand_name or (self.brand_plugin.current_brand if hasattr(self, 'brand_plugin') else None)
+        # Prepare context arguments
+        context_args = KernelArguments()
+        
+        # Add conversation_style to all flows
+        context_args["conversation_style"] = effective_style
+        context_args["chat_history"] = chat_history
+        context_args["brand_name"] = current_brand_name
+        
         try:
-            # Prepare context arguments
-            context_args = KernelArguments()
-            
             # Handle different flow types based on class name
             if self.__class__.__name__ == "OrderAssistantFlowSK":
                 context_args["current_order"] = current_order
-                context_args["chat_history"] = chat_history
-                context_args["brand_name"] = current_brand_name
                 plugin_name = "order_assistant"
                 function_name = "chat"
             else:
-                context_args["chat_history"] = chat_history
-                context_args["brand_name"] = current_brand_name
                 plugin_name = self.PLUGIN_NAME
                 function_name = "chat"
             
@@ -575,8 +594,8 @@ class ConversationFlowSK:
                 temperature=0.75,
                 top_p=0.95,
                 max_tokens=self.MAX_TOKENS,
-                presence_penalty=0.6,  
-                frequency_penalty=0.3,  
+                presence_penalty=0.6,
+                frequency_penalty=0.3,
                 stream=True
             )
 

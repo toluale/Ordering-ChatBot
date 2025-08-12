@@ -70,6 +70,7 @@ order_flow = OrderFlowSK(
     brand_name=BRAND_NAME
 )
 
+_flow_cache = {}
 # Create a factory function to get flows with specific conversation styles
 def get_conversation_flow(flow_class, conversation_style: Optional[str] = None):
     """Get a conversation flow instance with the specified conversation style."""
@@ -81,13 +82,27 @@ def get_conversation_flow(flow_class, conversation_style: Optional[str] = None):
         logging.warning(f"Invalid conversation style '{style}', falling back to default")
         style = CONVERSATION_STYLE
     
-    return flow_class(
+    cache_key = f"{flow_class.__name__}_{style}"
+    
+    # Check if we have this specific flow+style combination cached
+    if cache_key in _flow_cache:
+        logging.debug(f"Using cached flow: {cache_key}")
+        return _flow_cache[cache_key]
+    
+    # Create new flow with the requested conversation style
+    flow = flow_class(
         ENDPOINT=ENDPOINT,
         API_KEY=API_KEY,
         DEPLOYMENT_NAME=DEPLOYMENT_NAME,
         BRAND_NAME=BRAND_NAME,
         CONVERSATION_STYLE=style
     )
+    
+    # Cache the flow for future use
+    _flow_cache[cache_key] = flow
+    logging.info(f"Created and cached new flow: {cache_key}")
+    
+    return flow
 
 # Initialize intent classification flow (no conversation style needed)
 intent_flow = OrderIntentFlowSK(
@@ -261,15 +276,10 @@ async def assistant_response(
 ) -> StreamingResponse:
     """
     Generate assistant response using the SK-based assistant flow.
-    
-    Args:
-        chat_history: Chat conversation history
-        current_order: Current order state
-        config: LLM configuration including conversation style
-    
-    Returns:
-        StreamingResponse: Streaming assistant response
     """
+    logging.info(f"Assistant request with conversation style: {config.conversation_style}")
+    logging.info(f"Current cache keys: {list(_flow_cache.keys())}")
+    
     # Convert LLMOrder to dict for SK flow
     current_order_dict = current_order.model_dump() if isinstance(current_order, LLMOrder) else current_order
     
@@ -284,7 +294,6 @@ async def assistant_response(
         ),
         media_type="text/plain",
     )
-
 
 @app.get("/conversation-styles")
 async def list_conversation_styles():
@@ -342,3 +351,12 @@ async def preview_conversation_style(
         ),
         media_type="text/plain",
     )
+
+@app.post("/clear-flow-cache")
+async def clear_flow_cache():
+    """Clear the conversation flow cache to force recreation with new styles."""
+    global _flow_cache
+    cache_size = len(_flow_cache)
+    _flow_cache.clear()
+    logging.info(f"Cleared {cache_size} cached flows")
+    return {"status": "success", "cleared_flows": cache_size}

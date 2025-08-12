@@ -114,7 +114,7 @@ class BrandPersonalityPlugin:
         return f"Current brand: {brand['name']}\nTone: {brand['tone']}\nStyle: {brand['style']}"
     
 
-
+    '''
     @kernel_function(description="Apply brand personality with conversation style", name="enhance_with_style")
     def enhance_with_style(self, system_prompt: str, conversation_style: Optional[str] = None) -> str:
         """Enhance a system prompt with both brand personality and conversation style."""
@@ -129,7 +129,7 @@ class BrandPersonalityPlugin:
         if hasattr(self, 'kernel'):
             try:
                 style_result = self.kernel.invoke(
-                    plugin_name="conversation_style",
+                    plugin_name="style",
                     function_name="get_style_instructions",
                     arguments=KernelArguments(style=conversation_style) if conversation_style else None
                 )
@@ -143,3 +143,4 @@ class BrandPersonalityPlugin:
             enhanced_instructions = f"{brand_instructions}\n\nCONVERSATION STYLE:\n{style_instructions}"
         
         return f"{enhanced_instructions}\n\nBASE INSTRUCTIONS:\n{system_prompt}"
+    '''

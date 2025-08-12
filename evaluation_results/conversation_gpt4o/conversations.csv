@@ -1,0 +1,136 @@
+brand_name,user_prompt,assistant_response
+contoso_restaurant,Hello,"Hello and welcome to contoso_restaurant!
+
+We’re so glad you stopped in. If you’re looking for fresh, delicious home-style cooking made with love and organic ingredients, you’ve come to the right place. Let us know if you’d like to see our menu or have any questions—we’re here to make sure you feel right at home."
+contoso_restaurant,"Hello, I want to order dinner for my family","That sounds wonderful! We’re here to make your family dinner delicious and comforting. Our menu features home-style favorites like burgers, fresh fries, and classic drinks—all made with love and organic ingredients whenever possible.
+
+Could you let me know how many people you’ll be ordering for or if there are any preferences or dietary needs? I can help recommend some options or take your order whenever you’re ready."
+contoso_restaurant,What do you recommend on your menu,"For a cozy family dinner, we have some delicious home-style favorites that are always a hit:
+
+- **Cheeseburgers**: Made with fresh, organic ingredients and cooked just how you like. Customize with your choice of bun, toppings, and even add bacon for extra comfort.
+- **Black Bean Burgers**: Our veggie option, hearty and flavorful—perfect for anyone looking for something meat-free but still satisfying.
+- **Fries**: Crispy on the outside, fluffy inside—served hot and fresh. Choose your size or go unsalted if you prefer.
+- **Classic Drinks**: Cola, diet cola, lemon-lime, and root beer—all perfect pairings for a home-style meal.
+
+If you let me know how many you’re feeding or any preferences (like vegetarian options or favorite flavors), I can suggest a combination that’ll make everyone happy. At contoso_restaurant, every meal is made with love and care for quality and comfort!"
+contoso_restaurant,Can you put together a meal for 4 people?,"Absolutely! Here’s a delicious home-style meal for 4, made with love and fresh, organic ingredients:
+
+**Main Course:**
+- 2 Cheeseburgers (quarter lb, single patty, sesame bun, classic toppings)
+- 1 Hamburger (quarter lb, single patty, sesame bun, classic toppings)
+- 1 Black Bean Burger (quarter lb, single patty, sesame bun, classic toppings)  
+*(A mix of options so there’s something for everyone—let me know if you prefer different combinations!)*
+
+**Sides:**
+- 2 Medium Fries (salted)
+- 2 Large Fries (salted)  
+*Plenty to share around the table for that comforting diner feel.*
+
+**Drinks:**
+- 1 Cola
+- 1 Diet Cola
+- 1 Lemon-Lime
+- 1 Root Beer  
+*All medium size for a classic pairing.*
+
+Would you like to customize anything—like adding bacon, changing buns or cook levels, or choosing unsalted fries? If there are any dietary needs or special preferences in your family, just let me know. Your comfort and satisfaction are our top priority!"
+contoso_restaurant,Include medium size drinks for everyone,"Of course! Here’s your updated delicious, home-style meal for 4—each person will have their own fresh medium drink, all made with love and quality ingredients:
+
+**Main Course:**
+- 2 Cheeseburgers (quarter lb, single patty, sesame bun, classic toppings)
+- 1 Hamburger (quarter lb, single patty, sesame bun, classic toppings)
+- 1 Black Bean Burger (quarter lb, single patty, sesame bun, classic toppings)
+
+**Sides:**
+- 2 Medium Fries (salted)
+- 2 Large Fries (salted)
+
+**Drinks:**  
+Each drink is a medium size:
+- 1 Cola
+- 1 Diet Cola
+- 1 Lemon-Lime
+- 1 Root Beer
+
+Would you like to customize any burgers with different buns, add bacon for extra comfort, adjust the toppings or cook levels? And if anyone prefers unsalted fries or has any special dietary requests, just let me know. We’re here to make your family dinner as satisfying and welcoming as possible!"
+contoso_restaurant,let me have a cheeseburger. Increase the order by 2 people and give me a summary of the total order,"Absolutely! I’ll add a cheeseburger for you, and increase the order to serve 6 people in total. Here’s your home-style meal, perfect for a comforting group dinner—made with love and fresh, organic ingredients:
+
+**Main Course (6 burgers):**
+- 3 Cheeseburgers (quarter lb, single patty, sesame bun, classic toppings)
+- 1 Hamburger (quarter lb, single patty, sesame bun, classic toppings)
+- 2 Black Bean Burgers (quarter lb, single patty, sesame bun, classic toppings)
+
+**Sides:**
+- 3 Medium Fries (salted)
+- 3 Large Fries (salted)
+*(Plenty of crispy fries to share around the table.)*
+
+**Drinks:**  
+Each person gets their own medium drink:
+- 2 Cola
+- 1 Diet Cola
+- 2 Lemon-Lime
+- 1 Root Beer
+
+---
+
+Would you like to customize any of the burgers or fries? We’re happy to adjust buns, add bacon for extra comfort, change up the toppings or cook levels, or make any other changes you’d like. Your comfort and satisfaction are always our priority at contoso_restaurant!"
+contoso_restaurant,Can I get a pretzel hamburger with unsalted fries and a medium drink? Make the drink a Coke,"Absolutely! Here’s your delicious, made-with-love addition to the order:
+
+- **Hamburger**  
+  - Bun: Pretzel  
+  - Patty: Quarter lb, single patty  
+  - Toppings: Classic (lettuce, onion, pickle, tomato, ketchup, mayo, mustard, relish—let me know if you’d like any changes!)
+- **Fries**  
+  - Size: Medium  
+  - Salt: Unsalted
+- **Drink**  
+  - Medium Coke (Cola)
+
+This comforting combo is prepared with fresh, organic ingredients for that true home-style flavor. If you’d like to adjust any toppings or add a little extra comfort (like bacon), just let us know. Your satisfaction is our top priority at contoso_restaurant!
+
+Would you like this meal added to the existing group order, or will it be a separate meal?"
+contoso_restaurant,"I ordered a cheeseburger with unsalted fries and a medium Coke last time, can I get the same? But make it a large Coke this time","Absolutely! Here’s your comforting, home-style meal—made fresh with love and the best organic ingredients:
+
+- **Cheeseburger**  
+  - Quarter lb, single patty  
+  - Sesame bun (let me know if you’d like pretzel or another option)  
+  - Classic toppings (lettuce, onion, pickle, tomato, ketchup, mayo, mustard, relish—feel free to customize!)
+
+- **Fries**  
+  - Medium size  
+  - Unsalted
+
+- **Drink**  
+  - Large Coke (Cola)
+
+Your comfort is our priority. If you’d like to adjust any toppings or add a little extra satisfaction (like bacon), just let us know. Would you like this added to your current group order or as a separate meal?"
+contoso_restaurant,"I want a pizza with pineapple and olives as toppings, I am a vegetarian","Thank you for sharing your preferences! While we love serving delicious, home-style comfort food made with fresh, organic ingredients, our current menu at contoso_restaurant does not include pizza.
+
+However, if you’re looking for a vegetarian option, our Black Bean Burger is a hearty and satisfying choice. It’s made with love using quality, plant-based ingredients and can be customized with any toppings you like—such as lettuce, tomato, onion, pickles, and classic sauces. If you'd like, we can also serve it on a pretzel or sesame bun.
+
+Would you like to try our Black Bean Burger or customize another comforting meal to fit your vegetarian needs? Your satisfaction and comfort are always our top priority."
+contoso_restaurant,Can you summarize my order?,"Absolutely! Here’s a warm and welcoming summary of your delicious, home-style order—each meal crafted with love using fresh, organic ingredients for comfort and quality:
+
+**Main Course (serves 6):**
+- 3 Cheeseburgers (quarter lb, single patty, sesame bun, classic toppings)
+    - Plus 1 additional Cheeseburger with medium unsalted fries & large Coke (custom request; let us know if you prefer sesame or pretzel bun)
+- 1 Hamburger (quarter lb, single patty, sesame bun, classic toppings)
+- 2 Black Bean Burgers (quarter lb, single patty, sesame bun, classic toppings)
+- 1 Pretzel Hamburger (pretzel bun, quarter lb patty, classic toppings)
+    - With medium unsalted fries & medium Coke
+
+**Sides:**
+- 3 Medium Fries (salted)
+- 3 Large Fries (salted)
+- 2 Medium Fries (unsalted, served with the special burger orders above)
+
+**Drinks:**
+- 2 Cola (one as a large Coke, one as medium Coke)
+- 1 Diet Cola (medium)
+- 2 Lemon-Lime (medium)
+- 1 Root Beer (medium)
+
+Your meal is crafted for comfort and satisfaction—with plenty of delicious options for everyone at your table. If you’d like to adjust any toppings, buns, or sides—or if anyone has a special request—please let us know. Your comfort and happiness mean everything to us at contoso_restaurant!
+
+When you’re ready, just click the ""Add to Cart"" button to complete your order. Would you like to add anything else or customize any meals for your family?"

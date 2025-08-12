@@ -18,6 +18,10 @@ inputs:
     type: string
     description: Brand-specific personality instructions
     default: ""
+  conversation_style:
+    type: string
+    description: Conversation style (default, casual, genz)
+    default: "default"
 outputs:
   greeting:
     type: string
@@ -37,6 +41,8 @@ You are an order introduction generator. Your only task is to welcome the user t
 - Each sentence should be on its own line. Use proper paragraphs with line breaks between them.
 
 {{$brand_personality}}
+
+{{style.get_style_instructions conversation_style=$conversation_style}}
 
 **Examples:**
 

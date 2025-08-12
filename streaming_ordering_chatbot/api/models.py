@@ -6,7 +6,7 @@ from streaming_ordering_chatbot.api.flows.schemas_generalized import LLMItem, LL
 
 
 class LLMConfig(BaseModel):
-    conversation_style: Optional[str] = None  # "default", "casual", or "genz"
+    conversation_style: Optional[str] = "default"  # "default", "casual", or "genz"
     deployment: Optional[str] = None
 
     @field_validator('conversation_style')     # new addition for conversation style validation
@@ -15,7 +15,7 @@ class LLMConfig(BaseModel):
             valid_styles = ["default", "casual", "genz"]
             if v not in valid_styles:
                 raise ValueError(f"Invalid conversation style. Must be one of: {valid_styles}")
-        return v
+        return v or "default"
 
 class Message(BaseModel):
     role: Literal["user", "assistant", "system"]
