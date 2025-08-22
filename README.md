@@ -1,3 +1,5 @@
+Lastest Branch is version-1.0
+
 # To launch the Ordering Chatbot — Quickstart
 
 ## Run locally
@@ -166,4 +168,5 @@ Evaluation results are saved to:
 ## Notes
 - Context management: The latest 8 messages are kept verbatim for precision to keep prompts small and predictable. Optional summarization of older history can be added later if needed.
 - Conversation style and deployment are configured via `.env` (no code changes needed). The Streamlit UI can override style per-session.
+
 - Optional second UI: `streaming_ordering_chatbot/streamlit/app_evaluation.py` provides a lightweight dashboard for evaluation metrics.
