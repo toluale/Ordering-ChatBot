@@ -1,0 +1,10 @@
+Brand,Conversation_File,Metric,Score,Explanation,Timestamp
+contoso_restaurant,contoso_restaurant_conversation_20250805_142040.json,BrandVoiceMetric,0.0,Evaluation failed: 'Stream' object has no attribute 'choices',2025-08-21T10:54:20.952102
+contoso_restaurant,contoso_restaurant_conversation_20250805_144155.json,BrandVoiceMetric,0.0,Evaluation failed: 'Stream' object has no attribute 'choices',2025-08-21T10:55:11.902110
+contoso_restaurant,contoso_restaurant_conversation_20250821_105150.json,BrandVoiceMetric,0.0,Evaluation failed: 'Stream' object has no attribute 'choices',2025-08-21T10:55:51.397578
+contoso_restaurant,contoso_restaurant_conversation_20250805_142040.json,RelevanceMetric,0.0,Evaluation failed: 'Stream' object has no attribute 'choices',2025-08-21T10:54:49.644038
+contoso_restaurant,contoso_restaurant_conversation_20250805_144155.json,RelevanceMetric,0.0,Evaluation failed: 'Stream' object has no attribute 'choices',2025-08-21T10:55:13.800321
+contoso_restaurant,contoso_restaurant_conversation_20250821_105150.json,RelevanceMetric,0.0,Evaluation failed: 'Stream' object has no attribute 'choices',2025-08-21T10:55:51.881553
+contoso_restaurant,contoso_restaurant_conversation_20250805_142040.json,TaskCompletionMetric,0.0,Evaluation failed: 'Stream' object has no attribute 'choices',2025-08-21T10:54:50.208400
+contoso_restaurant,contoso_restaurant_conversation_20250805_144155.json,TaskCompletionMetric,0.0,Evaluation failed: 'Stream' object has no attribute 'choices',2025-08-21T10:55:21.685543
+contoso_restaurant,contoso_restaurant_conversation_20250821_105150.json,TaskCompletionMetric,0.0,Evaluation failed: 'Stream' object has no attribute 'choices',2025-08-21T10:56:12.720879

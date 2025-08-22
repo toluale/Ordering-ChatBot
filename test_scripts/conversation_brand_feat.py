@@ -56,9 +56,9 @@ def initialize_conversation_flows(
 ):
     """Initialize conversation flows with parameters."""
     return (
-        PreambleFlowSK(endpoint, api_key, deployment_name, brand_name=brand_name),
-        OrderAssistantFlowSK(endpoint, api_key, deployment_name, brand_name=brand_name),
-        SummaryFlowSK(endpoint, api_key, deployment_name, brand_name=brand_name)
+    PreambleFlowSK(ENDPOINT=endpoint, API_KEY=api_key, DEPLOYMENT_NAME=deployment_name, BRAND_NAME=brand_name),
+    OrderAssistantFlowSK(ENDPOINT=endpoint, API_KEY=api_key, DEPLOYMENT_NAME=deployment_name, BRAND_NAME=brand_name),
+    SummaryFlowSK(ENDPOINT=endpoint, API_KEY=api_key, DEPLOYMENT_NAME=deployment_name, BRAND_NAME=brand_name)
     )
 
 async def natural_conversation() -> None:

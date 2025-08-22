@@ -17,10 +17,6 @@ inputs:
     type: string
     description: Brand-specific personality instructions
     default: ""
-  conversation_style:
-    type: string
-    description: Conversation style (default, casual, genz)
-    default: "default"
   menu:
     type: string
     description: Available menu items and descriptions
@@ -50,8 +46,6 @@ IMPORTANT FORMATTING RULES:
 Keep responses focused on {{$brand_name}} ordering. Ensure all orders match the available menu items and options. Format responses in markdown style with proper spacing. Keep responses concise and natural.
 
 {{$brand_personality}}
-
-{{style.get_style_instructions conversation_style=$conversation_style}}
 
 **Reference Context (DO NOT INCLUDE IN RESPONSE):**
 

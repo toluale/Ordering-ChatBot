@@ -41,8 +41,7 @@ TONE_TO_STYLE_MAPPING = {
 
 MODEL_CHOICES = {
     "GPT-4o": "gpt-4o",
-    "GPT-4.1": "gpt-4.1",
-    "o3-mini": "o3-mini"
+    "GPT-4.1": "gpt-4.1"
 }
 
 # Evaluation metrics storage
@@ -82,17 +81,17 @@ class LatencyTracker:
             return {}
             
         total_latency = self.end_time - self.start_time
-        time_to_first_token = (self.first_token_time - self.start_time) if self.first_token_time else total_latency
-        tokens_per_second = self.token_count / total_latency if total_latency > 0 else 0
+        model_latency = (self.first_token_time - self.start_time) if self.first_token_time else total_latency
+        generation_latency = (self.end_time - self.first_token_time) if self.first_token_time else total_latency
         
-        # Model latency is the time from first token to end (actual generation time)
-        model_latency = (self.end_time - self.first_token_time) if self.first_token_time else total_latency
-        
+        # Use generation_latency for pure generation speed (excluding network/queue time)
+        tokens_per_second = self.token_count / max(generation_latency, 0.01) if generation_latency > 0 else 0
+
         return {
             "total_latency": total_latency,
-            "model_latency": model_latency,
-            "time_to_first_token": time_to_first_token,
-            "tokens_per_second": tokens_per_second,
+            "model_latency": model_latency,  # Time to first token (network + queue + model startup)
+            "generation_latency": generation_latency,  # Pure generation time
+            "tokens_per_second": tokens_per_second,  # Pure generation speed
             "token_count": self.token_count
         }
 
@@ -313,14 +312,6 @@ def display_evaluation_dashboard():
         avg_latency = df['total_latency'].mean()
         st.sidebar.metric("Avg Total Latency", f"{avg_latency:.2f}s")
     
-    if 'time_to_first_token' in df.columns:
-        avg_ttft = df['time_to_first_token'].mean()
-        st.sidebar.metric("Avg Time to First Token", f"{avg_ttft:.2f}s")
-    
-    if 'tokens_per_second' in df.columns:
-        avg_tps = df['tokens_per_second'].mean()
-        st.sidebar.metric("Avg Tokens/Second", f"{avg_tps:.1f}")
-    
     if 'token_count' in df.columns:
         avg_tokens = df['token_count'].mean()
         st.sidebar.metric("Avg Token Count", f"{avg_tokens:.0f}")
@@ -339,7 +330,7 @@ def _display_recent_interactions(df: pd.DataFrame):
     recent_df = df.tail(10)
     if not recent_df.empty:
         display_cols = ['timestamp', 'intent', 'model', 'conversation_style', 
-                       'total_latency', 'model_latency', 'time_to_first_token', 
+                       'total_latency', 'model_latency', 
                        'tokens_per_second', 'token_count']
         display_cols = [col for col in display_cols if col in recent_df.columns]
         st.dataframe(recent_df[display_cols].sort_values('timestamp', ascending=False))
@@ -358,10 +349,6 @@ def display_detailed_analytics():
     if 'timestamp' in df.columns:
         df['timestamp'] = pd.to_datetime(df['timestamp'])
     
-    # Create charts
-    #_create_time_series_charts(df)
-    #_create_model_comparison_charts(df)
-    #_create_style_comparison_charts(df)
     _display_recent_interactions(df)
     
     # Export data
@@ -581,7 +568,6 @@ async def _handle_content_screening(prompt: str, chat_history: List[Dict], evalu
             "filter_categories": ", ".join(screening_result["failed_categories"]),
             "total_latency": 0,
             "model_latency": 0,
-            "time_to_first_token": 0,
             "tokens_per_second": 0,
             "token_count": 0
         })
@@ -616,18 +602,6 @@ async def _process_order_intent(chat_history: List[Dict], tracker: LatencyTracke
     summary_tracker = LatencyTracker()
     summary_response = await fetch_stream_with_metrics(SUMMARY_ENDPOINT, summary, json_data, summary_tracker)
     
-    # Combine metrics
-    #order_metrics = tracker.get_metrics()
-    #summary_metrics = summary_tracker.get_metrics()
-    #combined_metrics = {
-    #    "total_latency": order_metrics.get("total_latency", 0) + summary_metrics.get("total_latency", 0),
-    #    "model_latency": order_metrics.get("model_latency", 0) + summary_metrics.get("model_latency", 0),
-    #    "time_to_first_token": order_metrics.get("time_to_first_token", 0),
-    #    "tokens_per_second": (order_metrics.get("token_count", 0) + summary_metrics.get("token_count", 0)) / 
-    #                       (order_metrics.get("total_latency", 0) + summary_metrics.get("total_latency", 0)) 
-    #                       if (order_metrics.get("total_latency", 0) + summary_metrics.get("total_latency", 0)) > 0 else 0,
-    #    "token_count": order_metrics.get("token_count", 0) + summary_metrics.get("token_count", 0)
-    #}
     
     return summary_response, summary_tracker.get_metrics() #combined_metrics
 
@@ -762,8 +736,6 @@ async def main():
                 st.sidebar.success(f"Response time: {evaluation_metrics['total_latency']:.2f}s")
                 if evaluation_metrics.get("model_latency"):
                     st.sidebar.info(f"Model latency: {evaluation_metrics['model_latency']:.2f}s")
-                if evaluation_metrics.get("time_to_first_token"):
-                    st.sidebar.info(f"First token: {evaluation_metrics['time_to_first_token']:.2f}s")
                 if evaluation_metrics.get("token_count"):
                     st.sidebar.info(f"Tokens: {evaluation_metrics['token_count']}")
                 if evaluation_metrics.get("tokens_per_second"):

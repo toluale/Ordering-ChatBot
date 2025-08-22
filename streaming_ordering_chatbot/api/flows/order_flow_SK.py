@@ -18,6 +18,9 @@ from streaming_ordering_chatbot.api.flows.schemas_generalized import (LLMBurgerI
 from streaming_ordering_chatbot.api.models import Message
 from streaming_ordering_chatbot.api.flows.menu_manager import get_menu_manager
 from streaming_ordering_chatbot.api.flows.schemas_generalized import set_brand_context
+from streaming_ordering_chatbot.api.utils.azure_client import create_azure_openai_client
+from streaming_ordering_chatbot.api.utils.order_stream_utils import process_order_function_stream
+from streaming_ordering_chatbot.api.utils.stream_utils import process_chat_stream
 
 # Set up logging
 handler = logging.FileHandler("streaming_ordering_chatbot.order_flow_SK.log")
@@ -50,15 +53,6 @@ def messages_to_dicts(messages: List[Message]) -> List[Dict[str, str]]:
         else:
             result.append({"role": msg.role, "content": msg.content})
     return result
-
-
-def create_azure_openai_client(api_key: str, endpoint: str) -> AzureOpenAI:
-    """Create and return AzureOpenAI client with standard configuration."""
-    return AzureOpenAI(
-        api_key=api_key,
-        api_version="2024-12-01-preview",
-        azure_endpoint=endpoint
-    )
 
 
 class OrderValidationPlugin:
@@ -357,109 +351,37 @@ Please process this order request and provide a structured response with the upd
             messages = await self._format_messages_for_streaming(chat_history, current_order)
             
             # Stream response with function calling for structured output
+            from streaming_ordering_chatbot.api.utils.azure_client import build_chat_params
+            params = build_chat_params({"stream": True, "max_tokens": 1000})
             response = self.client.chat.completions.create(
                 model=self.deployment_name,
                 messages=messages,
                 tools=self.tools.get("tools", []),
                 tool_choice=self.tools.get("tool_choice", "auto"),
-                stream=True,
-                max_tokens=1000
+                **params,
             )
             
-            # Process streaming response for structured order items
-            async for chunk in self._process_streaming_chunks(response, delay):
+            # Process streaming response for structured order items via shared util
+            def _finalize_order_state(state: dict) -> str:
+                try:
+                    final_order = LLMOrder.model_validate(state)
+                    return json.dumps({"LLMOrder": final_order.model_dump()}) + "\n"
+                except Exception as e:
+                    logger.error(f"Error creating final order: {e}")
+                    return json.dumps({"LLMOrder": {"items": []}}) + "\n"
+
+            async for chunk in process_order_function_stream(
+                response,
+                validate_item=self.validate_item,
+                finalize_order=_finalize_order_state,
+                delay=delay,
+            ):
                 yield chunk
             
         except Exception as e:
             logger.error("Error in stream_order_response: %s", e)
             yield json.dumps({"error": str(e)}) + "\n"
 
-    async def _process_streaming_chunks(
-        self, 
-        response, 
-        delay: float
-    ) -> AsyncGenerator[str, None]:
-        """Process streaming chunks and validate order items.
-        """
-        json_string = ""
-        current_order_items = {"items": []}
-        prev_item_id = -1
-        first_item = True
-        
-        for chunk in response:
-            await asyncio.sleep(delay)
-            
-            if (chunk is not None and 
-                hasattr(chunk, "choices") and 
-                len(chunk.choices) > 0 and
-                chunk.choices[0].delta.tool_calls):
-                
-                try:
-                    tool_call = chunk.choices[0].delta.tool_calls[0]
-                    if (hasattr(tool_call, 'function') and 
-                        tool_call.function and 
-                        hasattr(tool_call.function, 'arguments') and
-                        tool_call.function.arguments):
-                        
-                        arg = tool_call.function.arguments
-                        logger.debug("Processing function arguments")  # Avoid logging potentially sensitive tokens
-                        
-                        if isinstance(arg, str):
-                            json_string += arg
-                            
-                            # Process when we have a complete item
-                            if "}" in arg:
-                                parse_string = json_string[:json_string.rfind("}") + 1]
-                                left_brace = parse_string.count("{")
-                                right_brace = parse_string.count("}")
-                                
-                                if right_brace > 0 and (left_brace - right_brace) == 1:
-                                    try:
-                                        current_order_items = json.loads(parse_string + "]}")
-                                        
-                                        # Process new items
-                                        if (items := current_order_items.get("items")) and items:
-                                            latest_item = items[-1]
-                                            current_item_id = latest_item.get("itemId")
-                                            
-                                            if current_item_id != prev_item_id:
-                                                prev_item_id = current_item_id
-                                                
-                                                # Validate and stream item
-                                                logger.info(f"Attempting to validate item: {latest_item}")
-                                                validated_item = await self.validate_item(latest_item)
-                                                                                            
-                                                if validated_item is not None:
-                                                    ser_item = validated_item.model_dump()
-                                                    
-                                                    if first_item:
-                                                        first_item = False
-                                                        yield '{"order": [' + json.dumps(ser_item) + "\n"
-                                                    else:
-                                                        yield "," + json.dumps(ser_item) + "\n"
-                                                    
-                                                    logger.info("Validated and streamed item: %s", ser_item)
-                                                else:
-                                                    logger.warning(f"Item validation failed for: {latest_item}")
-                                    except json.JSONDecodeError as e:
-                                        logger.warning("JSON decode error: %s", e)
-                                        continue
-                
-                except (AttributeError, IndexError) as e:
-                    logger.warning("Error processing chunk: %s", e)
-                    continue
-        
-        # Close JSON structure and return final order state
-        if not first_item:
-            yield "]}\n"
-        
-        # Always return the final LLMOrder structure
-        try:
-            final_order = LLMOrder.model_validate(current_order_items)
-            yield json.dumps({"LLMOrder": final_order.model_dump()}) + "\n"
-        except Exception as e:
-            logger.error(f"Error creating final order: {e}")
-            yield json.dumps({"LLMOrder": {"items": []}}) + "\n"
     
     async def __call__(
         self,

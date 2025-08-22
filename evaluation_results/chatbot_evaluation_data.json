@@ -1,0 +1,197 @@
+{
+  "metadata": {
+    "timestamp": "2025-08-21T10:29:31.767466",
+    "num_brands": 2,
+    "num_scenarios": 8
+  },
+  "evaluation": [
+    {
+      "scenario_id": "full_conversation",
+      "brand_name": "contoso_restaurant",
+      "scores": {},
+      "conversation": [
+        {
+          "role": "user",
+          "content": "Hello"
+        },
+        {
+          "role": "assistant",
+          "content": "I apologize, but I encountered an error."
+        },
+        {
+          "role": "user",
+          "content": "Hello, I want to order dinner for my family"
+        },
+        {
+          "role": "assistant",
+          "content": "I apologize, but I encountered an error."
+        },
+        {
+          "role": "user",
+          "content": "What do you recommend on your menu"
+        },
+        {
+          "role": "assistant",
+          "content": "I apologize, but I encountered an error."
+        },
+        {
+          "role": "user",
+          "content": "Can you put together a meal for 4 people?"
+        },
+        {
+          "role": "assistant",
+          "content": "I apologize, but I encountered an error."
+        },
+        {
+          "role": "user",
+          "content": "Include medium size drinks for everyone"
+        },
+        {
+          "role": "assistant",
+          "content": "I apologize, but I encountered an error."
+        },
+        {
+          "role": "user",
+          "content": "let me have a cheeseburger. Increase the order by 2 people and give me a summary of the total order"
+        },
+        {
+          "role": "assistant",
+          "content": "I apologize, but I encountered an error."
+        },
+        {
+          "role": "user",
+          "content": "Can I get a pretzel hamburger with unsalted fries and a medium drink? Make the drink a Coke"
+        },
+        {
+          "role": "assistant",
+          "content": "I apologize, but I encountered an error."
+        },
+        {
+          "role": "user",
+          "content": "I ordered a cheeseburger with unsalted fries and a medium Coke last time, can I get the same? But make it a large Coke this time"
+        },
+        {
+          "role": "assistant",
+          "content": "I apologize, but I encountered an error."
+        },
+        {
+          "role": "user",
+          "content": "I want a pizza with pineapple and olives as toppings, I am a vegetarian"
+        },
+        {
+          "role": "assistant",
+          "content": "I apologize, but I encountered an error."
+        },
+        {
+          "role": "user",
+          "content": "Can you summarize my order?"
+        },
+        {
+          "role": "assistant",
+          "content": "I apologize, but I encountered an error."
+        }
+      ],
+      "timestamp": "2025-08-21T10:29:26.830566",
+      "status": "failure",
+      "errors": [
+        "Metric BrandVoiceMetric failed: Error code: 400 - {'error': {'message': \"Unsupported parameter: 'max_tokens' is not supported with this model. Use 'max_completion_tokens' instead.\", 'type': 'invalid_request_error', 'param': 'max_tokens', 'code': 'unsupported_parameter'}}",
+        "Metric RelevanceMetric failed: Error code: 400 - {'error': {'message': \"Unsupported parameter: 'max_tokens' is not supported with this model. Use 'max_completion_tokens' instead.\", 'type': 'invalid_request_error', 'param': 'max_tokens', 'code': 'unsupported_parameter'}}",
+        "Metric TaskCompletionMetric failed: Error code: 400 - {'error': {'message': \"Unsupported parameter: 'max_tokens' is not supported with this model. Use 'max_completion_tokens' instead.\", 'type': 'invalid_request_error', 'param': 'max_tokens', 'code': 'unsupported_parameter'}}"
+      ]
+    },
+    {
+      "scenario_id": "full_conversation",
+      "brand_name": "Zava Bistro",
+      "scores": {},
+      "conversation": [
+        {
+          "role": "user",
+          "content": "Hello"
+        },
+        {
+          "role": "assistant",
+          "content": "I apologize, but I encountered an error."
+        },
+        {
+          "role": "user",
+          "content": "Hello, I want to order dinner for my family"
+        },
+        {
+          "role": "assistant",
+          "content": "I apologize, but I encountered an error."
+        },
+        {
+          "role": "user",
+          "content": "What do you recommend on your menu"
+        },
+        {
+          "role": "assistant",
+          "content": "I apologize, but I encountered an error."
+        },
+        {
+          "role": "user",
+          "content": "Can you put together a meal for 4 people?"
+        },
+        {
+          "role": "assistant",
+          "content": "I apologize, but I encountered an error."
+        },
+        {
+          "role": "user",
+          "content": "Include medium size drinks for everyone"
+        },
+        {
+          "role": "assistant",
+          "content": "I apologize, but I encountered an error."
+        },
+        {
+          "role": "user",
+          "content": "let me have a cheeseburger. Increase the order by 2 people and give me a summary of the total order"
+        },
+        {
+          "role": "assistant",
+          "content": "I apologize, but I encountered an error."
+        },
+        {
+          "role": "user",
+          "content": "Can I get a pretzel hamburger with unsalted fries and a medium drink? Make the drink a Coke"
+        },
+        {
+          "role": "assistant",
+          "content": "I apologize, but I encountered an error."
+        },
+        {
+          "role": "user",
+          "content": "I ordered a cheeseburger with unsalted fries and a medium Coke last time, can I get the same? But make it a large Coke this time"
+        },
+        {
+          "role": "assistant",
+          "content": "I apologize, but I encountered an error."
+        },
+        {
+          "role": "user",
+          "content": "I want a pizza with pineapple and olives as toppings, I am a vegetarian"
+        },
+        {
+          "role": "assistant",
+          "content": "I apologize, but I encountered an error."
+        },
+        {
+          "role": "user",
+          "content": "Can you summarize my order?"
+        },
+        {
+          "role": "assistant",
+          "content": "I apologize, but I encountered an error."
+        }
+      ],
+      "timestamp": "2025-08-21T10:29:31.756061",
+      "status": "failure",
+      "errors": [
+        "Metric BrandVoiceMetric failed: Error code: 400 - {'error': {'message': \"Unsupported parameter: 'max_tokens' is not supported with this model. Use 'max_completion_tokens' instead.\", 'type': 'invalid_request_error', 'param': 'max_tokens', 'code': 'unsupported_parameter'}}",
+        "Metric RelevanceMetric failed: Error code: 400 - {'error': {'message': \"Unsupported parameter: 'max_tokens' is not supported with this model. Use 'max_completion_tokens' instead.\", 'type': 'invalid_request_error', 'param': 'max_tokens', 'code': 'unsupported_parameter'}}",
+        "Metric TaskCompletionMetric failed: Error code: 400 - {'error': {'message': \"Unsupported parameter: 'max_tokens' is not supported with this model. Use 'max_completion_tokens' instead.\", 'type': 'invalid_request_error', 'param': 'max_tokens', 'code': 'unsupported_parameter'}}"
+      ]
+    }
+  ]
+}

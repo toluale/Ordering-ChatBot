@@ -1,0 +1,41 @@
+{
+  "contoso_restaurant": {
+    "total_conversations": 3,
+    "metrics": {
+      "BrandVoiceMetric": {
+        "average_score": 0.0,
+        "min_score": 0.0,
+        "max_score": 0.0,
+        "std_score": 0.0,
+        "explanations": [
+          "Evaluation failed: 'Stream' object has no attribute 'choices'",
+          "Evaluation failed: 'Stream' object has no attribute 'choices'",
+          "Evaluation failed: 'Stream' object has no attribute 'choices'"
+        ]
+      },
+      "RelevanceMetric": {
+        "average_score": 0.0,
+        "min_score": 0.0,
+        "max_score": 0.0,
+        "std_score": 0.0,
+        "explanations": [
+          "Evaluation failed: 'Stream' object has no attribute 'choices'",
+          "Evaluation failed: 'Stream' object has no attribute 'choices'",
+          "Evaluation failed: 'Stream' object has no attribute 'choices'"
+        ]
+      },
+      "TaskCompletionMetric": {
+        "average_score": 0.0,
+        "min_score": 0.0,
+        "max_score": 0.0,
+        "std_score": 0.0,
+        "explanations": [
+          "Evaluation failed: 'Stream' object has no attribute 'choices'",
+          "Evaluation failed: 'Stream' object has no attribute 'choices'",
+          "Evaluation failed: 'Stream' object has no attribute 'choices'"
+        ]
+      }
+    },
+    "overall_average": 0.0
+  }
+}

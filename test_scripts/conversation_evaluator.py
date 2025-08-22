@@ -11,7 +11,7 @@ from dataclasses import dataclass
 import pandas as pd
 import re
 
-from openai import AzureOpenAI
+from streaming_ordering_chatbot.api.utils.azure_client import create_azure_openai_client
 from streaming_ordering_chatbot.evaluation.metrics import (
     EvaluationMetric, BrandVoiceMetric, RelevanceMetric, TaskCompletionMetric
 )
@@ -60,10 +60,10 @@ class ConversationEvaluator:
         self.api_version = api_version or self.DEFAULT_API_VERSION
         
         # Initialize Azure OpenAI client
-        self.client = AzureOpenAI(
-            azure_endpoint=self.endpoint,
+        self.client = create_azure_openai_client(
             api_key=self.api_key,
-            api_version=self.api_version
+            endpoint=self.endpoint,
+            api_version=self.api_version,
         )
         
         # Set up metrics
@@ -159,6 +159,8 @@ class ConversationEvaluator:
                 self.logger.info(f"Applying metric: {metric.__class__.__name__}")
                 
                 # Get evaluation from OpenAI
+                from streaming_ordering_chatbot.api.utils.azure_client import build_chat_params
+                params = build_chat_params({"temperature": 0.7, "max_tokens": 3500, "stream": False})
                 response = self.client.chat.completions.create(
                     model=self.deployment_name,
                     messages=[
@@ -171,9 +173,7 @@ class ConversationEvaluator:
                             "content": metric.format_conversation(conversation)
                         }
                     ],
-                    temperature=0.7,
-                    top_p=0.95,
-                    max_tokens=3500
+                    **params,
                 )
                 
                 content = response.choices[0].message.content

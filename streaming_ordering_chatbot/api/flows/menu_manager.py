@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 
 
 class MenuItemType(str, Enum):
-    """Standard menu item types across all brands."""
+    """Standard menu item types across all brands used in the system."""
     BURGER = "burger"
     PIZZA = "pizza" 
     SANDWICH = "sandwich"

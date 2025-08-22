@@ -554,7 +554,7 @@ class LLMFriesItem(BaseModel):
         """Convert to description format compatible with menu system."""
         context = get_menu_context()
         if not context.current_brand:
-            # Fallback to basic format - fries only have salt variants, no size
+            # Fallback
             salt_str = ItemConversionHelper.get_fries_salt_description(self.toppings)
             return f"{self.name.lower()}, {salt_str}"
         
@@ -594,8 +594,7 @@ class LLMDrinkItem(BaseModel):
 
     def __str__(self):
         """Convert to description format compatible with menu system."""
-        # For drinks, the menu system only uses flavor names, not size
-        # Format: "cola", "diet cola", "lemon-lime", "root beer"
+        # For drinks
         return self.name.lower()
 
     @model_serializer

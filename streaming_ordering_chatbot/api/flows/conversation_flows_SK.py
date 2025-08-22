@@ -15,6 +15,10 @@ from semantic_kernel.functions.kernel_arguments import KernelArguments
 
 from streaming_ordering_chatbot.api.models import Message
 from streaming_ordering_chatbot.api.content_safety import wrap_content_safety
+from streaming_ordering_chatbot.api.utils.text import clean_assistant_response
+from streaming_ordering_chatbot.api.utils.azure_client import create_azure_openai_client, build_chat_params
+from streaming_ordering_chatbot.api.utils.stream_utils import process_chat_stream
+from streaming_ordering_chatbot.api.utils.prompt_utils import build_overlay_cache_key, make_overlay_parts, enhance_prompt_with_parts
 
 # Load environment variables
 load_dotenv()
@@ -35,40 +39,7 @@ def get_required_env_var(name: str) -> str:
 logger = logging.getLogger(__name__)
 
 
-def clean_assistant_response(content: str) -> str:
-    """Remove context markers and sections from assistant responses.
-    """
-    if not content:
-        return ""
-        
-    # List of markers that indicate context sections to remove
-    context_markers = [
-        "Previous conversation:",
-        "Current Order:",
-        "Available menu:",
-        "Current order status:",
-        "Menu:",
-        "Chat History:",
-        "Instructions:",
-        "Reference Information",
-        "Brand:",
-        "[CONTEXT]",
-        "[END CONTEXT]",
-        "MENU", 
-        "CURRENT ORDER", 
-        "CHAT HISTORY", 
-        "CONVERSATION HISTORY"
-    ]
-    
-    # Get the content before any context marker
-    cleaned = content
-    for marker in context_markers:
-        if marker in cleaned:
-            # Keep only the first part (before the marker)
-            parts = cleaned.split(marker)
-            cleaned = parts[0].strip()
-    
-    return cleaned
+"""Centralized assistant response cleaning now lives in utils.text.clean_assistant_response."""
 
 
 class ConversationPlugin:
@@ -97,189 +68,15 @@ class OrderPlugin(ConversationPlugin):
         self.menu = self._load_menu_for_current_brand()
         
     def _load_menu_for_current_brand(self) -> str:
-        """Load menu using MenuManager for the current brand."""
+        """Load menu using MenuManager for the current brand (centralized via MenuManager)."""
         try:
-            # Get current brand from MenuManager (required to be set)
             current_brand = self.menu_manager.require_current_brand()
-            
-            # Generate menu description from configuration
-            menu_config = self.menu_manager.require_current_menu_config()
-            
-            return self._format_menu_from_config(menu_config)
-            
+            return self.menu_manager.get_menu_text_format(current_brand)
         except Exception as e:
             logger.error(f"Failed to load menu using MenuManager: {e}")
             raise RuntimeError(
-                f"Menu loading failed: {e}. "
-                "Please ensure RESTAURANT_BRAND environment variable is set "
-                "and corresponding menu file exists in the data directory."
+                f"Menu loading failed: {e}. Please ensure RESTAURANT_BRAND is set and a corresponding menu file exists."
             ) from e
-    
-    def _format_menu_from_config(self, menu_config: Dict[str, Any]) -> str:
-        """Format menu configuration into a readable string with all customization options."""
-        try:
-            brand_info = menu_config.get("brand_info", {})
-            menu_items = menu_config.get("menu_items", {})
-            toppings = menu_config.get("toppings", {})
-            item_types = menu_config.get("item_types", {})
-            
-            menu_text = f"# {brand_info.get('name', 'Restaurant')} Menu\n\n"
-            menu_text += f"**Cuisine**: {brand_info.get('cuisine_type', 'Various')}\n\n"
-            
-            # Group items by category
-            categories = {}
-            for item_name, item_config in menu_items.items():
-                category = item_config.get("category", "other")
-                if category not in categories:
-                    categories[category] = []
-                categories[category].append((item_name, item_config))
-            
-            # Format each category with customization options
-            for category, items in categories.items():
-                menu_text += f"## {category.title()}s\n"
-                
-                # Get category-specific customization options
-                category_config = item_types.get(category, {})
-                
-                for item_name, item_config in items:
-                    name_variations = item_config.get("name_variations", [item_name])
-                    menu_text += f"- **{name_variations[0].title()}**"
-                    if len(name_variations) > 1:
-                        menu_text += f" *(also known as: {', '.join(name_variations[1:])})*"
-                    menu_text += "\n"
-                
-                # Add customization options for this category
-                if category_config and category_config.get("customizable", False):
-                    customizations = []
-                    
-                    # Size options
-                    size_mapping = category_config.get("size_mapping", {})
-                    if size_mapping:
-                        sizes = list(size_mapping.values())
-                        default_size_code = None
-                        # Find default size from items in this category
-                        for item_name, item_config in items:
-                            default_size_code = item_config.get("default", {}).get("size")
-                            if default_size_code:
-                                break
-                        default_size = size_mapping.get(default_size_code, sizes[0]) if default_size_code else sizes[0]
-                        customizations.append(f"**Sizes**: {', '.join(sizes)} *(default: {default_size})*")
-                    
-                    # Category-specific options
-                    if category == "burger":
-                        # Patty options
-                        patties_mapping = category_config.get("patties_mapping", {})
-                        if patties_mapping:
-                            patties = list(patties_mapping.values())
-                            default_patty_code = None
-                            for item_name, item_config in items:
-                                default_patty_code = item_config.get("default", {}).get("patties")
-                                if default_patty_code:
-                                    break
-                            default_patty = patties_mapping.get(default_patty_code, patties[0]) if default_patty_code else patties[0]
-                            customizations.append(f"**Patties**: {', '.join(patties)} *(default: {default_patty})*")
-                        
-                        # Bun options
-                        buns_mapping = category_config.get("buns_mapping", {})
-                        if buns_mapping:
-                            buns = list(buns_mapping.values())
-                            default_bun_code = None
-                            for item_name, item_config in items:
-                                default_bun_code = item_config.get("default", {}).get("buns")
-                                if default_bun_code:
-                                    break
-                            default_bun = buns_mapping.get(default_bun_code, buns[0]) if default_bun_code else buns[0]
-                            customizations.append(f"**Buns**: {', '.join(buns)} *(default: {default_bun})*")
-                        
-                        # Cook levels
-                        cook_mapping = category_config.get("cook_mapping", {})
-                        if cook_mapping:
-                            cook_levels = list(cook_mapping.values())
-                            default_cook_code = None
-                            for item_name, item_config in items:
-                                default_cook_code = item_config.get("default", {}).get("cook")
-                                if default_cook_code:
-                                    break
-                            default_cook = cook_mapping.get(default_cook_code, cook_levels[0]) if default_cook_code else cook_levels[0]
-                            customizations.append(f"**Cook levels**: {', '.join(cook_levels)} *(default: {default_cook})*")
-                    
-                    elif category == "side":
-                        # Salt options for fries/sides
-                        salt_mapping = category_config.get("salt_mapping", {})
-                        if salt_mapping:
-                            salt_options = list(salt_mapping.values())
-                            default_salt_code = None
-                            for item_name, item_config in items:
-                                default_salt_code = item_config.get("default", {}).get("salt")
-                                if default_salt_code:
-                                    break
-                            default_salt = salt_mapping.get(default_salt_code, salt_options[0]) if default_salt_code else salt_options[0]
-                            customizations.append(f"**Salt options**: {', '.join(salt_options)} *(default: {default_salt})*")
-                    
-                    elif category == "pizza":
-                        # Pizza-specific options (for brands like Domino's)
-                        crust_mapping = category_config.get("crust_mapping", {})
-                        if crust_mapping:
-                            crusts = list(crust_mapping.values())
-                            customizations.append(f"**Crust types**: {', '.join(crusts)}")
-                        
-                        cheese_mapping = category_config.get("cheese_mapping", {})
-                        if cheese_mapping:
-                            cheese_options = list(cheese_mapping.values())
-                            customizations.append(f"**Cheese options**: {', '.join(cheese_options)}")
-                    
-                    elif category in ["taco", "burrito", "bowl"]:
-                        # Mexican food options (for brands like Chipotle)
-                        protein_mapping = category_config.get("protein_mapping", {})
-                        if protein_mapping:
-                            proteins = list(protein_mapping.values())
-                            customizations.append(f"**Proteins**: {', '.join(proteins)}")
-                        
-                        rice_mapping = category_config.get("rice_mapping", {})
-                        if rice_mapping:
-                            rice_options = list(rice_mapping.values())
-                            customizations.append(f"**Rice options**: {', '.join(rice_options)}")
-                        
-                        beans_mapping = category_config.get("beans_mapping", {})
-                        if beans_mapping:
-                            beans_options = list(beans_mapping.values())
-                            customizations.append(f"**Beans**: {', '.join(beans_options)}")
-                    
-                    # Add customization info
-                    if customizations:
-                        menu_text += f"  *Available customizations*: {' | '.join(customizations)}\n"
-                
-                menu_text += "\n"
-            
-            # Add toppings section with amounts
-            if toppings:
-                menu_text += "## Available Toppings & Add-ons\n"
-                menu_text += "*Note: All toppings can be ordered as none, light, normal, or extra*\n\n"
-                
-                # Group toppings by category
-                topping_categories = {}
-                for topping_code, topping_info in toppings.items():
-                    topping_category = topping_info.get('category', 'other')
-                    if topping_category not in topping_categories:
-                        topping_categories[topping_category] = []
-                    topping_categories[topping_category].append(topping_info.get('name', topping_code))
-                
-                for topping_category, topping_names in topping_categories.items():
-                    menu_text += f"**{topping_category.title()}**: {', '.join(sorted(topping_names))}\n"
-                
-                menu_text += "\n"
-            
-            # Add brand-specific notes if available
-            brand_description = brand_info.get("description")
-            if brand_description:
-                menu_text += f"## About {brand_info.get('name', 'Us')}\n"
-                menu_text += f"{brand_description}\n\n"
-            
-            return menu_text
-            
-        except Exception as e:
-            logger.error(f"Error formatting menu from config: {e}")
-            raise RuntimeError(f"Failed to format menu from configuration: {e}") from e
         
     @kernel_function(description="Prepares order context for prompt template", name="chat")
     async def prepare_order_context(self, chat_history: list[Message], current_order: dict, brand_name: Optional[str] = None) -> str:
@@ -293,7 +90,7 @@ class OrderPlugin(ConversationPlugin):
             clean_history.append(f"{msg.role}: {content}")
         
         # Get recent conversation history
-        chat_str = "\n".join(clean_history[-6:])  # Keep last 6 messages for immediate context
+        chat_str = "\n".join(clean_history[-8:])  # Keep last 8 messages for immediate context
         
         items = current_order.get("items", [])
         order_str = "Current items in order: " + ", ".join(str(item) for item in items) if items else "No items in order yet"
@@ -350,65 +147,52 @@ class ConversationFlowSK:
             service_id="azurechat"
         )
         self.kernel.add_service(self.chat_service)
-        
+
         # Initialize Azure OpenAI client
-        self.client = AzureOpenAI(
-            api_key=self.API_KEY,
-            api_version="2024-12-01-preview",
-            azure_endpoint=self.ENDPOINT
-        )
-        
+        self.client = create_azure_openai_client(api_key=self.API_KEY, endpoint=self.ENDPOINT)
+
         # Set up plugins
         self.conversation_plugin = ConversationPlugin(self.kernel)
         self.kernel.add_plugin(self.conversation_plugin, "conversation")
-        
+
         # Add brand personality plugin
         from .brand_personality import BrandPersonalityPlugin
         self.brand_plugin = BrandPersonalityPlugin(self.kernel, BRAND_NAME)
         self.kernel.add_plugin(self.brand_plugin, "brand")
-        
+
         # Store conversation style for use in prompt templates
         self.conversation_style = CONVERSATION_STYLE or "default"
-        
+
         # Always add conversation style plugin (not conditional)
         from .conversation_style import ConversationStylePlugin, ConversationStyle
         try:
             style_enum = ConversationStyle(self.conversation_style.lower())
         except ValueError:
             style_enum = ConversationStyle.DEFAULT
-        
+
         self.style_plugin = ConversationStylePlugin(self.kernel, style_enum)
         self.kernel.add_plugin(self.style_plugin, "style")
         logger.info(f"Added conversation style plugin: {self.conversation_style}")
-        
+
+        # Cache for brand/style overlays to avoid recomputing on each call
+        self._overlay_cache = {}
+
         # Load prompt template
         if self.PROMPT_PATH:
             self._setup_prompt_function()
 
     def _setup_prompt_function(self) -> None:
-        """Set up the prompt function with brand personality and conversation style integration."""
+        """Register the base (pure) template without brand/style prepends."""
         try:
             if not self.PROMPT_PATH:
                 raise ValueError("PROMPT_PATH must be set in the derived class")
                 
             with open(self.PROMPT_PATH, "r", encoding="utf-8") as f:
                 base_template = f.read()
-            
-            # Get brand instructions and optionally enhance with conversation style
-            if hasattr(self, 'brand_plugin'):
-                brand_instructions = self.brand_plugin.get_brand_instructions()
-                
-                # Apply conversation style to brand instructions only if style plugin exists
-                # Otherwise, use the brand's original style without modification
-                if hasattr(self, 'style_plugin') and self.style_plugin is not None:
-                    enhanced_instructions = self.style_plugin.enhance_brand_with_style(brand_instructions)
-                    prompt_template = f"{enhanced_instructions}\n\n{base_template}"
-                else:
-                    # Use original brand instructions without style modification
-                    prompt_template = f"{brand_instructions}\n\n{base_template}"
-            else:
-                prompt_template = base_template
-            
+
+            # Keep templates pure; brand/style applied at runtime in enhance_prompt_with_brand_and_style
+            prompt_template = base_template
+
             prompt_config = PromptTemplateConfig(
                 template=prompt_template,
                 name="chat",
@@ -426,100 +210,36 @@ class ConversationFlowSK:
             raise
 
     async def enhance_prompt_with_brand_and_style(self, system_prompt: str) -> str:
-        """Enhance system prompt with both brand personality and conversation style."""
+        """Enhance system prompt with both brand personality and conversation style with caching."""
         try:
-            enhanced_prompt = system_prompt
-            
-            # First apply brand enhancement if available
-            if hasattr(self, 'brand_plugin'):
-                args = KernelArguments()
-                args["system_prompt"] = enhanced_prompt
-                result = await self.kernel.invoke(
-                    plugin_name="brand",
-                    function_name="enhance_system_prompt",                
-                    arguments=args
-                )
-                enhanced_prompt = str(result) if result is not None else enhanced_prompt
-            
-            # Then apply conversation style enhancement if available
-            if hasattr(self, 'style_plugin') and self.style_plugin is not None:
-                style_instructions = self.style_plugin.get_style_instructions()
-                if style_instructions:
-                    enhanced_prompt = f"{enhanced_prompt}\n\nCONVERSATION STYLE:\n{style_instructions}"
-            
-            return enhanced_prompt
-            
+            brand = getattr(self.brand_plugin, 'current_brand', None) if hasattr(self, 'brand_plugin') else None
+            style_val = self.style_plugin.current_style.value if hasattr(self, 'style_plugin') and self.style_plugin is not None else "default"
+            tmpl = str(self.PROMPT_PATH) if self.PROMPT_PATH else ""
+            cache_key = build_overlay_cache_key(brand, style_val, tmpl)
+
+            if cache_key not in self._overlay_cache:
+                brand_instr = self.brand_plugin.get_brand_instructions() if hasattr(self, 'brand_plugin') and brand else None
+                style_instr = self.style_plugin.get_style_instructions() if hasattr(self, 'style_plugin') and self.style_plugin is not None else None
+                self._overlay_cache[cache_key] = make_overlay_parts(brand_instr, style_instr)
+
+            brand_prefix, style_suffix = self._overlay_cache[cache_key]
+            return enhance_prompt_with_parts(system_prompt, brand_prefix, style_suffix)
         except Exception:
             logger.warning("Failed to enhance prompt with brand personality and style", exc_info=True)
             return system_prompt
 
-    async def _process_stream(
-        self,
-        completion,
-        delay: float = 0.05
-    ) -> AsyncGenerator[str, None]:
-        """Process streaming response with markdown-friendly chunking."""
-        try:
-            buffer = []
-            
-            for chunk in completion:
-                if delay > 0:
-                    await asyncio.sleep(delay)
-                
-                if (not chunk or not chunk.choices 
-                    or not chunk.choices[0].delta 
-                    or not hasattr(chunk.choices[0].delta, 'content')
-                    or chunk.choices[0].delta.content is None):
-                    continue
-                
-                token = chunk.choices[0].delta.content
-                buffer.append(token)
-                
-                # Simple, markdown-friendly streaming logic
-                should_yield = False
-                buffer_text = "".join(buffer)
-            
-                # Don't break markdown headers - wait for complete line
-                if buffer_text.strip().startswith('#') and not buffer_text.endswith('\n'):
-                    # We're in a header, don't yield until we have the complete line
-                    continue
-                
-                # Don't break markdown formatting like **bold** or *italic*
-                open_bold = buffer_text.count('**') % 2
-                open_italic = buffer_text.count('*') % 2
-                if open_bold != 0 or open_italic != 0:
-                    # We're inside markdown formatting, wait for it to close
-                    if not (token in ['\n', '.', '!', '?']):
-                        continue
-            
-                # Yield on natural sentence boundaries (preserves markdown structure)
-                if token in '.!?\n':
-                    should_yield = True
-                # Yield on paragraph breaks (double newlines)
-                elif token == '\n' and len(buffer) > 1 and buffer[-2] == '\n':
-                    should_yield = True
-                # Yield after complete markdown headers
-                elif token == '\n' and buffer_text.strip().startswith('#'):
-                    should_yield = True
-                # Safety valve for very long content (but much more conservative)
-                elif len(buffer) > 50:  # Increased threshold to avoid breaking markdown
-                    should_yield = True
-                
-                if should_yield:
-                    text = "".join(buffer)
-                    if text:  # Don't filter out any content, including spaces
-                        yield text
-                    buffer = []
-                    
-            # Yield any remaining content
-            if buffer:
-                final_text = "".join(buffer)
-                if final_text:
-                    yield final_text
-                    
-        except Exception as e:
-            logger.error(f"Error in stream processing: {e}")
-            yield f"\nError: {str(e)}"
+    def _build_messages_from_history(self, system_prompt: str, history: List[Message]) -> List[Union[ChatCompletionSystemMessageParam, ChatCompletionUserMessageParam, ChatCompletionAssistantMessageParam]]:
+        messages: List[Union[ChatCompletionSystemMessageParam, ChatCompletionUserMessageParam, ChatCompletionAssistantMessageParam]] = [
+            ChatCompletionSystemMessageParam(role="system", content=str(system_prompt))
+        ]
+        for msg in history:
+            if msg.role == "user":
+                messages.append(ChatCompletionUserMessageParam(role="user", content=msg.content))
+            elif msg.role == "assistant":
+                cleaned_content = clean_assistant_response(msg.content) if msg.content else ""
+                if cleaned_content:
+                    messages.append(ChatCompletionAssistantMessageParam(role="assistant", content=cleaned_content))
+        return messages
 
     @wrap_content_safety
     async def __call__(
@@ -533,20 +253,21 @@ class ConversationFlowSK:
         """Handle a conversation turn."""
         current_order = current_order if current_order is not None else {"items": []}
         effective_style = conversation_style or self.conversation_style
-    
+
+        # Resolve current brand name (if brand plugin is available)
         if hasattr(self, 'brand_plugin'):
             brand_name = self.brand_plugin.get_current_brand()
         else:
             brand_name = None
         current_brand_name = brand_name or (self.brand_plugin.current_brand if hasattr(self, 'brand_plugin') else None)
+
         # Prepare context arguments
         context_args = KernelArguments()
-        
-        # Add conversation_style to all flows
         context_args["conversation_style"] = effective_style
-        context_args["chat_history"] = chat_history
+        # Use the last N messages to keep prompts focused
+        reduced_history = (chat_history or [])[-12:]
+        context_args["chat_history"] = reduced_history
         context_args["brand_name"] = current_brand_name
-        
         try:
             # Handle different flow types based on class name
             if self.__class__.__name__ == "OrderAssistantFlowSK":
@@ -556,11 +277,11 @@ class ConversationFlowSK:
             else:
                 plugin_name = self.PLUGIN_NAME
                 function_name = "chat"
-            
+
             brand_personality = ""
             if hasattr(self, 'brand_plugin') and self.brand_plugin.current_brand:
                 brand_personality = self.brand_plugin.get_brand_instructions()
-            
+
             context_args["brand_personality"] = brand_personality
             # Get system prompt from template and enhance with brand personality
             system_prompt = await self.kernel.invoke(
@@ -569,38 +290,21 @@ class ConversationFlowSK:
                 arguments=context_args
             )
             enhanced_prompt = await self.enhance_prompt_with_brand_and_style(str(system_prompt))
-            
-            # Create messages list with system message and recent context
-            messages: List[Union[ChatCompletionSystemMessageParam, ChatCompletionUserMessageParam, ChatCompletionAssistantMessageParam]] = [
-                ChatCompletionSystemMessageParam(role="system", content=str(enhanced_prompt))
-            ]
 
-            # Get the last 8 messages from chat history
-            recent_history = chat_history[-8:]
-            
-            # Add cleaned conversation history
-            for msg in recent_history:
-                if msg.role == "user":
-                    messages.append(ChatCompletionUserMessageParam(role="user", content=msg.content))
-                elif msg.role == "assistant":
-                    cleaned_content = clean_assistant_response(msg.content) if msg.content else ""
-                    if cleaned_content:
-                        messages.append(ChatCompletionAssistantMessageParam(role="assistant", content=cleaned_content))
+            # Build messages from recent history
+            recent_history = (reduced_history or chat_history)[-8:]
+            messages = self._build_messages_from_history(enhanced_prompt, recent_history)
 
-            # completion parameters
+            # completion parameters (centralized defaults + specific overrides)
+            params = build_chat_params({"max_tokens": self.MAX_TOKENS})
             completion = self.client.chat.completions.create(
                 model=model_deployment or self.DEPLOYMENT_NAME,
                 messages=messages,
-                temperature=0.75,
-                top_p=0.95,
-                max_tokens=self.MAX_TOKENS,
-                presence_penalty=0.6,
-                frequency_penalty=0.3,
-                stream=True
+                **params,
             )
 
             # Process and yield tokens
-            async for token in self._process_stream(completion, delay):
+            async for token in process_chat_stream(completion, delay):
                 yield token
 
         except Exception as e:
@@ -623,7 +327,7 @@ class PreamblePlugin(ConversationPlugin):
         for msg in chat_history:
             content = msg.content
             if msg.role == "assistant":
-                # Use the shared cleaning utility function
+                
                 content = clean_assistant_response(content)
             clean_history.append(f"{msg.role}: {content}")
         
@@ -681,14 +385,10 @@ class OrderAssistantFlowSK(ConversationFlowSK):
             function_name=function_name,
             arguments=arguments
         )
-        
+
         # Clean the response to remove any embedded context
         response_text = str(response)
-        for marker in ["Chat History:", "Current Order:", "Menu:", "Previous conversation:", "Available menu:", "Current order status:"]:
-            if marker in response_text:
-                response_text = response_text.split(marker)[0].strip()
-            
-        return response_text
+        return clean_assistant_response(response_text)
 
 
 class SummaryFlowSK(ConversationFlowSK):

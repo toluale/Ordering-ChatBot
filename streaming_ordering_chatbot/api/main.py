@@ -18,7 +18,8 @@ from streaming_ordering_chatbot.api.content_safety import pre_process_check, wra
 
 from .flows.classification_flow_SK import OrderIntentFlowSK
 from .flows.conversation_flows_SK import OrderAssistantFlowSK, PreambleFlowSK, SummaryFlowSK
-from .flows.conversation_style import ConversationStyle
+from .flows.conversation_style import ConversationStyle, ConversationStylePlugin
+from .utils.styles import parse_style, valid_styles
 from .flows.order_flow_SK import OrderFlowSK
 from .flows.schemas_generalized import LLMOrder
 from .models import Message, OrderState, ScreenData, ScreeningResponse, LLMConfig
@@ -60,7 +61,7 @@ DEPLOYMENT_NAME = get_required_env_var("AZURE_OPENAI_DEPLOYMENT_NAME")
 
 # Get brand name and default conversation style from environment
 BRAND_NAME = get_required_env_var("BRAND_NAME")
-CONVERSATION_STYLE = os.getenv("CONVERSATION_STYLE", "default")
+CONVERSATION_STYLE = parse_style(os.getenv("CONVERSATION_STYLE", "default"))
 
 # Initialize the Semantic Kernel flows with default conversation style
 order_flow = OrderFlowSK(
@@ -74,13 +75,7 @@ _flow_cache = {}
 # Create a factory function to get flows with specific conversation styles
 def get_conversation_flow(flow_class, conversation_style: Optional[str] = None):
     """Get a conversation flow instance with the specified conversation style."""
-    style = conversation_style or CONVERSATION_STYLE
-    
-    # Validate conversation style
-    valid_styles = [style.value for style in ConversationStyle]
-    if style not in valid_styles:
-        logging.warning(f"Invalid conversation style '{style}', falling back to default")
-        style = CONVERSATION_STYLE
+    style = parse_style(conversation_style or CONVERSATION_STYLE)
     
     cache_key = f"{flow_class.__name__}_{style}"
     
@@ -303,54 +298,13 @@ async def list_conversation_styles():
     Returns:
         dict: Dictionary of available conversation styles with descriptions
     """
+    # Source available styles from the plugin to avoid duplication
+    style_plugin = ConversationStylePlugin(kernel=OrderAssistantFlowSK(ENDPOINT, API_KEY, DEPLOYMENT_NAME, BRAND_NAME, CONVERSATION_STYLE).kernel)
     return {
-        "available_styles": {
-            ConversationStyle.DEFAULT.value: "Standard brand personality only",
-            ConversationStyle.CASUAL.value: "Casual, friendly, buddy-like conversation",
-            ConversationStyle.GENZ.value: "Gen Z slang, TikTok vibes, trendy language"
-        },
+        "available_styles": style_plugin.list_available_styles(),
         "default_style": CONVERSATION_STYLE,
         "current_brand": BRAND_NAME
     }
-# new addition for conversation style preview endpoint
-@app.post("/conversation-styles/preview")
-async def preview_conversation_style(
-    style: str,
-    sample_message: str = "Hello! I'd like to order something."
-):
-    """
-    Preview how a conversation style affects responses.
-    
-    Args:
-        style: The conversation style to preview ("default", "casual", "genz")
-        sample_message: Sample message to generate response for
-    
-    Returns:
-        dict: Sample response in the requested style
-    """
-    from fastapi import HTTPException
-    
-    # Validate style
-    valid_styles = [s.value for s in ConversationStyle]
-    if style not in valid_styles:
-        raise HTTPException(status_code=400, detail=f"Invalid style. Choose from: {valid_styles}")
-    
-    # Create sample chat history
-    chat_history = [
-        Message(role="user", content=sample_message)
-    ]
-    
-    # Generate preview response using assistant flow
-    flow = get_conversation_flow(OrderAssistantFlowSK, style)
-    
-    return StreamingResponse(
-        flow(
-            chat_history=chat_history,
-            current_order={},
-            model_deployment=None,
-        ),
-        media_type="text/plain",
-    )
 
 @app.post("/clear-flow-cache")
 async def clear_flow_cache():

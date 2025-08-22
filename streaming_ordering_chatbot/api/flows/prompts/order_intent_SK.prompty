@@ -11,7 +11,7 @@ Analyze this user message and determine if it's about making an order or general
 - Customization requests
 
 **Conversation Intent Indicators:**
-- Questions about ingredients, nutrition, prices
+- Questions about menu items, ingredients, nutrition
 - General inquiries about restaurant policies
 - Complaints or feedback
 - Small talk or greetings

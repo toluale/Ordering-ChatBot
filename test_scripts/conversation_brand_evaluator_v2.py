@@ -10,7 +10,7 @@ from datetime import datetime
 from dataclasses import dataclass
 from enum import Enum
 
-from openai import AzureOpenAI
+from streaming_ordering_chatbot.api.utils.azure_client import create_azure_openai_client
 
 from semantic_kernel.functions.kernel_arguments import KernelArguments
 
@@ -116,11 +116,11 @@ class BrandedChatbotEvaluator:
         self.deployment_name = str(deployment_name)
         self.api_version = api_version or self.DEFAULT_API_VERSION
         
-        # Initialize Azure OpenAI client
-        self.client = AzureOpenAI(
-            azure_endpoint=self.endpoint,
+        # Initialize Azure OpenAI client via shared factory
+        self.client = create_azure_openai_client(
             api_key=self.api_key,
-            api_version=self.api_version
+            endpoint=self.endpoint,
+            api_version=self.api_version,
         )
         
         # Set up metrics
@@ -144,22 +144,22 @@ class BrandedChatbotEvaluator:
         """Initialize conversation flows with Azure OpenAI credentials and brand configuration."""
         self.flows = {
             "preamble": PreambleFlowSK(
-                endpoint=self.endpoint,
-                api_key=self.api_key,
-                deployment_name=self.deployment_name,
-                brand_name=brand_name
+                ENDPOINT=self.endpoint,
+                API_KEY=self.api_key,
+                DEPLOYMENT_NAME=self.deployment_name,
+                BRAND_NAME=brand_name
             ),
             "order": OrderAssistantFlowSK(
-                endpoint=self.endpoint,
-                api_key=self.api_key,
-                deployment_name=self.deployment_name,
-                brand_name=brand_name
+                ENDPOINT=self.endpoint,
+                API_KEY=self.api_key,
+                DEPLOYMENT_NAME=self.deployment_name,
+                BRAND_NAME=brand_name
             ),
             "summary": SummaryFlowSK(
-                endpoint=self.endpoint,
-                api_key=self.api_key,
-                deployment_name=self.deployment_name,
-                brand_name=brand_name
+                ENDPOINT=self.endpoint,
+                API_KEY=self.api_key,
+                DEPLOYMENT_NAME=self.deployment_name,
+                BRAND_NAME=brand_name
             )
         }
         
@@ -235,6 +235,8 @@ class BrandedChatbotEvaluator:
             
             for metric in self.metrics:
                 try:
+                    from streaming_ordering_chatbot.api.utils.azure_client import build_chat_params
+                    params = build_chat_params({"temperature": 0.7, "max_tokens": 500})
                     response = self.client.chat.completions.create(
                         model=self.deployment_name,
                         messages=[
@@ -247,9 +249,7 @@ class BrandedChatbotEvaluator:
                                 "content": metric.format_conversation(conversation)
                             }
                         ],
-                        temperature=0.7,
-                        top_p=0.95,
-                        max_tokens=500
+                        **params,
                     )
                     
                     content = response.choices[0].message.content

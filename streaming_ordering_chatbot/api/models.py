@@ -1,6 +1,7 @@
 from typing import Literal, Optional
 
 from pydantic import BaseModel, field_validator
+from streaming_ordering_chatbot.api.utils.styles import valid_styles, parse_style
 
 from streaming_ordering_chatbot.api.flows.schemas_generalized import LLMItem, LLMOrder
 
@@ -9,13 +10,14 @@ class LLMConfig(BaseModel):
     conversation_style: Optional[str] = "default"  # "default", "casual", or "genz"
     deployment: Optional[str] = None
 
-    @field_validator('conversation_style')     # new addition for conversation style validation
+    @field_validator('conversation_style')     # for conversation style validation
     def validate_conversation_style(cls, v):
-        if v is not None:
-            valid_styles = ["default", "casual", "genz"]
-            if v not in valid_styles:
-                raise ValueError(f"Invalid conversation style. Must be one of: {valid_styles}")
-        return v or "default"
+        if v is None:
+            return parse_style(None)
+        v_lower = v.lower()
+        if v_lower not in valid_styles():
+            raise ValueError(f"Invalid conversation style. Must be one of: {valid_styles()}")
+        return v_lower
 
 class Message(BaseModel):
     role: Literal["user", "assistant", "system"]

@@ -5,6 +5,7 @@ from typing import Dict, Optional
 from semantic_kernel import Kernel
 from semantic_kernel.functions.kernel_function_decorator import kernel_function
 from semantic_kernel.functions.kernel_arguments import KernelArguments
+from .menu_manager import get_menu_manager
 
 
 class BrandPersonalityPlugin:
@@ -14,7 +15,12 @@ class BrandPersonalityPlugin:
         """Initialize the brand personality plugin."""
         self.kernel = kernel
         self._load_brand_configs()
-        self.current_brand = brand_name if brand_name in self.brand_configs else None
+        self.menu_manager = get_menu_manager()
+        # Prefer explicit brand_name if valid; else follow MenuManager's current brand
+        if brand_name and brand_name in self.brand_configs:
+            self.current_brand = brand_name
+        else:
+            self.current_brand = self.menu_manager.get_current_brand()
 
     def _load_brand_configs(self):
         """Load brand configurations from JSON file."""
@@ -33,13 +39,19 @@ class BrandPersonalityPlugin:
         """
         if brand_name in self.brand_configs:
             self.current_brand = brand_name
+            # Keep MenuManager in sync to avoid divergent state
+            try:
+                self.menu_manager.set_current_brand(brand_name)
+            except Exception:
+                pass
             return True
         return False   
      
     @kernel_function(description="Get brand personality instructions", name="get_brand_instructions")
     def get_brand_instructions(self, brand_name: Optional[str] = None) -> str:
         """Get the personality instructions for a specific brand."""
-        brand_name = brand_name or self.current_brand
+        # Resolve brand: prefer provided, then MenuManager, then local
+        brand_name = brand_name or self.menu_manager.get_current_brand() or self.current_brand
         if not brand_name:
             return "No brand personality selected."
             
@@ -103,15 +115,21 @@ class BrandPersonalityPlugin:
 
     @kernel_function(description="Get the current brand personality", name="get_current_brand")
     def get_current_brand(self) -> str:
-        """Get information about the currently selected brand."""
-        if not self.current_brand:
+        """Get information about the currently selected brand (detailed)."""
+        # Prefer MenuManager's brand if set
+        brand_name = self.menu_manager.get_current_brand() or self.current_brand
+        if not brand_name:
             return "No brand personality currently selected."
-            
-        brand = self.brand_configs.get(self.current_brand, {})
+        brand = self.brand_configs.get(brand_name, {})
         if not brand:
-            return f"Error: Selected brand '{self.current_brand}' not found in configurations."
-            
+            return f"Error: Selected brand '{brand_name}' not found in configurations."
         return f"Current brand: {brand['name']}\nTone: {brand['tone']}\nStyle: {brand['style']}"
+
+    @kernel_function(description="Get the current brand name only", name="get_current_brand_name")
+    def get_current_brand_name(self) -> str:
+        """Return only the brand name string, or empty if none set."""
+        brand_name = self.menu_manager.get_current_brand() or self.current_brand
+        return brand_name or ""
     
 
     '''

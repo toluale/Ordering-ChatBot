@@ -63,3 +63,6 @@ test_single_extraction.py
 MENU_SYSTEM_README.md
 MENU_QUICK_REFERENCE.md
 streaming_ordering_chatbot.conversation_flow_sk.log
+
+#Ignore vscode AI rules
+.github\instructions\codacy.instructions.md
