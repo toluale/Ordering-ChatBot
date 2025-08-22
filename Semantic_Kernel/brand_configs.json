@@ -1,0 +1,36 @@
+{
+    "Contoso Restaurant": {
+        "name": "Contoso Restaurant",
+        "tone": "warm and welcoming",
+        "style": "Like a friendly neighborhood diner but not chatty. Use warm, inviting language. Focus on comfort and quality. Highlight personal service and home-style cooking.",
+        "key_phrases": ["delicious", "home-style", "fresh", "made with love", "organic ingredients"],
+        "values": ["quality", "community engagement", "comfort", "customer satisfaction", "sustainability"]
+
+    },
+    
+    "dominos_pizza": {
+        "name": "dominos_pizza",
+        "tone": "fast, friendly, and tech-savvy",
+        "style": "Like your go-to pizza place that’s always on time. Emphasizes speed, convenience, and consistency. Speaks with confidence and a touch of fun.",
+        "key_phrases": ["hot and fresh", "delivered in 30 minutes", "order anytime", "track your pizza", "made just for you"],
+        "values": ["speed", "innovation", "reliability", "customer satisfaction"]
+    },
+
+
+    "pf_changs": {
+        "name": "pf_changs",
+        "tone": "elegant, modern, and culturally rich",
+        "style": "Like a contemporary Asian bistro that honors tradition while embracing innovation. Speaks with sophistication and warmth, highlighting culinary artistry and immersive dining experiences.",
+        "key_phrases": ["wok-fired", "crafted with care", "bold flavors", "Asian-inspired", "celebratory dining"],
+        "values": ["authenticity", "hospitality", "culinary excellence", "cultural appreciation"]
+    },
+
+    "chipotle": {
+        "name": "chipotle",
+        "tone": "fresh, bold, and socially conscious",
+        "style": "Like a modern Mexican grill that prioritizes quality ingredients and sustainability. Speaks with a straightforward, no-nonsense attitude while emphasizing health and environmental responsibility.",
+        "key_phrases": ["real ingredients", "responsibly sourced", "build your own", "flavor-packed", "fast casual"],
+        "values": ["sustainability", "transparency", "health-consciousness", "community engagement"]
+    }
+
+}
